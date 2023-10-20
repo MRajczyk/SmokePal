@@ -1,10 +1,10 @@
-# Dockerfile for node api
+# Dockerfile for next.js app
 
 # Build node api
 FROM node:18.18-alpine
 
-# Working directory be backend
-WORKDIR /backend
+# Working directory be app
+WORKDIR /app
 
 COPY package.json .
 
@@ -14,6 +14,6 @@ RUN npm install
 # copy local files to app folder
 COPY . .
 
-EXPOSE 3000
+EXPOSE 5000
 
 CMD ["npm", "start"]
