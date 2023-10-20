@@ -2,8 +2,9 @@ version: '3.1'
 services :
   db:
     image: postgres:10-alpine
+    container_name: postgres
     ports:
-      - "5432:5432"
+      - 5432:5432
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
@@ -14,10 +15,13 @@ services :
   admin:
     image: adminer
     restart: always
+    container_name: adminer
     depends_on: 
       - db
     ports:
       - 8080:8080
+    networks:
+      - app-network
       
   backend:
     build:
@@ -26,7 +30,7 @@ services :
     container_name: express-backend
     restart: always
     ports:
-      - "5000:5000"
+      - 3000:3000
     depends_on:
       - db
     networks:
