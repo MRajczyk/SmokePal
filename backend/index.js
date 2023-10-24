@@ -6,7 +6,7 @@ const wsPort = 7071;
 const mqtt = require('mqtt');
 const WebSocket = require('ws');
 
-const clients = [];
+let clients = [];
 
 let wss;
 const mqttClient = mqtt.connect('mqtt://' + process.env.LOCAL_IP);
@@ -18,7 +18,7 @@ mqttClient.on('connect', () => {
     wss.on('connection', (ws) => {
         clients.push(ws);
         ws.on('close', () => {
-            clients.delete(ws);
+            clients = clients.filter(x => x !== ws)
         });
     });
 });
@@ -47,6 +47,10 @@ app.post('/api/start', (req, res) => {
 })
 app.post('/api/stop', (req, res) => {
     console.log('stopping all websockets connections');
+    clients.forEach(ws => {
+        ws.close();
+    })
+    clients = [];
     savingDataToDatabaseFlag = false;
     mqttClient.unsubscribe('esp8266_data');
     res.send('Unsubscribed to topic \"esp8266_data\"');
