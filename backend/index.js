@@ -6,6 +6,14 @@ const wsPort = 7071;
 const mqtt = require('mqtt');
 const WebSocket = require('ws');
 
+const {PrismaClient} = require('@prisma/client');
+const func = async () => {
+    const prisma = new PrismaClient();
+    const users = await prisma.user.findMany();
+    console.log(users)
+};
+func();
+
 let clients = [];
 
 let wss;
