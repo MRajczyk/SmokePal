@@ -15,6 +15,11 @@ enum Role {
   ADMIN
 }
 
+enum ReadingType {
+  TEMP
+  HUM
+}
+
 model User {
   id             Int              @id @default(autoincrement())
   username       String           @unique
@@ -30,7 +35,8 @@ model SmokingSensorReading {
   sessionId  Int
   sensorName String
   value      Float
-  timestamp  DateTime
+  type       ReadingType
+  timestamp  DateTime @default(now())
 }
 
 model SmokingSessionPhoto {
@@ -44,9 +50,9 @@ model SmokingSessionPhoto {
 model SmokingSession {
   id             Int                    @id @default(autoincrement())
   sensorReadings SmokingSensorReading[]
-  photo          SmokingSessionPhoto[]
-  author         User                   @relation(fields: [authorId], references: [id])
-  authorId       Int
-  dateStart  DateTime
-  dateEnd  DateTime
+  photos          SmokingSessionPhoto[]
+  author         User?                   @relation(fields: [authorId], references: [id])
+  authorId       Int?
+  dateStart  DateTime @default(now())
+  dateEnd  DateTime?
 }
