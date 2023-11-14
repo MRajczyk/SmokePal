@@ -9,3 +9,50 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ReadingType {
+  TEMP
+  HUM
+}
+
+model User {
+  id             Int              @id @default(autoincrement())
+  username       String           @unique
+  email          String           @unique
+  password       String
+  role           Role
+  SmokingSession SmokingSession[]
+}
+
+model SmokingSensorReading {
+  id         Int            @id @default(autoincrement())
+  session    SmokingSession @relation(fields: [sessionId], references: [id])
+  sessionId  Int
+  sensorName String
+  value      Float
+  type       ReadingType
+  timestamp  DateTime @default(now())
+}
+
+model SmokingSessionPhoto {
+  id        Int            @id @default(autoincrement())
+  session   SmokingSession @relation(fields: [sessionId], references: [id])
+  sessionId Int
+  mime      String
+  data      Bytes
+}
+
+model SmokingSession {
+  id             Int                    @id @default(autoincrement())
+  sensorReadings SmokingSensorReading[]
+  photos          SmokingSessionPhoto[]
+  author         User?                   @relation(fields: [authorId], references: [id])
+  authorId       Int?
+  dateStart  DateTime @default(now())
+  dateEnd  DateTime?
+}
