@@ -42,14 +42,16 @@ mqttClient.on("message", async (topic, message) => {
           console.log("creating sensorReading: ", {
             sessionId: currentSessionId,
             sensorName: reading.sensorName,
-            value: reading.reading,
+            //check whether adding error handling is advisable
+            value: Number.parseFloat(reading.reading),
             type: reading.type == "TEMP" ? ReadingType.TEMP : ReadingType.HUM,
           });
           await prisma.smokingSensorReading.create({
             data: {
               sessionId: currentSessionId,
               sensorName: reading.sensorName,
-              value: reading.reading,
+              //check whether adding error handling is advisable
+              value: Number.parseFloat(reading.reading),
               type: reading.type == "TEMP" ? ReadingType.TEMP : ReadingType.HUM,
             },
           });
@@ -63,7 +65,8 @@ mqttClient.on("message", async (topic, message) => {
         console.log("creating sensorReading: ", {
           sessionId: currentSessionId,
           sensorName: parsedMessage.sensorName,
-          value: parsedMessage.reading,
+          //check whether adding error handling is advisable
+          value: Number.parseFloat(parsedMessage.reading),
           type:
             parsedMessage.type == "TEMP" ? ReadingType.TEMP : ReadingType.HUM,
         });
@@ -71,7 +74,8 @@ mqttClient.on("message", async (topic, message) => {
           data: {
             sessionId: currentSessionId,
             sensorName: parsedMessage.sensorName,
-            value: parsedMessage.reading,
+            //check whether adding error handling is advisable
+            value: Number.parseFloat(parsedMessage.reading),
             type:
               parsedMessage.type == "TEMP" ? ReadingType.TEMP : ReadingType.HUM,
           },
@@ -104,26 +108,26 @@ app.post("/api/start", async (req, res) => {
     if (err) {
       return res
         .status(500)
-        .send('An error occured while subscribing to topic "esp8266_data"');
+        .send("An error occured while subscribing to topic esp8266_data");
     }
   });
-  savingDataFlag = true;
   try {
     const newSession = await prisma.smokingSession.create({
       data: { authorId: req.body.authorId },
     });
     currentSessionId = newSession.id;
-    console.log(savingDataFlag, currentSessionId);
     if (!currentSessionId) {
       return res.status(500).send("Error creating session");
     }
+    savingDataFlag = true;
+    console.log(savingDataFlag, currentSessionId);
   } catch (e) {
     console.log(e.message);
     savingDataFlag = false;
     currentSessionId = undefined;
     return res.status(500).send("Error creating session");
   }
-  res.status(200).send('Successfully subscribed to topic "esp8266_data"');
+  res.status(200).send("Successfully subscribed to topic esp8266_data");
 });
 app.post("/api/stop", (req, res) => {
   //TODO: think about any kind of identity validation, maybe decode jwt token, tbd
@@ -134,7 +138,7 @@ app.post("/api/stop", (req, res) => {
   clients = [];
   savingDataFlag = false;
   mqttClient.unsubscribe("esp8266_data");
-  res.send('Unsubscribed to topic "esp8266_data"');
+  res.send("Unsubscribed to topic esp8266_data");
 });
 
 app.listen(appPort, () => {
