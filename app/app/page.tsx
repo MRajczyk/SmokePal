@@ -9,7 +9,7 @@ export default async function Home() {
       <LoginButton />
       &nbsp;
       <LogoutButton />
-      <p className="font-poppins">Hello world, yes!</p>
+      <p>Hello world, yes!</p>
       <pre>{JSON.stringify(session)}</pre>
       {session ? <p>Logged in</p> : <p>Not logged in</p>}
     </main>
