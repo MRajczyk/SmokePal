@@ -1,10 +1,10 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { registerUser } from "@/app/actions/register";
 
 const RegisterSchema = z
   .object({
@@ -27,9 +27,7 @@ const RegisterSchema = z
 
 type RegisterSchemaType = z.infer<typeof RegisterSchema>;
 
-export default function LoginPage() {
-  const router = useRouter();
-
+export default function RegisterPage() {
   const {
     watch,
     trigger,
@@ -42,7 +40,8 @@ export default function LoginPage() {
   });
   //todo: fire server action for register form
   const onSubmit = async (data: RegisterSchemaType) => {
-    console.log(data);
+    const res = await registerUser(data);
+    console.log(res);
   };
 
   useEffect(() => {
@@ -59,7 +58,7 @@ export default function LoginPage() {
     <div>
       <form className="flex flex-col gap-1" onSubmit={handleSubmit(onSubmit)}>
         <input {...register("email")} placeholder="email" />
-        <p>{errors.email?.message}</p>
+        <p className="text-red-600">{errors.email?.message}</p>
 
         <input
           type="password"
