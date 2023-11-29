@@ -1,0 +1,4 @@
+run mosquitto as a docker container
+
+mapping 1883:1883 should expose docker to all host machine's interfaces (ip 0.0.0.0) also making it visible on the whole wifi network
+to test.
