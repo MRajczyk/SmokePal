@@ -8,8 +8,10 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 const LoginSchema = z.object({
-  email: z.string(),
-  password: z.string().min(5),
+  email: z.string().email().min(1, "Email address is required!"),
+  password: z
+    .string()
+    .min(5, "Password needs to be at least 5 characters long!"),
 });
 
 type LoginSchemaType = z.infer<typeof LoginSchema>;
