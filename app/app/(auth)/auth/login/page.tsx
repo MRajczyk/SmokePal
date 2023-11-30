@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const LoginSchema = z.object({
   email: z.string().email().min(1, "Email address is required!"),
@@ -47,6 +48,7 @@ export default function LoginPage() {
         <p>{errors.password?.message}</p>
 
         <Button type="submit"> Login</Button>
+        <Link href="/auth/register">Go to register</Link>
       </form>
     </div>
   );
