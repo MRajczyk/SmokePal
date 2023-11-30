@@ -23,18 +23,18 @@ services:
     networks:
       - app-network
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: express-backend
-    restart: always
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
-    networks:
-      - app-network
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: express-backend
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - app-network
 
   # app:
   #   build:

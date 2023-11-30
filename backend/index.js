@@ -106,9 +106,7 @@ app.post("/api/start", async (req, res) => {
   console.log("starting to pass all incoming data through websockets");
   mqttClient.subscribe("esp8266_data", (err) => {
     if (err) {
-      return res
-        .status(500)
-        .send("An error occured while subscribing to topic esp8266_data");
+      return res.status(500);
     }
   });
   try {
@@ -127,7 +125,7 @@ app.post("/api/start", async (req, res) => {
     currentSessionId = undefined;
     return res.status(500).send("Error creating session");
   }
-  res.status(200).send("Successfully subscribed to topic esp8266_data");
+  return res.status(200).send("Successfully subscribed to topic esp8266_data");
 });
 app.post("/api/stop", (req, res) => {
   //TODO: think about any kind of identity validation, maybe decode jwt token, tbd
@@ -138,7 +136,7 @@ app.post("/api/stop", (req, res) => {
   clients = [];
   savingDataFlag = false;
   mqttClient.unsubscribe("esp8266_data");
-  res.send("Unsubscribed to topic esp8266_data");
+  return res.send("Unsubscribed to topic esp8266_data");
 });
 
 app.listen(appPort, () => {
