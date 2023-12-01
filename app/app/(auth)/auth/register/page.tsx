@@ -1,14 +1,16 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { registerUser } from "@/app/actions/register";
+import Link from "next/link";
 
 const RegisterSchema = z
   .object({
     email: z.string().email().min(1, "Email address is required!"),
+    username: z.string().min(1, "Username is required!"),
     passwordFirst: z
       .string()
       .min(5, "Password needs to be at least 5 characters long!"),
@@ -41,7 +43,11 @@ export default function RegisterPage() {
   //todo: fire server action for register form
   const onSubmit = async (data: RegisterSchemaType) => {
     const res = await registerUser(data);
-    console.log(res);
+    if (res.success) {
+      alert("Registered successfully!");
+    } else {
+      alert("Could not register user");
+    }
   };
 
   useEffect(() => {
@@ -60,6 +66,9 @@ export default function RegisterPage() {
         <input {...register("email")} placeholder="email" />
         <p className="text-red-600">{errors.email?.message}</p>
 
+        <input {...register("username")} placeholder="username" />
+        <p className="text-red-600">{errors.username?.message}</p>
+
         <input
           type="password"
           {...register("passwordFirst")}
@@ -74,7 +83,8 @@ export default function RegisterPage() {
         />
         <p className="text-red-600">{errors.passwordSecond?.message}</p>
 
-        <Button type="submit"> Login</Button>
+        <Button type="submit">Register</Button>
+        <Link href="/auth/login">Go to login</Link>
       </form>
     </div>
   );
