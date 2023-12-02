@@ -1,8 +1,14 @@
 const { ReadingType } = require("@prisma/client");
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 const app = express();
 app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:5000",
+  })
+);
 const appPort = 3000;
 const wsPort = 7071;
 const mqtt = require("mqtt");
@@ -100,7 +106,11 @@ app.post("/api/start", async (req, res) => {
   //TODO: think about any kind of identity validation, maybe decode jwt token, tbd
   if (!req.body.authorId) {
     console.log(req.body);
-    return res.status(404).send("Forbidden");
+    return res.status(404).send(
+      JSON.stringify({
+        message: "Forbidden",
+      })
+    );
   }
 
   console.log("starting to pass all incoming data through websockets");
@@ -115,7 +125,11 @@ app.post("/api/start", async (req, res) => {
     });
     currentSessionId = newSession.id;
     if (!currentSessionId) {
-      return res.status(500).send("Error creating session");
+      return res.status(500).send(
+        JSON.stringify({
+          message: "Error creating session",
+        })
+      );
     }
     savingDataFlag = true;
     console.log(savingDataFlag, currentSessionId);
@@ -123,20 +137,33 @@ app.post("/api/start", async (req, res) => {
     console.log(e.message);
     savingDataFlag = false;
     currentSessionId = undefined;
-    return res.status(500).send("Error creating session");
+    return res.status(500).send(
+      JSON.stringify({
+        message: "Error creating session",
+      })
+    );
   }
-  return res.status(200).send("Successfully subscribed to topic esp8266_data");
+  return res.status(200).send(
+    JSON.stringify({
+      message: "Successfully subscribed to topic esp8266_data",
+    })
+  );
 });
 app.post("/api/stop", (req, res) => {
   //TODO: think about any kind of identity validation, maybe decode jwt token, tbd
   console.log("stopping all websockets connections");
+  //TODO: I don't think closing should be handled this way, but dunno - think about mechanism to resume broadcasting
   clients.forEach((ws) => {
     ws.close();
   });
   clients = [];
   savingDataFlag = false;
   mqttClient.unsubscribe("esp8266_data");
-  return res.send("Unsubscribed to topic esp8266_data");
+  return res.status(200).send(
+    JSON.stringify({
+      message: "Unsubscribed to topic esp8266_data",
+    })
+  );
 });
 
 app.listen(appPort, () => {

@@ -34,7 +34,8 @@ export default function LoginPage() {
     if (res?.ok) {
       router.push("/", { scroll: false });
     } else {
-      alert(res?.error ?? "And error occured.");
+      console.log(res?.error);
+      alert(res?.error ?? "An error occured.");
     }
   };
 
@@ -44,7 +45,11 @@ export default function LoginPage() {
         <input {...register("email")} placeholder="email" />
         <p>{errors.email?.message}</p>
 
-        <input {...register("password")} placeholder="password" />
+        <input
+          type="password"
+          {...register("password")}
+          placeholder="password"
+        />
         <p>{errors.password?.message}</p>
 
         <Button type="submit"> Login</Button>

@@ -1,7 +1,23 @@
 import prisma from "@/lib/prisma";
 import { compareSync } from "bcrypt";
-import { type NextAuthOptions } from "next-auth";
+import { type NextAuthOptions, type DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { Role } from "@prisma/client";
+
+declare module "next-auth" {
+  /**
+   * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
+   */
+  interface User {
+    id: string;
+    email: string;
+    role: Role;
+  }
+
+  interface Session extends DefaultSession {
+    user: User;
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   pages: {
@@ -61,6 +77,7 @@ export const authOptions: NextAuthOptions = {
         user: {
           ...session.user,
           id: token.id,
+          role: token.role,
         },
       };
     },
@@ -70,6 +87,7 @@ export const authOptions: NextAuthOptions = {
         return {
           ...token,
           id: user.id,
+          role: user.role,
         };
       }
       return token;
