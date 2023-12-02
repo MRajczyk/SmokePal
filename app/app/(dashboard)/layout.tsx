@@ -2,6 +2,7 @@ import Provider from "../context/client-provider";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/server/auth";
 import { redirect } from "next/navigation";
+import QueryClientProviderWrapper from "../context/queryClient-provider";
 
 export default async function DashboardLayout({
   children,
@@ -14,7 +15,9 @@ export default async function DashboardLayout({
   }
   return (
     <div>
-      <Provider session={session}>{children}</Provider>
+      <QueryClientProviderWrapper>
+        <Provider session={session}>{children}</Provider>
+      </QueryClientProviderWrapper>
     </div>
   );
 }
