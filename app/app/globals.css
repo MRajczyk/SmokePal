@@ -3,10 +3,14 @@
 @tailwind utilities;
 
 :root {
+  height: 100%;
+  width: 100%;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
+    height: 100%;
+    width: 100%;
   }
 }
 
