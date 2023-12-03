@@ -104,31 +104,29 @@ export default function Home() {
   );
 
   return (
-    <main>
-      <div>
-        <Button
-          variant="default"
-          onClick={() => {
-            debounceStartSmokingSession();
-          }}
-        >
-          Start
-        </Button>
-        <Button variant="default" onClick={() => debounceStopSmokingSession()}>
-          Stop
-        </Button>
-        <Button variant="destructive" onClick={() => signOut()}>
-          Log out
-        </Button>
-        <br />
-        <span>The WebSocket is currently {connectionStatus}</span>
-        {lastMessage ? <span>Last message: {lastMessage.data}</span> : null}
-        <ul>
-          {messageHistory.map((message, idx) => (
-            <span key={idx}>{message ? message.data : null}</span>
-          ))}
-        </ul>
-      </div>
-    </main>
+    <div>
+      <Button
+        variant="default"
+        onClick={() => {
+          debounceStartSmokingSession();
+        }}
+      >
+        Start
+      </Button>
+      <Button variant="default" onClick={() => debounceStopSmokingSession()}>
+        Stop
+      </Button>
+      <Button variant="destructive" onClick={() => signOut()}>
+        Log out
+      </Button>
+      <br />
+      <span>The WebSocket is currently {connectionStatus}</span>
+      {lastMessage ? <span>Last message: {lastMessage.data}</span> : null}
+      <ul>
+        {messageHistory.map((message, idx) => (
+          <span key={idx}>{message ? message.data : null}</span>
+        ))}
+      </ul>
+    </div>
   );
 }
