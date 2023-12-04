@@ -21,7 +21,7 @@ export default async function DashboardLayout({
 }) {
   const session = await getServerSession(authOptions);
   if (!session) {
-    // redirect("/auth/login");
+    redirect("/auth/login");
   }
   return (
     <main className="w-full h-full">
@@ -72,11 +72,11 @@ export default async function DashboardLayout({
                     className="cursor-pointer"
                   ></Image>
                 </Link>
-                <LogoutButton className="w-12 h-12" href={{ pathname: "/" }}>
+                <LogoutButton>
                   <Image
                     src={logoutIcon}
                     alt="Logout icon"
-                    className="cursor-pointer w-full h-full"
+                    className="cursor-pointer w-12 h-12"
                   ></Image>
                 </LogoutButton>
               </div>
