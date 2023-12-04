@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import useWebSocket, { ReadyState } from "react-use-websocket";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import debounce from "just-debounce-it";
 import { SUBMIT_DEBOUNCE_MS } from "@/lib/utils";
 import { useMutation } from "react-query";
@@ -115,9 +115,6 @@ export default function Home() {
       </Button>
       <Button variant="default" onClick={() => debounceStopSmokingSession()}>
         Stop
-      </Button>
-      <Button variant="destructive" onClick={() => signOut()}>
-        Log out
       </Button>
       <br />
       <span>The WebSocket is currently {connectionStatus}</span>

@@ -2,8 +2,10 @@ import Provider from "../context/client-provider";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/server/auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import QueryClientProviderWrapper from "../context/queryclient-provider";
 import Image from "next/image";
+import { LogoutButton } from "@/components/ui/logoutButton";
 import smokepalLogo from "@/public/assets/logo.svg";
 import addIcon from "@/public/assets/add_placeholder.svg";
 import historyIcon from "@/public/assets/history_placeholder.svg";
@@ -33,50 +35,50 @@ export default async function DashboardLayout({
                 className="cursor-pointer"
               ></Image>
               <div className="flex flex-col justify-center items-center gap-[10px]">
-                <div className="w-12 h-12">
+                <Link className="w-12 h-12" href={{ pathname: "/" }}>
                   <Image
                     src={homeIcon}
                     alt="Home icon"
                     className="cursor-pointer"
                   ></Image>
-                </div>
-                <div className="w-12 h-12">
+                </Link>
+                <Link className="w-12 h-12" href={{ pathname: "/new-session" }}>
                   <Image
                     src={addIcon}
                     alt="Add icon"
                     className="cursor-pointer"
                   ></Image>
-                </div>
-                <div className="w-12 h-12">
+                </Link>
+                <Link className="w-12 h-12" href={{ pathname: "/history" }}>
                   <Image
                     src={historyIcon}
                     alt="History icon"
                     className="cursor-pointer"
                   ></Image>
-                </div>
-                <div className="w-12 h-12">
+                </Link>
+                <Link className="w-12 h-12" href={{ pathname: "/recipes" }}>
                   <Image
                     src={recipesIcon}
                     alt="Recipes icon"
                     className="cursor-pointer"
                   ></Image>
-                </div>
+                </Link>
               </div>
               <div className="flex flex-col justify-center items-center gap-[10px] mb-10  ">
-                <div className="w-12 h-12">
+                <Link className="w-12 h-12" href={{ pathname: "/settings" }}>
                   <Image
                     src={settingsIcon}
                     alt="Settings icon"
                     className="cursor-pointer"
                   ></Image>
-                </div>
-                <div className="w-12 h-12">
+                </Link>
+                <LogoutButton className="w-12 h-12" href={{ pathname: "/" }}>
                   <Image
                     src={logoutIcon}
                     alt="Logout icon"
-                    className="cursor-pointer"
+                    className="cursor-pointer w-full h-full"
                   ></Image>
-                </div>
+                </LogoutButton>
               </div>
             </div>
             <div className="bg-white w-full">{children}</div>
