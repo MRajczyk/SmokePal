@@ -13,6 +13,7 @@ import defaultResponseSchema from "@/schemas/defaultResponseSchema";
 export default function Home() {
   const { data: session } = useSession();
   const socketUrl = "ws://localhost:7071";
+
   const [messageHistory, setMessageHistory] = useState([]);
   const { /*sendMessage,*/ lastMessage, readyState } = useWebSocket(socketUrl, {
     shouldReconnect: (closeEvent) => true,
