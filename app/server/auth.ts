@@ -9,8 +9,9 @@ declare module "next-auth" {
    * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
    */
   interface User {
-    id: string;
+    id: number;
     email: string;
+    username: string;
     role: Role;
   }
 
@@ -62,9 +63,10 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: user.id + "",
+          id: user.id,
           email: user.email,
           role: user.role,
+          username: user.username,
         };
       },
     }),
@@ -78,16 +80,27 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           id: token.id,
           role: token.role,
+          username: token.username,
         },
       };
     },
-    jwt: ({ token, user }) => {
-      console.log("jwt callback", { token, user });
+    jwt: ({ token, user, trigger, session }) => {
+      console.log("jwt callback", token, user, trigger, session);
+      if (trigger === "update" && session?.username) {
+        //todo: maybe validation or sth in the future
+        token.username = session.username;
+      }
+      if (trigger === "update" && session?.email) {
+        //todo: maybe validation or sth in the future
+        token.email = session.email;
+      }
+
       if (user) {
         return {
           ...token,
           id: user.id,
           role: user.role,
+          username: user.username,
         };
       }
       return token;

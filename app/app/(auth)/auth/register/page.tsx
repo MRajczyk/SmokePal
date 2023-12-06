@@ -40,7 +40,7 @@ export default function RegisterPage() {
     mode: "all",
     resolver: zodResolver(RegisterSchema),
   });
-  //todo: fire server action for register form
+
   const onSubmit = async (data: RegisterSchemaType) => {
     const res = await registerUser(data);
     if (res.success) {
@@ -56,7 +56,6 @@ export default function RegisterPage() {
       void trigger(["passwordFirst", "passwordSecond"]);
     });
 
-    // Cleanup the subscription on unmount.
     return () => subscription.unsubscribe();
   }, [watch, trigger]);
 

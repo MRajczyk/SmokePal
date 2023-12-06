@@ -106,6 +106,7 @@ export default function Home() {
 
   return (
     <div>
+      <div>HomePage Works!</div>
       <Button
         variant="default"
         onClick={() => {
