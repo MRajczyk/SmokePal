@@ -29,7 +29,7 @@ const ProfileMenu = () => {
           <b>Settings</b>
         </h1>
         {settingsTabs.map(({ title, href }) => (
-          <ProfileTab title={title} href={href} />
+          <ProfileTab title={title} href={href} key={title} />
         ))}
       </div>
     </>
