@@ -1,13 +1,8 @@
 "use server";
 import prisma from "@/lib/prisma";
-import { z } from "zod";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/server/auth";
-
-const UsernameSchema = z.object({
-  username: z.string().min(1, "Username is required!"),
-});
-type UsernameSchemaType = z.infer<typeof UsernameSchema>;
+import { UsernameSchema, type UsernameSchemaType } from "@/schemas/UserSchemas";
 
 export async function changeUsername(data: UsernameSchemaType) {
   const session = await getServerSession(authOptions);
