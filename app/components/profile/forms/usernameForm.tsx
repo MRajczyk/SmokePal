@@ -36,7 +36,7 @@ const ChangeUsernameForm = () => {
   return (
     <div className="flex flex-col items-center justify-center w-[200px] h-[200px] bg-orange-300 rounded-xl">
       <form className="flex flex-col gap-1" onSubmit={handleSubmit(onSubmit)}>
-        <h3>Current username:</h3>
+        <h3 className="text-center">Current username:</h3>
         <p className="text-center">
           <b>{session?.user.username}</b>
         </p>

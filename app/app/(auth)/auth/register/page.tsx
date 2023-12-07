@@ -2,32 +2,10 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { registerUser } from "@/app/actions/register";
 import Link from "next/link";
-
-const RegisterSchema = z
-  .object({
-    email: z.string().email().min(1, "Email address is required!"),
-    username: z.string().min(1, "Username is required!"),
-    passwordFirst: z
-      .string()
-      .min(5, "Password needs to be at least 5 characters long!"),
-    passwordSecond: z
-      .string()
-      .min(5, "Password needs to be at least 5 characters long!"),
-  })
-  .refine((data) => data.passwordFirst === data.passwordSecond, {
-    message: "Passwords don't match",
-    path: ["passwordFirst"], // path of error
-  })
-  .refine((data) => data.passwordFirst === data.passwordSecond, {
-    message: "Passwords don't match",
-    path: ["passwordSecond"], // path of error
-  });
-
-type RegisterSchemaType = z.infer<typeof RegisterSchema>;
+import { RegisterSchema, type RegisterSchemaType } from "@/schemas/UserSchemas";
 
 export default function RegisterPage() {
   const {
@@ -43,7 +21,7 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterSchemaType) => {
     const res = await registerUser(data);
-    if (res.success) {
+    if (res.success === true) {
       alert("Registered successfully!");
     } else {
       alert("Could not register user");
@@ -53,7 +31,7 @@ export default function RegisterPage() {
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const subscription = watch((_value, { name }) => {
-      void trigger(["passwordFirst", "passwordSecond"]);
+      void trigger(["password", "confirm"]);
     });
 
     return () => subscription.unsubscribe();
@@ -70,17 +48,17 @@ export default function RegisterPage() {
 
         <input
           type="password"
-          {...register("passwordFirst")}
+          {...register("password")}
           placeholder="password"
         />
-        <p className="text-red-600">{errors.passwordFirst?.message}</p>
+        <p className="text-red-600">{errors.password?.message}</p>
 
         <input
           type="password"
-          {...register("passwordSecond")}
+          {...register("confirm")}
           placeholder="password"
         />
-        <p className="text-red-600">{errors.passwordSecond?.message}</p>
+        <p className="text-red-600">{errors.confirm?.message}</p>
 
         <Button type="submit">Register</Button>
         <Link href="/auth/login">Go to login</Link>

@@ -56,13 +56,13 @@ export default async function DashboardLayout({
                     className="cursor-pointer"
                   ></Image>
                 </Link>
-                <Link className="w-12 h-12" href={{ pathname: "/recipes" }}>
+                {/*TODO: in the future <Link className="w-12 h-12" href={{ pathname: "/recipes" }}>
                   <Image
                     src={recipesIcon}
                     alt="Recipes icon"
                     className="cursor-pointer"
                   ></Image>
-                </Link>
+                </Link> */}
               </div>
               <div className="flex flex-col justify-center items-center gap-[10px] mb-10  ">
                 <Link className="w-12 h-12" href={{ pathname: "/settings" }}>
