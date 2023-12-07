@@ -1,24 +1,16 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
-const LoginSchema = z.object({
-  email: z.string().email().min(1, "Email address is required!"),
-  password: z
-    .string()
-    .min(5, "Password needs to be at least 5 characters long!"),
-});
-
-type LoginSchemaType = z.infer<typeof LoginSchema>;
+import { LoginSchema, type LoginSchemaType } from "@/schemas/UserSchemas";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [loginError, setLoginError] = useState("");
 
   const {
     register,
@@ -32,10 +24,11 @@ export default function LoginPage() {
       password: data.password,
     });
     if (res?.ok) {
+      setLoginError("");
       router.push("/", { scroll: false });
     } else {
       console.log(res?.error);
-      alert(res?.error ?? "An error occured.");
+      setLoginError("Login attemp failed");
     }
   };
 
@@ -50,10 +43,13 @@ export default function LoginPage() {
           {...register("password")}
           placeholder="password"
         />
-        <p>{errors.password?.message}</p>
+        <p className="text-red-600">{errors.password?.message}</p>
+        <p className="text-red-600">{loginError}</p>
 
         <Button type="submit"> Login</Button>
-        <Link href="/auth/register">Go to register</Link>
+        <Link className="text-blue-700" href="/auth/register">
+          Go to register
+        </Link>
       </form>
     </div>
   );

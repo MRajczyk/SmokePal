@@ -61,7 +61,9 @@ export default function RegisterPage() {
         <p className="text-red-600">{errors.confirm?.message}</p>
 
         <Button type="submit">Register</Button>
-        <Link href="/auth/login">Go to login</Link>
+        <Link className="text-blue-700" href="/auth/login">
+          Go to login
+        </Link>
       </form>
     </div>
   );
