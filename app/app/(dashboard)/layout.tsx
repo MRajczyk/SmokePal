@@ -10,7 +10,7 @@ import smokepalLogo from "@/public/assets/logo.svg";
 import addIcon from "@/public/assets/add_placeholder.svg";
 import historyIcon from "@/public/assets/history_placeholder.svg";
 import logoutIcon from "@/public/assets/logout_placeholder.svg";
-import recipesIcon from "@/public/assets/recipes_placeholder.svg";
+// import recipesIcon from "@/public/assets/recipes_placeholder.svg";
 import settingsIcon from "@/public/assets/settings_placeholder.svg";
 import homeIcon from "@/public/assets/home_placeholder.svg";
 
