@@ -10,7 +10,8 @@ import smokepalLogo from "@/public/assets/logo.svg";
 import addIcon from "@/public/assets/add_placeholder.svg";
 import historyIcon from "@/public/assets/history_placeholder.svg";
 import logoutIcon from "@/public/assets/logout_placeholder.svg";
-import recipesIcon from "@/public/assets/recipes_placeholder.svg";
+// import recipesIcon from "@/public/assets/recipes_placeholder.svg";
+import smokerIcon from "@/public/assets/smoker_placeholder.svg";
 import settingsIcon from "@/public/assets/settings_placeholder.svg";
 import homeIcon from "@/public/assets/home_placeholder.svg";
 
@@ -29,11 +30,13 @@ export default async function DashboardLayout({
         <Provider session={session}>
           <div className="w-full h-full flex flex-row">
             <div className="bg-orange-600 w-[100px] flex flex-col justify-between items-center">
-              <Image
-                src={smokepalLogo}
-                alt="SmokePal Logo"
-                className="cursor-pointer"
-              ></Image>
+              <Link href={{ pathname: "/" }}>
+                <Image
+                  src={smokepalLogo}
+                  alt="SmokePal Logo"
+                  className="cursor-pointer"
+                ></Image>
+              </Link>
               <div className="flex flex-col justify-center items-center gap-[10px]">
                 <Link className="w-12 h-12" href={{ pathname: "/" }}>
                   <Image
@@ -49,6 +52,16 @@ export default async function DashboardLayout({
                     className="cursor-pointer"
                   ></Image>
                 </Link>
+                <Link
+                  className="w-12 h-12"
+                  href={{ pathname: "/current-session" }}
+                >
+                  <Image
+                    src={smokerIcon}
+                    alt="Smoker icon"
+                    className="cursor-pointer"
+                  ></Image>
+                </Link>
                 <Link className="w-12 h-12" href={{ pathname: "/history" }}>
                   <Image
                     src={historyIcon}
@@ -56,13 +69,13 @@ export default async function DashboardLayout({
                     className="cursor-pointer"
                   ></Image>
                 </Link>
-                <Link className="w-12 h-12" href={{ pathname: "/recipes" }}>
+                {/*TODO: in the future <Link className="w-12 h-12" href={{ pathname: "/recipes" }}>
                   <Image
                     src={recipesIcon}
                     alt="Recipes icon"
                     className="cursor-pointer"
                   ></Image>
-                </Link>
+                </Link> */}
               </div>
               <div className="flex flex-col justify-center items-center gap-[10px] mb-10  ">
                 <Link className="w-12 h-12" href={{ pathname: "/settings" }}>

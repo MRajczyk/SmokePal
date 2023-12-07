@@ -2,18 +2,18 @@
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/server/auth";
-import { UsernameSchema, type UsernameSchemaType } from "@/schemas/UserSchemas";
+import { EmailSchema, type EmailSchemaType } from "@/schemas/UserSchemas";
 
-export async function changeUsername(data: UsernameSchemaType) {
+export async function changeEmail(data: EmailSchemaType) {
   const session = await getServerSession(authOptions);
   if (!session) {
     // TODO: maybe redirect to login page?
     return { success: false, message: "Unauthorized" };
   }
 
-  const parseResult = UsernameSchema.safeParse(data);
+  const parseResult = EmailSchema.safeParse(data);
   if (!parseResult.success) {
-    return { success: false, message: "Invalid username data" };
+    return { success: false, message: "Invalid email data" };
   }
 
   const user = session.user;
@@ -24,11 +24,11 @@ export async function changeUsername(data: UsernameSchemaType) {
         id: user.id,
       },
       data: {
-        username: parseResult.data.username,
+        email: parseResult.data.email,
       },
     });
   } catch (e) {
-    return { success: false, message: "Could not change username" };
+    return { success: false, message: "Could not change email" };
   }
-  return { success: true, message: "Username changed" };
+  return { success: true, message: "Email changed" };
 }
