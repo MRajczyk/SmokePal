@@ -17,6 +17,7 @@ const ChangeUsernameForm = () => {
     register,
     handleSubmit,
     formState: { errors },
+    resetField,
   } = useForm<PasswordChangeSchemaType>({
     mode: "onChange",
     resolver: zodResolver(PasswordChangeSchema),
@@ -27,6 +28,9 @@ const ChangeUsernameForm = () => {
     const res = await changePassword(data);
     if (res.success) {
       setSuccessMessage(res.message);
+      resetField("password");
+      resetField("newPassword");
+      resetField("confirm");
     } else {
       setErrorMessage(res.message);
     }

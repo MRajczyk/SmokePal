@@ -2,15 +2,10 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { changeUsername } from "@/app/actions/changeUsername";
 import { useSession } from "next-auth/react";
-
-const UsernameSchema = z.object({
-  username: z.string().min(1, "Username is required!"),
-});
-type UsernameSchemaType = z.infer<typeof UsernameSchema>;
+import { UsernameSchema, type UsernameSchemaType } from "@/schemas/UserSchemas";
 
 const ChangeUsernameForm = () => {
   const [errorMessage, setErrorMessage] = useState("");
