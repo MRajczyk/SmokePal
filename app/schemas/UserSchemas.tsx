@@ -8,20 +8,21 @@ const passwordMinimialPatternLogin = z.string().min(1, "Password is required");
 const usernamePattern = z.string().min(1, "Username is required!");
 
 //TODO: fix copypasting of refines and super refines, maybe there is a fix for not working array of path strings...
-export const PasswordSchema = z
+export const PasswordChangeSchema = z
   .object({
-    password: passwordMinimialPattern,
+    password: passwordMinimialPatternLogin,
+    newPassword: passwordMinimialPattern,
     confirm: passwordMinimialPattern,
   })
-  .refine((data) => data.password === data.confirm, {
+  .refine((data) => data.newPassword === data.confirm, {
     message: "Passwords don't match",
     path: ["password"], // path of error
   })
-  .refine((data) => data.password === data.confirm, {
+  .refine((data) => data.newPassword === data.confirm, {
     message: "Passwords don't match",
     path: ["confirm"], // path of error
   })
-  .superRefine(({ password }, checkPassComplexity) => {
+  .superRefine(({ newPassword }, checkPassComplexity) => {
     const containsUppercase = (ch: string) => /[A-Z]/.test(ch);
     const containsLowercase = (ch: string) => /[a-z]/.test(ch);
     const containsSpecialChar = (ch: string) =>
@@ -31,8 +32,8 @@ export const PasswordSchema = z
       countOfLowerCase = 0,
       countOfNumbers = 0,
       countOfSpecialChar = 0;
-    for (let i = 0; i < password.length; i++) {
-      const ch = password.charAt(i);
+    for (let i = 0; i < newPassword.length; i++) {
+      const ch = newPassword.charAt(i);
       if (!isNaN(+ch)) countOfNumbers++;
       else if (containsUppercase(ch)) countOfUpperCase++;
       else if (containsLowercase(ch)) countOfLowerCase++;
@@ -45,7 +46,7 @@ export const PasswordSchema = z
       countOfNumbers < 1
     ) {
       checkPassComplexity.addIssue({
-        path: ["password"],
+        path: ["newPassword"],
         code: "custom",
         message: "Password does not meet complexity requirements",
       });
@@ -85,7 +86,7 @@ export const PasswordSchema = z
       return z.NEVER;
     }
   });
-export type PasswordSchemaType = z.infer<typeof PasswordSchema>;
+export type PasswordChangeSchemaType = z.infer<typeof PasswordChangeSchema>;
 
 export const EmailSchema = z.object({
   email: emailPattern,

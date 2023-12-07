@@ -2,32 +2,31 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { changeUsername } from "@/app/actions/changeUsername";
-import { useSession } from "next-auth/react";
-
-const UsernameSchema = z.object({
-  username: z.string().min(1, "Username is required!"),
-});
-type UsernameSchemaType = z.infer<typeof UsernameSchema>;
+import { changePassword } from "@/app/actions/changePassword";
+import {
+  PasswordChangeSchema,
+  type PasswordChangeSchemaType,
+} from "@/schemas/UserSchemas";
 
 const ChangeUsernameForm = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const { data: session, update } = useSession();
 
-  const { register, handleSubmit, resetField } = useForm<UsernameSchemaType>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<PasswordChangeSchemaType>({
     mode: "onChange",
-    resolver: zodResolver(UsernameSchema),
+    resolver: zodResolver(PasswordChangeSchema),
   });
 
-  const onSubmit = async (data: UsernameSchemaType) => {
-    const res = await changeUsername(data);
+  const onSubmit = async (data: PasswordChangeSchemaType) => {
+    //update password on backend vv placeholder so no errors
+    const res = await changePassword(data);
     if (res.success) {
-      await update({ username: data.username });
       setSuccessMessage(res.message);
-      resetField("username");
     } else {
       setErrorMessage(res.message);
     }
@@ -36,12 +35,25 @@ const ChangeUsernameForm = () => {
   return (
     <div className="flex flex-col items-center justify-center w-[200px] h-[200px] bg-orange-300 rounded-xl">
       <form className="flex flex-col gap-1" onSubmit={handleSubmit(onSubmit)}>
-        <h3 className="text-center">Current username:</h3>
-        <p className="text-center">
-          <b>{session?.user.username}</b>
-        </p>
-        <input {...register("username")}></input>
-        <Button type="submit">Change username</Button>
+        <input
+          placeholder="Current password"
+          type="password"
+          {...register("password")}
+        ></input>
+        <p className="text-red-600">{errors.password?.message}</p>
+        <input
+          placeholder="New password"
+          type="password"
+          {...register("newPassword")}
+        ></input>
+        <p className="text-red-600">{errors.newPassword?.message}</p>
+        <input
+          placeholder="Confirm new password"
+          type="password"
+          {...register("confirm")}
+        ></input>
+        <p className="text-red-600">{errors.confirm?.message}</p>
+        <Button type="submit">Change password</Button>
       </form>
       <p className="text-red-600">{errorMessage}</p>
       <p className="text-green-600">{successMessage}</p>

@@ -1,12 +1,11 @@
 "use server";
 import prisma from "@/lib/prisma";
-import { hash } from "bcrypt";
+import { hashSync } from "bcrypt";
 import { Role } from "@prisma/client";
 import { RegisterSchema, type RegisterSchemaType } from "@/schemas/UserSchemas";
+import { SALT_ROUNDS } from "@/lib/consts";
 
 export async function registerUser(data: RegisterSchemaType) {
-  const SALT_ROUNDS = 10;
-
   const parseResult = RegisterSchema.safeParse(data);
   if (!parseResult.success) {
     return { success: false, error: "Could not register user" };
@@ -17,7 +16,7 @@ export async function registerUser(data: RegisterSchemaType) {
       data: {
         username: parseResult.data.username,
         email: parseResult.data.email,
-        password: await hash(parseResult.data.password, SALT_ROUNDS),
+        password: hashSync(parseResult.data.password, SALT_ROUNDS),
         role: Role.USER,
       },
     });

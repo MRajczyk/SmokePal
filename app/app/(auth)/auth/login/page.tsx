@@ -36,7 +36,7 @@ export default function LoginPage() {
     <div>
       <form className="flex flex-col gap-1" onSubmit={handleSubmit(onSubmit)}>
         <input {...register("email")} placeholder="email" />
-        <p>{errors.email?.message}</p>
+        <p className="text-red-600">{errors.email?.message}</p>
 
         <input
           type="password"

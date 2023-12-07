@@ -40,7 +40,7 @@ const ChangeUsernameForm = () => {
         <p className="text-center">
           <b>{session?.user.username}</b>
         </p>
-        <input {...register("username")}></input>
+        <input placeholder="New username" {...register("username")}></input>
         <Button type="submit">Change username</Button>
       </form>
       <p className="text-red-600">{errorMessage}</p>
