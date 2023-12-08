@@ -11,7 +11,7 @@ import addIcon from "@/public/assets/add_placeholder.svg";
 import historyIcon from "@/public/assets/history_placeholder.svg";
 import logoutIcon from "@/public/assets/logout_placeholder.svg";
 // import recipesIcon from "@/public/assets/recipes_placeholder.svg";
-import smokerIcon from "@/public/assets/smoker_placeholder.svg";
+// import smokerIcon from "@/public/assets/smoker_placeholder.svg";
 import settingsIcon from "@/public/assets/settings_placeholder.svg";
 import homeIcon from "@/public/assets/home_placeholder.svg";
 
@@ -52,7 +52,7 @@ export default async function DashboardLayout({
                     className="cursor-pointer"
                   ></Image>
                 </Link>
-                <Link
+                {/*TODO: maybe in the nearer future /* <Link
                   className="w-12 h-12"
                   href={{ pathname: "/current-session" }}
                 >
@@ -61,7 +61,7 @@ export default async function DashboardLayout({
                     alt="Smoker icon"
                     className="cursor-pointer"
                   ></Image>
-                </Link>
+                </Link> */}
                 <Link className="w-12 h-12" href={{ pathname: "/history" }}>
                   <Image
                     src={historyIcon}
