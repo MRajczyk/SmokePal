@@ -1,10 +1,11 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import CreatableSelect from "react-select/creatable";
+import { getNewSessionInitialData } from "@/app/actions/getNewSessionInit";
 
 export const NewSmokingSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -12,15 +13,62 @@ export const NewSmokingSchema = z.object({
     label: z.string().min(1, "Label is required"),
     value: z.string().min(1, "Value is required"),
   }),
-  wood: z.string().min(1, "Wood type is required"),
+  wood: z.object({
+    label: z.string().min(1, "Label is required"),
+    value: z.string().min(1, "Value is required"),
+  }),
   description: z.string().optional(),
-  tempSensor1Name: z.string().min(1, "Description is required"),
-  tempSensor2Name: z.string().min(1, "Description is required"),
-  tempSensor3Name: z.string().min(1, "Description is required"),
+  tempSensor1Name: z.string().min(1, "Name is required"),
+  tempSensor2Name: z.string().min(1, "Name is required"),
+  tempSensor3Name: z.string().min(1, "Name is required"),
 });
 export type NewSmokingSchemaType = z.infer<typeof NewSmokingSchema>;
 
 const NewSessionPage = () => {
+  const createOption = (label: string) => ({
+    label,
+    value: label.toLowerCase().replace(/\W/g, ""),
+  });
+
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+  const [optionsProducts, setOptionsProducts] = useState<
+    { label: string; value: string }[]
+  >([]);
+  const [isLoadingWood, setIsLoadingWood] = useState(false);
+  const [optionsWood, setOptionsWood] = useState<
+    { label: string; value: string }[]
+  >([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await getNewSessionInitialData();
+
+      if (res.success === true) {
+        //use zod parser or w/e type def is not that terrible idk
+        const data: {
+          woodTypes: [{ id: number; name: string }];
+          productTypes: [{ id: number; name: string }];
+        } = JSON.parse(res.data ?? "");
+
+        const productTypes: { label: string; value: string }[] = [];
+        data.productTypes.forEach(
+          (productType: { id: number; name: string }) => {
+            productTypes.push(createOption(productType.name));
+          }
+        );
+        setOptionsProducts(productTypes);
+
+        const woodTypes: { label: string; value: string }[] = [];
+        data.woodTypes.forEach((woodType: { id: number; name: string }) => {
+          woodTypes.push(createOption(woodType.name));
+        });
+        setOptionsWood(woodTypes);
+      }
+    };
+
+    fetchData().catch(console.error);
+  }, []);
+
   const {
     control,
     register,
@@ -40,27 +88,21 @@ const NewSessionPage = () => {
     // }
   };
 
-  ///////////////////////////////////////////////// create select test:
-  const createOption = (label: string) => ({
-    label,
-    value: label.toLowerCase().replace(/\W/g, ""),
-  });
-
-  const defaultOptions = [
-    createOption("One"),
-    createOption("Two"),
-    createOption("Three"),
-  ];
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [options, setOptions] = useState(defaultOptions);
-
-  const handleCreate = (inputValue: string) => {
-    setIsLoading(true);
+  const handleCreateProducts = (inputValue: string) => {
+    setIsLoadingProducts(true);
     setTimeout(() => {
       const newOption = createOption(inputValue);
-      setIsLoading(false);
-      setOptions((prev) => [...prev, newOption]);
+      setIsLoadingProducts(false);
+      setOptionsProducts((prev) => [...prev, newOption]);
+    }, 1000);
+  };
+
+  const handleCreateWood = (inputValue: string) => {
+    setIsLoadingWood(true);
+    setTimeout(() => {
+      const newOption = createOption(inputValue);
+      setIsLoadingWood(false);
+      setOptionsWood((prev) => [...prev, newOption]);
     }, 1000);
   };
 
@@ -87,19 +129,33 @@ const NewSessionPage = () => {
                   onChange={onChange} // send value to hook form
                   onBlur={onBlur} // notify when input is touched/blur
                   ref={ref}
-                  defaultValue={{ label: "One", value: "one" }}
                   value={value}
                   isClearable
-                  isDisabled={isLoading}
-                  isLoading={isLoading}
-                  onCreateOption={handleCreate}
-                  options={options}
+                  isDisabled={isLoadingProducts}
+                  isLoading={isLoadingProducts}
+                  onCreateOption={handleCreateProducts}
+                  options={optionsProducts}
                 />
               )}
             />
 
-            <input {...register("wood")} placeholder="wood" />
-            <p className="text-red-600">{errors.wood?.message}</p>
+            <Controller
+              control={control}
+              name="wood"
+              render={({ field: { onChange, onBlur, value, ref } }) => (
+                <CreatableSelect
+                  onChange={onChange} // send value to hook form
+                  onBlur={onBlur} // notify when input is touched/blur
+                  ref={ref}
+                  value={value}
+                  isClearable
+                  isDisabled={isLoadingWood}
+                  isLoading={isLoadingWood}
+                  onCreateOption={handleCreateWood}
+                  options={optionsWood}
+                />
+              )}
+            />
 
             <input {...register("description")} placeholder="description" />
             <p className="text-red-600">{errors.description?.message}</p>
