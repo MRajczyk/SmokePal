@@ -47,13 +47,43 @@ model SmokingSessionPhoto {
   data      Bytes
 }
 
+enum Unit {
+    GRAM
+    MILILITER
+    PIECE
+}
+
+model Ingredient {
+    id          Int     @id @default(autoincrement())
+    name        String  @unique
+    unit        Unit
+    sessionIngredients   SessionIngredient[]
+}
+
+model SessionIngredient {
+    id              Int                 @id @default(autoincrement())
+    recipe          SmokingSession      @relation(fields: [sessionId], references: [id])
+    sessionId       Int
+    ingredient      Ingredient          @relation(fields: [ingredientId], references: [id])
+    ingredientId    Int
+    amount          Float     
+}
+
 model SmokingSession {
-  id             Int                    @id @default(autoincrement())
-  sensorReadings SmokingSensorReading[]
+  id              Int                     @id @default(autoincrement())
+  sensorReadings  SmokingSensorReading[]
   photos          SmokingSessionPhoto[]
-  author         User?                   @relation(fields: [authorId], references: [id])
-  authorId       Int?
-  dateStart  DateTime @default(now())
-  dateEnd  DateTime?
-  finished Boolean
+  author          User?                   @relation(fields: [authorId], references: [id])
+  authorId        Int?
+  dateStart       DateTime                @default(now())
+  dateEnd         DateTime?
+  finished        Boolean
+  title           String?
+  product         String?
+  wood            String?
+  description     String?
+  ingredients     SessionIngredient[]
+  tempSensor1Name String?
+  tempSensor2Name String?
+  tempSensor3Name String?
 }
