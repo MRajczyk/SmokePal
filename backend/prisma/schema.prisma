@@ -57,4 +57,5 @@ model SmokingSession {
   authorId       Int?
   dateStart  DateTime @default(now())
   dateEnd  DateTime?
+  finished Boolean
 }
