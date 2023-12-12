@@ -10,6 +10,8 @@ import {
   type NewSmokingSchemaType,
 } from "@/schemas/NewSmokingSchema";
 import { z } from "zod";
+import { createNewSmokingSession } from "@/app/actions/createNewSmokingSession";
+import { useRouter } from "next/navigation";
 
 export const OptionsSchema = z.object({
   label: z.string(),
@@ -24,6 +26,7 @@ export const NewSessionSelectSchema = z.object({
 export type NewSessionSelectSchemaType = z.infer<typeof NewSessionSelectSchema>;
 
 const NewSessionPage = () => {
+  const router = useRouter();
   const createOption = (label: string) => ({
     label,
     value: label.toLowerCase().replace(/\W/g, ""),
@@ -74,12 +77,14 @@ const NewSessionPage = () => {
   });
 
   const onSubmit = async (data: NewSmokingSchemaType) => {
-    console.log(data);
-    // if (res.success === true) {
-    //   alert("Registered successfully!");
-    // } else {
-    //   alert("Could not register user");
-    // }
+    const res = await createNewSmokingSession(data);
+    if (res.success === true && res.data) {
+      router.push(`/session/${JSON.parse(res.data).sessionId}`, {
+        scroll: false,
+      });
+    } else {
+      alert("Could not create new session");
+    }
   };
 
   const handleCreateProducts = (inputValue: string) => {
