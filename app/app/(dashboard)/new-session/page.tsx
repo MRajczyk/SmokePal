@@ -3,26 +3,25 @@ import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { z } from "zod";
 import CreatableSelect from "react-select/creatable";
 import { getNewSessionInitialData } from "@/app/actions/getNewSessionInit";
+import {
+  NewSmokingSchema,
+  type NewSmokingSchemaType,
+} from "@/schemas/NewSmokingSchema";
+import { z } from "zod";
 
-export const NewSmokingSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  product: z.object({
-    label: z.string().min(1, "Label is required"),
-    value: z.string().min(1, "Value is required"),
-  }),
-  wood: z.object({
-    label: z.string().min(1, "Label is required"),
-    value: z.string().min(1, "Value is required"),
-  }),
-  description: z.string().optional(),
-  tempSensor1Name: z.string().min(1, "Name is required"),
-  tempSensor2Name: z.string().min(1, "Name is required"),
-  tempSensor3Name: z.string().min(1, "Name is required"),
+export const OptionsSchema = z.object({
+  label: z.string(),
+  value: z.string(),
 });
-export type NewSmokingSchemaType = z.infer<typeof NewSmokingSchema>;
+export type OptionsSchemaType = z.infer<typeof OptionsSchema>;
+
+export const NewSessionSelectSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+});
+export type NewSessionSelectSchemaType = z.infer<typeof NewSessionSelectSchema>;
 
 const NewSessionPage = () => {
   const createOption = (label: string) => ({
@@ -31,35 +30,30 @@ const NewSessionPage = () => {
   });
 
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
-  const [optionsProducts, setOptionsProducts] = useState<
-    { label: string; value: string }[]
-  >([]);
+  const [optionsProducts, setOptionsProducts] = useState<OptionsSchemaType[]>(
+    []
+  );
   const [isLoadingWood, setIsLoadingWood] = useState(false);
-  const [optionsWood, setOptionsWood] = useState<
-    { label: string; value: string }[]
-  >([]);
+  const [optionsWood, setOptionsWood] = useState<OptionsSchemaType[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       const res = await getNewSessionInitialData();
 
       if (res.success === true) {
-        //use zod parser or w/e type def is not that terrible idk
         const data: {
-          woodTypes: [{ id: number; name: string }];
-          productTypes: [{ id: number; name: string }];
+          woodTypes: NewSessionSelectSchemaType[];
+          productTypes: NewSessionSelectSchemaType[];
         } = JSON.parse(res.data ?? "");
 
-        const productTypes: { label: string; value: string }[] = [];
-        data.productTypes.forEach(
-          (productType: { id: number; name: string }) => {
-            productTypes.push(createOption(productType.name));
-          }
-        );
+        const productTypes: OptionsSchemaType[] = [];
+        data.productTypes.forEach((productType: NewSessionSelectSchemaType) => {
+          productTypes.push(createOption(productType.name));
+        });
         setOptionsProducts(productTypes);
 
-        const woodTypes: { label: string; value: string }[] = [];
-        data.woodTypes.forEach((woodType: { id: number; name: string }) => {
+        const woodTypes: OptionsSchemaType[] = [];
+        data.woodTypes.forEach((woodType: NewSessionSelectSchemaType) => {
           woodTypes.push(createOption(woodType.name));
         });
         setOptionsWood(woodTypes);
