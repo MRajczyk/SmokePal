@@ -113,7 +113,7 @@ const NewSessionPage = () => {
       <div className="grid grid-cols-2 w-full h-full">
         <div className="flex bg-yellow-100 border-2 border-red-600 mx-4 mb-4">
           <form
-            key={1}
+            key={0}
             className="flex flex-col gap-1"
             onSubmit={handleSubmit(onSubmit)}
           >
@@ -162,7 +162,7 @@ const NewSessionPage = () => {
         </div>
         <div className="flex bg-green-100 border-2 border-red-600 mx-4 mb-4">
           <form
-            key={2}
+            key={1}
             className="flex flex-col gap-1"
             onSubmit={handleSubmit(onSubmit)}
           >

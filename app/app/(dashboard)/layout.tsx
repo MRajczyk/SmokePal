@@ -6,12 +6,13 @@ import Link from "next/link";
 import QueryClientProviderWrapper from "../context/queryclient-provider";
 import Image from "next/image";
 import { LogoutButton } from "@/components/ui/logoutButton";
+import { ActiveSessionButton } from "@/components/ui/activeSessionButton";
 import smokepalLogo from "@/public/assets/logo.svg";
 import addIcon from "@/public/assets/add_placeholder.svg";
 import historyIcon from "@/public/assets/history_placeholder.svg";
 import logoutIcon from "@/public/assets/logout_placeholder.svg";
 // import recipesIcon from "@/public/assets/recipes_placeholder.svg";
-// import smokerIcon from "@/public/assets/smoker_placeholder.svg";
+import smokerIcon from "@/public/assets/smoker_placeholder.svg";
 import settingsIcon from "@/public/assets/settings_placeholder.svg";
 import homeIcon from "@/public/assets/home_placeholder.svg";
 
@@ -52,16 +53,13 @@ export default async function DashboardLayout({
                     className="cursor-pointer"
                   ></Image>
                 </Link>
-                {/*TODO: maybe in the nearer future /* <Link
-                  className="w-12 h-12"
-                  href={{ pathname: "/current-session" }}
-                >
+                <ActiveSessionButton>
                   <Image
                     src={smokerIcon}
-                    alt="Smoker icon"
-                    className="cursor-pointer"
+                    alt="Active session"
+                    className="cursor-pointer w-12 h-12"
                   ></Image>
-                </Link> */}
+                </ActiveSessionButton>
                 <Link className="w-12 h-12" href={{ pathname: "/history" }}>
                   <Image
                     src={historyIcon}
