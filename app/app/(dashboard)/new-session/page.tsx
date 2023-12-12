@@ -12,6 +12,12 @@ import {
 import { z } from "zod";
 import { createNewSmokingSession } from "@/app/actions/createNewSmokingSession";
 import { useRouter } from "next/navigation";
+import debounce from "just-debounce-it";
+import { SUBMIT_DEBOUNCE_MS } from "@/lib/utils";
+import { useMutation } from "react-query";
+import { createZodFetcher } from "zod-fetch";
+import { fetcher } from "@/lib/utils";
+import defaultResponseSchema from "@/schemas/defaultResponseSchema";
 
 export const OptionsSchema = z.object({
   label: z.string(),
@@ -66,6 +72,39 @@ const NewSessionPage = () => {
     fetchData().catch(console.error);
   }, []);
 
+  async function stopSmokingSession() {
+    const fetch = createZodFetcher(fetcher);
+    return fetch(
+      defaultResponseSchema,
+      process.env.NEXT_PUBLIC_BACKEND_URL + "/api/stop",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  }
+
+  const {
+    mutate: mutateStop,
+    // isLoading: isLoadingStop,
+    // isSuccess: isSuccessStop,
+  } = useMutation({
+    mutationFn: stopSmokingSession,
+    onError: (error) => {
+      if (error instanceof Error) {
+        alert(error);
+      }
+    },
+  });
+
+  const debounceStopSmokingSession = debounce(
+    () => mutateStop(),
+    SUBMIT_DEBOUNCE_MS,
+    true
+  );
+
   const {
     control,
     register,
@@ -79,6 +118,7 @@ const NewSessionPage = () => {
   const onSubmit = async (data: NewSmokingSchemaType) => {
     const res = await createNewSmokingSession(data);
     if (res.success === true && res.data) {
+      debounceStopSmokingSession();
       router.push(`/session/${JSON.parse(res.data).sessionId}`, {
         scroll: false,
       });
