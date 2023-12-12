@@ -16,6 +16,7 @@ export default function Home() {
 
   const [messageHistory, setMessageHistory] = useState([]);
   const { /*sendMessage,*/ lastMessage, readyState } = useWebSocket(socketUrl, {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     shouldReconnect: (closeEvent) => true,
     reconnectAttempts: Infinity,
   });
@@ -43,7 +44,7 @@ export default function Home() {
         method: "POST",
         body: JSON.stringify({
           //add error handling for missing session id i guess, or just use !
-          authorId: Number.parseInt(session?.user.id ?? "-1"),
+          authorId: session?.user.id ?? -1,
         }),
         headers: {
           "Content-Type": "application/json",

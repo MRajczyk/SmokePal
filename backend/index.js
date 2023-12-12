@@ -121,7 +121,7 @@ app.post("/api/start", async (req, res) => {
   });
   try {
     const newSession = await prisma.smokingSession.create({
-      data: { authorId: req.body.authorId },
+      data: { authorId: req.body.authorId, finished: false },
     });
     currentSessionId = newSession.id;
     if (!currentSessionId) {
