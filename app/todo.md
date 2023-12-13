@@ -1,15 +1,17 @@
-roadmap:
-dodac do schemy wedzenia pola finished: bool,
-to wtedy:
+dalej:
+Po wejsciu na session page fetch całości danych
+reszte dopisywac do listy co przychodzi z websocketu
+i moze przy kazdym wystartowaniu najpierw fetch z bazy?
 
-- zmienic handler start na BE, ze jak przekaze sie param sesji to się ją wznawia
-  i wysyla dane do bazy o danym id i ustawia ją jako current
-- stop bez zmian
-- trzeba zrobic serwer akcje na zapisanie do bazy ze jest finished po przyjsciu
-  zwrotki z sukcesem z expressowego handlera stop
+pierwszy pomysl trzymac wszystkie pomiary w tablicy
+i przy ewentualnym wyborze ktoregos z czujnikow filtrować do
+innej tablicy, zeby nie tracic danych zeby nie trzeba bylo refetchowac
 
-DUZY PLUS: na FE jest wtedy wspólny dynamiczny route z [id],
-jezeli nie jest zakonczona to wyswietla sie panel
-start, pause, finish
+moze ustawic interwal na 5/10 sekund defaultowy?
+(mozna to ustawic jako zmienne na plytce, jako ficzer do rozszerzenia kiedys hehe)
 
-pause jedynie stopuje zapis do bazy ale nie ma finished true
+trzeba zrobic wysylanie na start id sesji
+i wyrzucenie tworzenia z backendu, tylko dopisywanie
+nowych readingow z tym id
+start stop ma byc samym sluchaniem i ew azpisywaniem readingow
+stanem sesji zarządza fullstackowa apka.

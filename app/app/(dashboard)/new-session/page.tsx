@@ -116,9 +116,10 @@ const NewSessionPage = () => {
   });
 
   const onSubmit = async (data: NewSmokingSchemaType) => {
+    //maybe move to on success callback in mutation, idk
+    debounceStopSmokingSession();
     const res = await createNewSmokingSession(data);
     if (res.success === true && res.data) {
-      debounceStopSmokingSession();
       router.push(`/session/${JSON.parse(res.data).sessionId}`, {
         scroll: false,
       });
