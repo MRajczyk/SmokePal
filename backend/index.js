@@ -104,8 +104,10 @@ app.get("/", (req, res) => {
 
 app.post("/api/start", async (req, res) => {
   //TODO: think about any kind of identity validation, maybe decode jwt token, tbd
-  if (!req.body.authorId) {
-    console.log(req.body);
+  if (
+    !req.body.sessionId ||
+    Number.isNaN(Number.parseInt(req.body.sessionId))
+  ) {
     return res.status(404).send(
       JSON.stringify({
         message: "Forbidden",
@@ -119,30 +121,11 @@ app.post("/api/start", async (req, res) => {
       return res.status(500);
     }
   });
-  try {
-    const newSession = await prisma.smokingSession.create({
-      data: { authorId: req.body.authorId, finished: false },
-    });
-    currentSessionId = newSession.id;
-    if (!currentSessionId) {
-      return res.status(500).send(
-        JSON.stringify({
-          message: "Error creating session",
-        })
-      );
-    }
-    savingDataFlag = true;
-    console.log(savingDataFlag, currentSessionId);
-  } catch (e) {
-    console.log(e.message);
-    savingDataFlag = false;
-    currentSessionId = undefined;
-    return res.status(500).send(
-      JSON.stringify({
-        message: "Error creating session",
-      })
-    );
-  }
+
+  savingDataFlag = true;
+  currentSessionId = Number.parseInt(req.body.sessionId);
+  console.log(savingDataFlag, currentSessionId);
+
   return res.status(200).send(
     JSON.stringify({
       message: "Successfully subscribed to topic esp8266_data",

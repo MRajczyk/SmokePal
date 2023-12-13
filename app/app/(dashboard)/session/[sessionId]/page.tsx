@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import useWebSocket, { ReadyState } from "react-use-websocket";
-import { useSession } from "next-auth/react";
 import debounce from "just-debounce-it";
 import { SUBMIT_DEBOUNCE_MS } from "@/lib/utils";
 import { useMutation } from "react-query";
@@ -10,8 +9,11 @@ import { createZodFetcher } from "zod-fetch";
 import { fetcher } from "@/lib/utils";
 import defaultResponseSchema from "@/schemas/defaultResponseSchema";
 
-export default function SessionPage({ params }: { params: { id: string } }) {
-  const { data: session } = useSession();
+export default function SessionPage({
+  params,
+}: {
+  params: { sessionId: number };
+}) {
   const socketUrl = "ws://localhost:7071";
 
   const [messageHistory, setMessageHistory] = useState([]);
@@ -44,7 +46,7 @@ export default function SessionPage({ params }: { params: { id: string } }) {
         method: "POST",
         body: JSON.stringify({
           //add error handling for missing session id i guess, or just use !
-          authorId: session?.user.id ?? -1,
+          sessionId: params.sessionId,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -107,26 +109,35 @@ export default function SessionPage({ params }: { params: { id: string } }) {
 
   return (
     <div>
-      <div>Session with id: {params.id} works!</div>
-      <Button
-        variant="default"
-        onClick={() => {
-          debounceStartSmokingSession();
-        }}
-      >
-        Start
-      </Button>
-      <Button variant="default" onClick={() => debounceStopSmokingSession()}>
-        Stop
-      </Button>
-      <br />
-      <span>The WebSocket is currently {connectionStatus}</span>
-      {lastMessage ? <span>Last message: {lastMessage.data}</span> : null}
-      <ul>
-        {messageHistory.map((message, idx) => (
-          <span key={idx}>{message ? message.data : null}</span>
-        ))}
-      </ul>
+      {params.sessionId > 0 ? (
+        <div>
+          <div>Session with id: {params.sessionId} works!</div>
+          <Button
+            variant="default"
+            onClick={() => {
+              debounceStartSmokingSession();
+            }}
+          >
+            Start
+          </Button>
+          <Button
+            variant="default"
+            onClick={() => debounceStopSmokingSession()}
+          >
+            Stop
+          </Button>
+          <br />
+          <span>The WebSocket is currently {connectionStatus}</span>
+          {lastMessage ? <span>Last message: {lastMessage.data}</span> : null}
+          <ul>
+            {messageHistory.map((message, idx) => (
+              <span key={idx}>{message ? message.data : null}</span>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <div>Invalid session id</div>
+      )}
     </div>
   );
 }
