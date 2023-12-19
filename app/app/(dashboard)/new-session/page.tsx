@@ -18,6 +18,8 @@ import { useMutation } from "react-query";
 import { createZodFetcher } from "zod-fetch";
 import { fetcher } from "@/lib/utils";
 import defaultResponseSchema from "@/schemas/defaultResponseSchema";
+import { createNewProductType } from "@/app/actions/createNewProductType";
+import { createNewWoodType } from "@/app/actions/createNewWoodType";
 
 export const OptionsSchema = z.object({
   label: z.string(),
@@ -110,6 +112,7 @@ const NewSessionPage = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<NewSmokingSchemaType>({
     mode: "all",
     resolver: zodResolver(NewSmokingSchema),
@@ -128,22 +131,26 @@ const NewSessionPage = () => {
     }
   };
 
-  const handleCreateProducts = (inputValue: string) => {
+  const handleCreateProducts = async (inputValue: string) => {
     setIsLoadingProducts(true);
-    setTimeout(() => {
+    const res = await createNewProductType(inputValue);
+    if (res.success) {
       const newOption = createOption(inputValue);
       setIsLoadingProducts(false);
       setOptionsProducts((prev) => [...prev, newOption]);
-    }, 1000);
+      setValue("product", newOption);
+    }
   };
 
-  const handleCreateWood = (inputValue: string) => {
+  const handleCreateWood = async (inputValue: string) => {
     setIsLoadingWood(true);
-    setTimeout(() => {
+    const res = await createNewWoodType(inputValue);
+    if (res.success) {
       const newOption = createOption(inputValue);
       setIsLoadingWood(false);
       setOptionsWood((prev) => [...prev, newOption]);
-    }, 1000);
+      setValue("wood", newOption);
+    }
   };
 
   return (
@@ -166,6 +173,7 @@ const NewSessionPage = () => {
               name="product"
               render={({ field: { onChange, onBlur, value, ref } }) => (
                 <CreatableSelect
+                  placeholder="Select product..."
                   onChange={onChange} // send value to hook form
                   onBlur={onBlur} // notify when input is touched/blur
                   ref={ref}
@@ -184,6 +192,7 @@ const NewSessionPage = () => {
               name="wood"
               render={({ field: { onChange, onBlur, value, ref } }) => (
                 <CreatableSelect
+                  placeholder="Select wood..."
                   onChange={onChange} // send value to hook form
                   onBlur={onBlur} // notify when input is touched/blur
                   ref={ref}

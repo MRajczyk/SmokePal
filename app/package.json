@@ -17,6 +17,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "just-debounce-it": "^3.2.0",
+    "moment": "^2.29.4",
     "next": "13.5.6",
     "next-auth": "^4.24.5",
     "nextjs-routes": "^2.1.0",

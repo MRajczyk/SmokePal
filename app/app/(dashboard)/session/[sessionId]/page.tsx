@@ -129,6 +129,7 @@ export default function SessionPage({
           <br />
           <span>The WebSocket is currently {connectionStatus}</span>
           {lastMessage ? <span>Last message: {lastMessage.data}</span> : null}
+          <br />
           <ul>
             {messageHistory.map((message, idx) => (
               <span key={idx}>{message ? message.data : null}</span>

@@ -1,5 +1,6 @@
 const { ReadingType } = require("@prisma/client");
 require("dotenv").config();
+const moment = require("moment");
 const express = require("express");
 const cors = require("cors");
 const app = express();
@@ -41,9 +42,20 @@ mqttClient.on("connect", () => {
 mqttClient.on("message", async (topic, message) => {
   //TODO: decide whether that name fits and if it should be left that this flag controls not only saving to DB but also sending live data through WS
   if (savingDataFlag) {
+    const timestamp = moment().utc().format();
     const parsedMessage = JSON.parse(message);
     if (Array.isArray(parsedMessage)) {
       parsedMessage.forEach(async (reading) => {
+        clients.forEach((client) => {
+          client.send(
+            JSON.stringify({
+              sensorName: reading.sensorName,
+              value: Number.parseFloat(reading.reading),
+              type: reading.type == "TEMP" ? ReadingType.TEMP : ReadingType.HUM,
+              timestamp: timestamp,
+            })
+          );
+        });
         try {
           console.log("creating sensorReading: ", {
             sessionId: currentSessionId,
@@ -51,6 +63,7 @@ mqttClient.on("message", async (topic, message) => {
             //check whether adding error handling is advisable
             value: Number.parseFloat(reading.reading),
             type: reading.type == "TEMP" ? ReadingType.TEMP : ReadingType.HUM,
+            timestamp: timestamp,
           });
           await prisma.smokingSensorReading.create({
             data: {
@@ -59,6 +72,7 @@ mqttClient.on("message", async (topic, message) => {
               //check whether adding error handling is advisable
               value: Number.parseFloat(reading.reading),
               type: reading.type == "TEMP" ? ReadingType.TEMP : ReadingType.HUM,
+              timestamp: timestamp,
             },
           });
         } catch (e) {
@@ -67,6 +81,17 @@ mqttClient.on("message", async (topic, message) => {
         }
       });
     } else {
+      clients.forEach((client) => {
+        client.send(
+          JSON.stringify({
+            sensorName: parsedMessage.sensorName,
+            value: Number.parseFloat(parsedMessage.reading),
+            type:
+              parsedMessage.type == "TEMP" ? ReadingType.TEMP : ReadingType.HUM,
+            timestamp: timestamp,
+          })
+        );
+      });
       try {
         console.log("creating sensorReading: ", {
           sessionId: currentSessionId,
@@ -75,6 +100,7 @@ mqttClient.on("message", async (topic, message) => {
           value: Number.parseFloat(parsedMessage.reading),
           type:
             parsedMessage.type == "TEMP" ? ReadingType.TEMP : ReadingType.HUM,
+          timestamp: timestamp,
         });
         await prisma.smokingSensorReading.create({
           data: {
@@ -84,6 +110,7 @@ mqttClient.on("message", async (topic, message) => {
             value: Number.parseFloat(parsedMessage.reading),
             type:
               parsedMessage.type == "TEMP" ? ReadingType.TEMP : ReadingType.HUM,
+            timestamp: timestamp,
           },
         });
       } catch (e) {
@@ -91,15 +118,12 @@ mqttClient.on("message", async (topic, message) => {
         //ignore
       }
     }
-    clients.forEach((client) => {
-      client.send(message.toString());
-    });
     console.log("sending msg to all clients");
   }
 });
 
 app.get("/", (req, res) => {
-  res.send("im not a teapot");
+  res.send("im not a teapot but im alive");
 });
 
 app.post("/api/start", async (req, res) => {
@@ -141,6 +165,7 @@ app.post("/api/stop", (req, res) => {
   });
   clients = [];
   savingDataFlag = false;
+  currentSessionId = undefined;
   mqttClient.unsubscribe("esp8266_data");
   return res.status(200).send(
     JSON.stringify({
