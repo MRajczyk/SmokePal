@@ -198,8 +198,9 @@ export default function SessionPage({
           <p>The WebSocket is currently {connectionStatus}</p>
           <p>Humidity readings over time</p>
           {humSensor1Readings.length > 0 && (
-            <LineChart width={600} height={300} data={humSensor1Readings}>
+            <LineChart width={600} height={300}>
               <Line
+                data={humSensor1Readings}
                 type="monotone"
                 dataKey="value"
                 stroke="black"
@@ -221,13 +222,30 @@ export default function SessionPage({
               <YAxis />
             </LineChart>
           )}
-          <p>Temperature 1 readings over time</p>
+          <p>Temperature readings over time</p>
           {tempSensor1Readings.length > 0 && (
-            <LineChart width={600} height={300} data={tempSensor1Readings}>
+            <LineChart width={600} height={300}>
               <Line
+                data={tempSensor1Readings}
                 type="monotone"
                 dataKey="value"
-                stroke="black"
+                stroke="red"
+                strokeWidth={2}
+                dot={false}
+              />
+              <Line
+                data={tempSensor2Readings}
+                type="monotone"
+                dataKey="value"
+                stroke="green"
+                strokeWidth={2}
+                dot={false}
+              />
+              <Line
+                data={tempSensor3Readings}
+                type="monotone"
+                dataKey="value"
+                stroke="blue"
                 strokeWidth={2}
                 dot={false}
               />
