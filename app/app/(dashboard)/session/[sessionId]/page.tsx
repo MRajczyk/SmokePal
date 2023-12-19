@@ -180,7 +180,23 @@ export default function SessionPage({
       {params.sessionId > 0 ? (
         <div>
           <div>Session id: {params.sessionId}</div>
-          <span>Humidity readings over time</span>
+          <Button
+            variant="default"
+            onClick={() => {
+              debounceStartSmokingSession();
+            }}
+          >
+            Start
+          </Button>
+          <Button
+            variant="default"
+            onClick={() => debounceStopSmokingSession()}
+          >
+            Stop
+          </Button>
+          <br />
+          <p>The WebSocket is currently {connectionStatus}</p>
+          <p>Humidity readings over time</p>
           {humSensor1Readings.length > 0 && (
             <LineChart width={600} height={300} data={humSensor1Readings}>
               <Line
@@ -205,7 +221,7 @@ export default function SessionPage({
               <YAxis />
             </LineChart>
           )}
-          <span>Temperature 1 readings over time</span>
+          <p>Temperature 1 readings over time</p>
           {tempSensor1Readings.length > 0 && (
             <LineChart width={600} height={300} data={tempSensor1Readings}>
               <Line
@@ -230,22 +246,6 @@ export default function SessionPage({
               <YAxis />
             </LineChart>
           )}
-          <Button
-            variant="default"
-            onClick={() => {
-              debounceStartSmokingSession();
-            }}
-          >
-            Start
-          </Button>
-          <Button
-            variant="default"
-            onClick={() => debounceStopSmokingSession()}
-          >
-            Stop
-          </Button>
-          <br />
-          <span>The WebSocket is currently {connectionStatus}</span>
         </div>
       ) : (
         <div>Invalid session id</div>
