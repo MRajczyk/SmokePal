@@ -8,9 +8,10 @@ import { useMutation } from "react-query";
 import { createZodFetcher } from "zod-fetch";
 import { fetcher } from "@/lib/utils";
 import defaultResponseSchema from "@/schemas/defaultResponseSchema";
-import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Legend } from "recharts";
 import moment from "moment";
 import { z } from "zod";
+import { getHistoricData } from "@/app/actions/getHistoricData";
 
 const sensorReadingSchema = z.object({
   sensorName: z.string(),
@@ -61,31 +62,47 @@ export default function SessionPage({
     if (lastMessage !== null) {
       setMessageHistory((prev) => prev.concat(lastMessage.data));
       const msg = JSON.parse(lastMessage.data);
+      if (msg.sessionId != params.sessionId) {
+        console.log("not added");
+        return;
+      }
       if (msg.sensorName === "Hum1") {
         setHumSensor1Readings((prev) =>
           prev.concat({
-            ...msg,
+            sensorName: msg.sensorName,
+            value: msg.value,
+            timestamp: msg.timestamp,
+            type: msg.type,
             timestampUnix: moment(msg.timestamp).valueOf(),
           })
         );
       } else if (msg.sensorName === "Temp1") {
         setTempSensor1Readings((prev) =>
           prev.concat({
-            ...msg,
+            sensorName: msg.sensorName,
+            value: msg.value,
+            timestamp: msg.timestamp,
+            type: msg.type,
             timestampUnix: moment(msg.timestamp).valueOf(),
           })
         );
       } else if (msg.sensorName === "Temp2") {
         setTempSensor2Readings((prev) =>
           prev.concat({
-            ...msg,
+            sensorName: msg.sensorName,
+            value: msg.value,
+            timestamp: msg.timestamp,
+            type: msg.type,
             timestampUnix: moment(msg.timestamp).valueOf(),
           })
         );
       } else if (msg.sensorName === "Temp3") {
         setTempSensor3Readings((prev) =>
           prev.concat({
-            ...msg,
+            sensorName: msg.sensorName,
+            value: msg.value,
+            timestamp: msg.timestamp,
+            type: msg.type,
             timestampUnix: moment(msg.timestamp).valueOf(),
           })
         );
@@ -99,6 +116,89 @@ export default function SessionPage({
     setTempSensor3Readings,
     setHumSensor1Readings,
   ]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await getHistoricData(params.sessionId.toString());
+      if (!res.data) {
+        console.log("no data available");
+        return;
+      }
+      const historicData = await JSON.parse(res.data);
+      const hum1Array: sensorReadingSchemaType[] = [];
+      const temp1Array: sensorReadingSchemaType[] = [];
+      const temp2Array: sensorReadingSchemaType[] = [];
+      const temp3Array: sensorReadingSchemaType[] = [];
+
+      historicData.historicData.forEach(
+        (reading: {
+          sensorName: string;
+          value: number;
+          timestamp: string;
+          type: string;
+        }) => {
+          if (reading.sensorName === "Hum1") {
+            hum1Array.push({
+              sensorName: reading.sensorName,
+              value: reading.value,
+              timestamp: reading.timestamp,
+              timestampUnix: moment(reading.timestamp).valueOf(),
+              type: reading.type,
+            });
+          } else if (reading.sensorName === "Temp1") {
+            temp1Array.push({
+              sensorName: reading.sensorName,
+              value: reading.value,
+              timestamp: reading.timestamp,
+              timestampUnix: moment(reading.timestamp).valueOf(),
+              type: reading.type,
+            });
+          } else if (reading.sensorName === "Temp2") {
+            temp2Array.push({
+              sensorName: reading.sensorName,
+              value: reading.value,
+              timestamp: reading.timestamp,
+              timestampUnix: moment(reading.timestamp).valueOf(),
+              type: reading.type,
+            });
+          } else if (reading.sensorName === "Temp3") {
+            temp3Array.push({
+              sensorName: reading.sensorName,
+              value: reading.value,
+              timestamp: reading.timestamp,
+              timestampUnix: moment(reading.timestamp).valueOf(),
+              type: reading.type,
+            });
+          }
+        }
+      );
+
+      setTempSensor1Readings((prev) =>
+        prev
+          .concat(temp1Array)
+          .sort((a, b) => (a.timestampUnix > b.timestampUnix ? 1 : -1))
+      );
+      setTempSensor2Readings((prev) =>
+        prev
+          .concat(temp2Array)
+          .sort((a, b) => (a.timestampUnix > b.timestampUnix ? 1 : -1))
+      );
+      setTempSensor3Readings((prev) =>
+        prev
+          .concat(temp3Array)
+          .sort((a, b) => (a.timestampUnix > b.timestampUnix ? 1 : -1))
+      );
+      setHumSensor1Readings((prev) =>
+        prev
+          .concat(hum1Array)
+          .sort((a, b) => (a.timestampUnix > b.timestampUnix ? 1 : -1))
+      );
+    };
+
+    if (params.sessionId) {
+      fetchData().catch(console.error);
+    }
+  }, []);
 
   async function startSmokingSession() {
     const fetch = createZodFetcher(fetcher);
@@ -207,7 +307,7 @@ export default function SessionPage({
                 strokeWidth={2}
                 dot={false}
               />
-              <CartesianGrid stroke="#ccc" />
+              {/* <CartesianGrid stroke="#ccc" /> */}
               <XAxis
                 dataKey={"timestampUnix"}
                 domain={[
@@ -215,9 +315,9 @@ export default function SessionPage({
                   humSensor1Readings.at(humSensor1Readings.length - 1)!
                     .timestampUnix,
                 ]}
-                scale="time"
                 type="number"
                 tickFormatter={dateFormatter}
+                interval="preserveStartEnd"
               />
               <YAxis />
             </LineChart>
@@ -226,6 +326,7 @@ export default function SessionPage({
           {tempSensor1Readings.length > 0 && (
             <LineChart width={600} height={300}>
               <Line
+                name="Temperature 1"
                 data={tempSensor1Readings}
                 type="monotone"
                 dataKey="value"
@@ -234,6 +335,7 @@ export default function SessionPage({
                 dot={false}
               />
               <Line
+                name="Temperature 2"
                 data={tempSensor2Readings}
                 type="monotone"
                 dataKey="value"
@@ -242,6 +344,7 @@ export default function SessionPage({
                 dot={false}
               />
               <Line
+                name="Temperature 3"
                 data={tempSensor3Readings}
                 type="monotone"
                 dataKey="value"
@@ -249,7 +352,7 @@ export default function SessionPage({
                 strokeWidth={2}
                 dot={false}
               />
-              <CartesianGrid stroke="#ccc" />
+              {/* <CartesianGrid stroke="#ccc" /> */}
               <XAxis
                 dataKey={"timestampUnix"}
                 domain={[
@@ -257,11 +360,12 @@ export default function SessionPage({
                   tempSensor1Readings.at(tempSensor1Readings.length - 1)!
                     .timestampUnix,
                 ]}
-                scale="time"
                 type="number"
                 tickFormatter={dateFormatter}
+                interval="preserveStartEnd"
               />
               <YAxis />
+              <Legend />
             </LineChart>
           )}
         </div>

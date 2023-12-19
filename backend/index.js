@@ -49,6 +49,7 @@ mqttClient.on("message", async (topic, message) => {
         clients.forEach((client) => {
           client.send(
             JSON.stringify({
+              sessionId: currentSessionId,
               sensorName: reading.sensorName,
               value: Number.parseFloat(reading.reading),
               type: reading.type == "TEMP" ? ReadingType.TEMP : ReadingType.HUM,
@@ -84,6 +85,7 @@ mqttClient.on("message", async (topic, message) => {
       clients.forEach((client) => {
         client.send(
           JSON.stringify({
+            sessionId: currentSessionId,
             sensorName: parsedMessage.sensorName,
             value: Number.parseFloat(parsedMessage.reading),
             type:

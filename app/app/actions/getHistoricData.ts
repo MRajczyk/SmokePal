@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/server/auth";
 
-export async function getHistoricData(sessionId: number) {
+export async function getHistoricData(sessionId: string) {
   const session = await getServerSession(authOptions);
   if (!session) {
     // TODO: maybe redirect to login page?
@@ -18,9 +18,10 @@ export async function getHistoricData(sessionId: number) {
   try {
     const historicData = await prisma.smokingSensorReading.findMany({
       where: {
-        sessionId: sessionId,
+        sessionId: Number.parseInt(sessionId),
       },
     });
+
     return {
       success: true,
       data: JSON.stringify({
@@ -28,6 +29,7 @@ export async function getHistoricData(sessionId: number) {
       }),
     };
   } catch (e) {
+    console.log(e.message);
     return { success: false, message: "Could not fetch historic data" };
   }
 }
