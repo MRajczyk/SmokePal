@@ -12,6 +12,14 @@ import {
 import { z } from "zod";
 import { createNewSmokingSession } from "@/app/actions/createNewSmokingSession";
 import { useRouter } from "next/navigation";
+import debounce from "just-debounce-it";
+import { SUBMIT_DEBOUNCE_MS } from "@/lib/utils";
+import { useMutation } from "react-query";
+import { createZodFetcher } from "zod-fetch";
+import { fetcher } from "@/lib/utils";
+import defaultResponseSchema from "@/schemas/defaultResponseSchema";
+import { createNewProductType } from "@/app/actions/createNewProductType";
+import { createNewWoodType } from "@/app/actions/createNewWoodType";
 
 export const OptionsSchema = z.object({
   label: z.string(),
@@ -66,17 +74,53 @@ const NewSessionPage = () => {
     fetchData().catch(console.error);
   }, []);
 
+  async function stopSmokingSession() {
+    const fetch = createZodFetcher(fetcher);
+    return fetch(
+      defaultResponseSchema,
+      process.env.NEXT_PUBLIC_BACKEND_URL + "/api/stop",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+  }
+
+  const {
+    mutate: mutateStop,
+    // isLoading: isLoadingStop,
+    // isSuccess: isSuccessStop,
+  } = useMutation({
+    mutationFn: stopSmokingSession,
+    onError: (error) => {
+      if (error instanceof Error) {
+        alert(error);
+      }
+    },
+  });
+
+  const debounceStopSmokingSession = debounce(
+    () => mutateStop(),
+    SUBMIT_DEBOUNCE_MS,
+    true
+  );
+
   const {
     control,
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<NewSmokingSchemaType>({
     mode: "all",
     resolver: zodResolver(NewSmokingSchema),
   });
 
   const onSubmit = async (data: NewSmokingSchemaType) => {
+    //maybe move to on success callback in mutation, idk
+    debounceStopSmokingSession();
     const res = await createNewSmokingSession(data);
     if (res.success === true && res.data) {
       router.push(`/session/${JSON.parse(res.data).sessionId}`, {
@@ -87,22 +131,26 @@ const NewSessionPage = () => {
     }
   };
 
-  const handleCreateProducts = (inputValue: string) => {
+  const handleCreateProducts = async (inputValue: string) => {
     setIsLoadingProducts(true);
-    setTimeout(() => {
+    const res = await createNewProductType(inputValue);
+    if (res.success) {
       const newOption = createOption(inputValue);
       setIsLoadingProducts(false);
       setOptionsProducts((prev) => [...prev, newOption]);
-    }, 1000);
+      setValue("product", newOption);
+    }
   };
 
-  const handleCreateWood = (inputValue: string) => {
+  const handleCreateWood = async (inputValue: string) => {
     setIsLoadingWood(true);
-    setTimeout(() => {
+    const res = await createNewWoodType(inputValue);
+    if (res.success) {
       const newOption = createOption(inputValue);
       setIsLoadingWood(false);
       setOptionsWood((prev) => [...prev, newOption]);
-    }, 1000);
+      setValue("wood", newOption);
+    }
   };
 
   return (
@@ -125,6 +173,7 @@ const NewSessionPage = () => {
               name="product"
               render={({ field: { onChange, onBlur, value, ref } }) => (
                 <CreatableSelect
+                  placeholder="Select product..."
                   onChange={onChange} // send value to hook form
                   onBlur={onBlur} // notify when input is touched/blur
                   ref={ref}
@@ -143,6 +192,7 @@ const NewSessionPage = () => {
               name="wood"
               render={({ field: { onChange, onBlur, value, ref } }) => (
                 <CreatableSelect
+                  placeholder="Select wood..."
                   onChange={onChange} // send value to hook form
                   onBlur={onBlur} // notify when input is touched/blur
                   ref={ref}
