@@ -300,6 +300,7 @@ export default function SessionPage({
           {humSensor1Readings.length > 0 && (
             <LineChart width={600} height={300}>
               <Line
+                name="Humidity"
                 data={humSensor1Readings}
                 type="monotone"
                 dataKey="value"
@@ -320,6 +321,7 @@ export default function SessionPage({
                 interval="preserveStartEnd"
               />
               <YAxis />
+              <Legend />
             </LineChart>
           )}
           <p>Temperature readings over time</p>
