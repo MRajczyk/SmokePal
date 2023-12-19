@@ -8,6 +8,19 @@ import { useMutation } from "react-query";
 import { createZodFetcher } from "zod-fetch";
 import { fetcher } from "@/lib/utils";
 import defaultResponseSchema from "@/schemas/defaultResponseSchema";
+import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
+import moment from "moment";
+import { z } from "zod";
+
+const sensorReadingSchema = z.object({
+  sensorName: z.string(),
+  value: z.number(),
+  type: z.string(),
+  timestamp: z.string().datetime(),
+  timestampUnix: z.number(),
+});
+
+export type sensorReadingSchemaType = z.infer<typeof sensorReadingSchema>;
 
 export default function SessionPage({
   params,
@@ -15,6 +28,19 @@ export default function SessionPage({
   params: { sessionId: number };
 }) {
   const socketUrl = "ws://localhost:7071";
+
+  const [tempSensor1Readings, setTempSensor1Readings] = useState<
+    sensorReadingSchemaType[]
+  >([]);
+  const [tempSensor2Readings, setTempSensor2Readings] = useState<
+    sensorReadingSchemaType[]
+  >([]);
+  const [tempSensor3Readings, setTempSensor3Readings] = useState<
+    sensorReadingSchemaType[]
+  >([]);
+  const [humSensor1Readings, setHumSensor1Readings] = useState<
+    sensorReadingSchemaType[]
+  >([]);
 
   const [messageHistory, setMessageHistory] = useState([]);
   const { /*sendMessage,*/ lastMessage, readyState } = useWebSocket(socketUrl, {
@@ -33,9 +59,46 @@ export default function SessionPage({
 
   useEffect(() => {
     if (lastMessage !== null) {
-      setMessageHistory((prev) => prev.concat(lastMessage));
+      setMessageHistory((prev) => prev.concat(lastMessage.data));
+      const msg = JSON.parse(lastMessage.data);
+      if (msg.sensorName === "Hum1") {
+        setHumSensor1Readings((prev) =>
+          prev.concat({
+            ...msg,
+            timestampUnix: moment(msg.timestamp).valueOf(),
+          })
+        );
+      } else if (msg.sensorName === "Temp1") {
+        setTempSensor1Readings((prev) =>
+          prev.concat({
+            ...msg,
+            timestampUnix: moment(msg.timestamp).valueOf(),
+          })
+        );
+      } else if (msg.sensorName === "Temp2") {
+        setTempSensor2Readings((prev) =>
+          prev.concat({
+            ...msg,
+            timestampUnix: moment(msg.timestamp).valueOf(),
+          })
+        );
+      } else if (msg.sensorName === "Temp3") {
+        setTempSensor3Readings((prev) =>
+          prev.concat({
+            ...msg,
+            timestampUnix: moment(msg.timestamp).valueOf(),
+          })
+        );
+      }
     }
-  }, [lastMessage, setMessageHistory]);
+  }, [
+    lastMessage,
+    setMessageHistory,
+    setTempSensor1Readings,
+    setTempSensor2Readings,
+    setTempSensor3Readings,
+    setHumSensor1Readings,
+  ]);
 
   async function startSmokingSession() {
     const fetch = createZodFetcher(fetcher);
@@ -107,11 +170,66 @@ export default function SessionPage({
     true
   );
 
+  const dateFormatter = (date) => {
+    // return moment(date).unix();
+    return moment(date).format("HH:mm:ss");
+  };
+
   return (
     <div>
       {params.sessionId > 0 ? (
         <div>
-          <div>Session with id: {params.sessionId} works!</div>
+          <div>Session id: {params.sessionId}</div>
+          <span>Humidity readings over time</span>
+          {humSensor1Readings.length > 0 && (
+            <LineChart width={600} height={300} data={humSensor1Readings}>
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="black"
+                strokeWidth={2}
+                dot={false}
+              />
+              <CartesianGrid stroke="#ccc" />
+              <XAxis
+                dataKey={"timestampUnix"}
+                domain={[
+                  humSensor1Readings.at(0)!.timestampUnix,
+                  humSensor1Readings.at(humSensor1Readings.length - 1)!
+                    .timestampUnix,
+                ]}
+                scale="time"
+                type="number"
+                tickFormatter={dateFormatter}
+              />
+              <YAxis />
+            </LineChart>
+          )}
+          <span>Temperature 1 readings over time</span>
+          {tempSensor1Readings.length > 0 && (
+            <LineChart width={600} height={300} data={tempSensor1Readings}>
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="black"
+                strokeWidth={2}
+                dot={false}
+              />
+              <CartesianGrid stroke="#ccc" />
+              <XAxis
+                dataKey={"timestampUnix"}
+                domain={[
+                  tempSensor1Readings.at(0)!.timestampUnix,
+                  tempSensor1Readings.at(tempSensor1Readings.length - 1)!
+                    .timestampUnix,
+                ]}
+                scale="time"
+                type="number"
+                tickFormatter={dateFormatter}
+              />
+              <YAxis />
+            </LineChart>
+          )}
           <Button
             variant="default"
             onClick={() => {
@@ -128,13 +246,6 @@ export default function SessionPage({
           </Button>
           <br />
           <span>The WebSocket is currently {connectionStatus}</span>
-          {lastMessage ? <span>Last message: {lastMessage.data}</span> : null}
-          <br />
-          <ul>
-            {messageHistory.map((message, idx) => (
-              <span key={idx}>{message ? message.data : null}</span>
-            ))}
-          </ul>
         </div>
       ) : (
         <div>Invalid session id</div>
