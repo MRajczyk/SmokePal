@@ -159,7 +159,7 @@ const NewSessionPage = () => {
         <b>Nowe wędzenie</b>
       </div>
       <div className="grid grid-cols-2 w-full h-full">
-        <div className="flex bg-yellow-100 border-2 border-red-600 mx-4 mb-4">
+        <div className="flex border-2 border-red-600 mx-4 mb-4">
           <form
             key={0}
             className="flex flex-col gap-1"
@@ -210,7 +210,7 @@ const NewSessionPage = () => {
             <p className="text-red-600">{errors.description?.message}</p>
           </form>
         </div>
-        <div className="flex bg-green-100 border-2 border-red-600 mx-4 mb-4">
+        <div className="flex border-2 border-red-600 mx-4 mb-4">
           <form
             key={1}
             className="flex flex-col gap-1"
