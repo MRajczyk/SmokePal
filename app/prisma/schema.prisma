@@ -89,8 +89,8 @@ model SmokingSession {
   dateEnd         DateTime?
   finished        Boolean
   title           String?
-  product         String?
-  wood            String?
+  products        String[]
+  woods           String[]
   description     String?
   ingredients     SessionIngredient[]
   tempSensor1Name String?

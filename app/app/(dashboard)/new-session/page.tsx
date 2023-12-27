@@ -112,6 +112,7 @@ const NewSessionPage = () => {
     register,
     handleSubmit,
     formState: { errors },
+    getValues,
     setValue,
   } = useForm<NewSmokingSchemaType>({
     mode: "all",
@@ -138,7 +139,9 @@ const NewSessionPage = () => {
       const newOption = createOption(inputValue);
       setIsLoadingProducts(false);
       setOptionsProducts((prev) => [...prev, newOption]);
-      setValue("product", newOption);
+      const selectedProducts = getValues("products");
+      selectedProducts.push(newOption);
+      setValue("products", selectedProducts);
     }
   };
 
@@ -149,7 +152,9 @@ const NewSessionPage = () => {
       const newOption = createOption(inputValue);
       setIsLoadingWood(false);
       setOptionsWood((prev) => [...prev, newOption]);
-      setValue("wood", newOption);
+      const selectedWoods = getValues("woods");
+      selectedWoods.push(newOption);
+      setValue("woods", selectedWoods);
     }
   };
 
@@ -170,9 +175,10 @@ const NewSessionPage = () => {
 
             <Controller
               control={control}
-              name="product"
+              name="products"
               render={({ field: { onChange, onBlur, value, ref } }) => (
                 <CreatableSelect
+                  isMulti
                   placeholder="Select product..."
                   onChange={onChange} // send value to hook form
                   onBlur={onBlur} // notify when input is touched/blur
@@ -186,12 +192,14 @@ const NewSessionPage = () => {
                 />
               )}
             />
+            <p className="text-red-600">{errors.products?.message}</p>
 
             <Controller
               control={control}
-              name="wood"
+              name="woods"
               render={({ field: { onChange, onBlur, value, ref } }) => (
                 <CreatableSelect
+                  isMulti
                   placeholder="Select wood..."
                   onChange={onChange} // send value to hook form
                   onBlur={onBlur} // notify when input is touched/blur
@@ -205,6 +213,7 @@ const NewSessionPage = () => {
                 />
               )}
             />
+            <p className="text-red-600">{errors.woods?.message}</p>
 
             <input {...register("description")} placeholder="description" />
             <p className="text-red-600">{errors.description?.message}</p>
