@@ -30,7 +30,7 @@ export default async function DashboardLayout({
       <QueryClientProviderWrapper>
         <Provider session={session}>
           <div className="w-full h-full flex flex-row">
-            <div className="bg-orange-600 w-[100px] flex flex-col justify-between items-center">
+            <div className="bg-orange-600 w-[100px] flex flex-col justify-between items-center h-full sticky top-0">
               <Link href={{ pathname: "/" }}>
                 <Image
                   src={smokepalLogo}
@@ -92,7 +92,7 @@ export default async function DashboardLayout({
                 </LogoutButton>
               </div>
             </div>
-            <div className="bg-white w-full flex flex-row justify-center">
+            <div className="bg-white w-full flex flex-row justify-center overflow-y-scroll">
               {children}
             </div>
           </div>
