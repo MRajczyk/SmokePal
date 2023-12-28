@@ -36,8 +36,12 @@ export async function createNewSmokingSession(data: NewSmokingSchemaType) {
         authorId: userFromSession.id,
         finished: false,
         title: parseResult.data.title,
-        product: parseResult.data.product.value,
-        wood: parseResult.data.wood.value,
+        products: parseResult.data.products.map((item) => {
+          return item.value;
+        }),
+        woods: parseResult.data.woods.map((item) => {
+          return item.value;
+        }),
         description: parseResult.data.description,
         tempSensor1Name: parseResult.data.tempSensor1Name,
         tempSensor2Name: parseResult.data.tempSensor2Name,

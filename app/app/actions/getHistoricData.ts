@@ -14,11 +14,17 @@ export async function getHistoricData(sessionId: string) {
     // TODO: maybe redirect to login page?
     return { success: false, message: "Unauthorized" };
   }
+  const sessionIdNumeric = Number.parseInt(sessionId);
 
   try {
+    const sessionData = await prisma.smokingSession.findFirst({
+      where: {
+        id: sessionIdNumeric,
+      },
+    });
     const historicData = await prisma.smokingSensorReading.findMany({
       where: {
-        sessionId: Number.parseInt(sessionId),
+        sessionId: sessionIdNumeric,
       },
     });
 
@@ -26,6 +32,7 @@ export async function getHistoricData(sessionId: string) {
       success: true,
       data: JSON.stringify({
         historicData: historicData,
+        sessionData: sessionData,
       }),
     };
   } catch (e) {

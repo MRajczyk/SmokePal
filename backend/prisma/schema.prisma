@@ -46,7 +46,7 @@ model SmokingSensorReading {
   sensorName String
   value      Float
   type       ReadingType
-  timestamp  DateTime @default(now())
+  timestamp  DateTime
 }
 
 model SmokingSessionPhoto {
@@ -89,8 +89,8 @@ model SmokingSession {
   dateEnd         DateTime?
   finished        Boolean
   title           String?
-  product         String?
-  wood            String?
+  products        String[]
+  woods           String[]
   description     String?
   ingredients     SessionIngredient[]
   tempSensor1Name String?

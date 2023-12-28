@@ -112,6 +112,7 @@ const NewSessionPage = () => {
     register,
     handleSubmit,
     formState: { errors },
+    getValues,
     setValue,
   } = useForm<NewSmokingSchemaType>({
     mode: "all",
@@ -138,7 +139,9 @@ const NewSessionPage = () => {
       const newOption = createOption(inputValue);
       setIsLoadingProducts(false);
       setOptionsProducts((prev) => [...prev, newOption]);
-      setValue("product", newOption);
+      const selectedProducts = getValues("products");
+      selectedProducts.push(newOption);
+      setValue("products", selectedProducts);
     }
   };
 
@@ -149,7 +152,9 @@ const NewSessionPage = () => {
       const newOption = createOption(inputValue);
       setIsLoadingWood(false);
       setOptionsWood((prev) => [...prev, newOption]);
-      setValue("wood", newOption);
+      const selectedWoods = getValues("woods");
+      selectedWoods.push(newOption);
+      setValue("woods", selectedWoods);
     }
   };
 
@@ -159,7 +164,7 @@ const NewSessionPage = () => {
         <b>Nowe wędzenie</b>
       </div>
       <div className="grid grid-cols-2 w-full h-full">
-        <div className="flex bg-yellow-100 border-2 border-red-600 mx-4 mb-4">
+        <div className="flex border-2 border-red-600 mx-4 mb-4">
           <form
             key={0}
             className="flex flex-col gap-1"
@@ -170,9 +175,11 @@ const NewSessionPage = () => {
 
             <Controller
               control={control}
-              name="product"
+              name="products"
+              rules={{ required: true }}
               render={({ field: { onChange, onBlur, value, ref } }) => (
                 <CreatableSelect
+                  isMulti
                   placeholder="Select product..."
                   onChange={onChange} // send value to hook form
                   onBlur={onBlur} // notify when input is touched/blur
@@ -186,12 +193,15 @@ const NewSessionPage = () => {
                 />
               )}
             />
+            <p className="text-red-600">{errors.products?.message}</p>
 
             <Controller
               control={control}
-              name="wood"
+              name="woods"
+              rules={{ required: true }}
               render={({ field: { onChange, onBlur, value, ref } }) => (
                 <CreatableSelect
+                  isMulti
                   placeholder="Select wood..."
                   onChange={onChange} // send value to hook form
                   onBlur={onBlur} // notify when input is touched/blur
@@ -205,12 +215,13 @@ const NewSessionPage = () => {
                 />
               )}
             />
+            <p className="text-red-600">{errors.woods?.message}</p>
 
             <input {...register("description")} placeholder="description" />
             <p className="text-red-600">{errors.description?.message}</p>
           </form>
         </div>
-        <div className="flex bg-green-100 border-2 border-red-600 mx-4 mb-4">
+        <div className="flex border-2 border-red-600 mx-4 mb-4">
           <form
             key={1}
             className="flex flex-col gap-1"
