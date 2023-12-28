@@ -92,7 +92,9 @@ export default async function DashboardLayout({
                 </LogoutButton>
               </div>
             </div>
-            <div className="bg-white w-full">{children}</div>
+            <div className="bg-white w-full flex flex-row justify-center">
+              {children}
+            </div>
           </div>
         </Provider>
       </QueryClientProviderWrapper>

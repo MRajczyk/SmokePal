@@ -176,6 +176,7 @@ const NewSessionPage = () => {
             <Controller
               control={control}
               name="products"
+              rules={{ required: true }}
               render={({ field: { onChange, onBlur, value, ref } }) => (
                 <CreatableSelect
                   isMulti
@@ -197,6 +198,7 @@ const NewSessionPage = () => {
             <Controller
               control={control}
               name="woods"
+              rules={{ required: true }}
               render={({ field: { onChange, onBlur, value, ref } }) => (
                 <CreatableSelect
                   isMulti

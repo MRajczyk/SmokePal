@@ -12,6 +12,9 @@ import { LineChart, Line, CartesianGrid, XAxis, YAxis, Legend } from "recharts";
 import moment from "moment";
 import { z } from "zod";
 import { getHistoricData } from "@/app/actions/getHistoricData";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { type SmokingSession } from "@prisma/client";
 
 const sensorReadingSchema = z.object({
   sensorName: z.string(),
@@ -29,6 +32,13 @@ export default function SessionPage({
   params: { sessionId: number };
 }) {
   const socketUrl = "ws://localhost:7071";
+  const [sessionFinished, setSessionFinished] = useState(undefined);
+  const [sessionData, setSessionData] = useState<SmokingSession | undefined>(
+    undefined
+  );
+
+  const searchParams = useSearchParams();
+  const fromHistory = searchParams.get("fromHistory");
 
   const [tempSensor1Readings, setTempSensor1Readings] = useState<
     sensorReadingSchemaType[]
@@ -124,13 +134,16 @@ export default function SessionPage({
         console.log("no data available");
         return;
       }
-      const historicData = await JSON.parse(res.data);
+      const session = await JSON.parse(res.data);
+      setSessionFinished(session.sessionData.finished);
+      setSessionData(session.sessionData);
+      const historicData = session.historicData;
       const hum1Array: sensorReadingSchemaType[] = [];
       const temp1Array: sensorReadingSchemaType[] = [];
       const temp2Array: sensorReadingSchemaType[] = [];
       const temp3Array: sensorReadingSchemaType[] = [];
 
-      historicData.historicData.forEach(
+      historicData.forEach(
         (reading: {
           sensorName: string;
           value: number;
@@ -271,29 +284,40 @@ export default function SessionPage({
   );
 
   const dateFormatter = (date) => {
-    // return moment(date).unix();
     return moment(date).format("HH:mm:ss");
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center">
       {params.sessionId > 0 ? (
         <div>
-          <div>Session id: {params.sessionId}</div>
-          <Button
-            variant="default"
-            onClick={() => {
-              debounceStartSmokingSession();
-            }}
-          >
-            Start
-          </Button>
-          <Button
-            variant="default"
-            onClick={() => debounceStopSmokingSession()}
-          >
-            Stop
-          </Button>
+          <p>Session id: {params.sessionId}</p>
+          {sessionData && (
+            <div>
+              <p>Session title: {sessionData.title}</p>
+              <p>Session woods: {sessionData.woods.concat(" ")}</p>
+              <p>Session products: {sessionData.products.concat(" ")}</p>
+              <p>Session description: {sessionData.description}</p>
+            </div>
+          )}
+          {sessionFinished !== undefined && !sessionFinished && (
+            <div>
+              <Button
+                variant="default"
+                onClick={() => {
+                  debounceStartSmokingSession();
+                }}
+              >
+                Start
+              </Button>
+              <Button
+                variant="default"
+                onClick={() => debounceStopSmokingSession()}
+              >
+                Stop
+              </Button>
+            </div>
+          )}
           <br />
           <p>The WebSocket is currently {connectionStatus}</p>
           <p>Humidity readings over time</p>
@@ -373,6 +397,11 @@ export default function SessionPage({
         </div>
       ) : (
         <div>Invalid session id</div>
+      )}
+      {fromHistory && fromHistory === "true" && (
+        <Button asChild variant={"destructive"} className="w-[300px] mt-10">
+          <Link href={"/history"}>Go back to history</Link>
+        </Button>
       )}
     </div>
   );
