@@ -35,7 +35,7 @@ const HistoryPage = () => {
       return;
     } else {
       const sessions = await JSON.parse(res.data);
-      console.log(sessions.smokingSessions);
+      // console.log(sessions.smokingSessions);
       setMaxPages(Math.ceil(sessions.count / ITEMS_PER_PAGE));
       setPreviousSessions(sessions.smokingSessions);
     }
@@ -63,7 +63,7 @@ const HistoryPage = () => {
         return;
       } else {
         const sessions = await JSON.parse(res.data);
-        console.log(sessions.smokingSessions);
+        // console.log(sessions.smokingSessions);
         setMaxPages(Math.ceil(sessions.count / ITEMS_PER_PAGE));
         setPreviousSessions(sessions.smokingSessions);
       }
