@@ -2,6 +2,7 @@
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/server/auth";
+import { Prisma } from "@prisma/client";
 
 export async function getHistoricData(sessionId: string) {
   const session = await getServerSession(authOptions);
@@ -36,7 +37,11 @@ export async function getHistoricData(sessionId: string) {
       }),
     };
   } catch (e) {
-    console.log(e.message);
+    if (
+      e instanceof Prisma.PrismaClientKnownRequestError ||
+      e instanceof Prisma.PrismaClientUnknownRequestError
+    )
+      console.log(e.message);
     return { success: false, message: "Could not fetch historic data" };
   }
 }

@@ -16,6 +16,7 @@ export function LogoutButton({
       className={className}
       variant="ghost"
       size={"logout"}
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onClick={(e) => {
         signOut();
       }}

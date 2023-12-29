@@ -21,17 +21,17 @@ import defaultResponseSchema from "@/schemas/defaultResponseSchema";
 import { createNewProductType } from "@/app/actions/createNewProductType";
 import { createNewWoodType } from "@/app/actions/createNewWoodType";
 
-export const OptionsSchema = z.object({
+const OptionsSchema = z.object({
   label: z.string(),
   value: z.string(),
 });
-export type OptionsSchemaType = z.infer<typeof OptionsSchema>;
+type OptionsSchemaType = z.infer<typeof OptionsSchema>;
 
-export const NewSessionSelectSchema = z.object({
+const NewSessionSelectSchema = z.object({
   id: z.number(),
   name: z.string(),
 });
-export type NewSessionSelectSchemaType = z.infer<typeof NewSessionSelectSchema>;
+type NewSessionSelectSchemaType = z.infer<typeof NewSessionSelectSchema>;
 
 const NewSessionPage = () => {
   const router = useRouter();

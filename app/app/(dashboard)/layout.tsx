@@ -75,7 +75,7 @@ export default async function DashboardLayout({
                   ></Image>
                 </Link> */}
               </div>
-              <div className="flex flex-col justify-center items-center gap-[10px] mb-10  ">
+              <div className="flex flex-col justify-center items-center gap-[10px] mb-10">
                 <Link className="w-12 h-12" href={{ pathname: "/settings" }}>
                   <Image
                     src={settingsIcon}
@@ -92,7 +92,7 @@ export default async function DashboardLayout({
                 </LogoutButton>
               </div>
             </div>
-            <div className="bg-white w-full flex flex-row justify-center overflow-y-scroll">
+            <div className="bg-white w-full flex flex-row justify-center overflow-y-auto">
               {children}
             </div>
           </div>

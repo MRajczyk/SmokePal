@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/server/auth";
 
-export async function getAllSmokingSessions() {
+export async function getSmokingSessions(page: number, pageItemsCount: number) {
   const session = await getServerSession(authOptions);
   if (!session) {
     // TODO: maybe redirect to login page?
@@ -11,11 +11,18 @@ export async function getAllSmokingSessions() {
   }
 
   try {
-    const smokingSessions = await prisma.smokingSession.findMany();
+    const [count, smokingSessions] = await prisma.$transaction([
+      prisma.smokingSession.count(),
+      prisma.smokingSession.findMany({
+        take: pageItemsCount,
+        skip: (page - 1) * pageItemsCount,
+      }),
+    ]);
     return {
       success: true,
       data: JSON.stringify({
         smokingSessions: smokingSessions,
+        count: count,
       }),
     };
   } catch (e) {

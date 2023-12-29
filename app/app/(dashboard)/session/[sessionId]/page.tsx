@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -118,14 +119,7 @@ export default function SessionPage({
         );
       }
     }
-  }, [
-    lastMessage,
-    setMessageHistory,
-    setTempSensor1Readings,
-    setTempSensor2Readings,
-    setTempSensor3Readings,
-    setHumSensor1Readings,
-  ]);
+  }, [lastMessage]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -283,7 +277,7 @@ export default function SessionPage({
     true
   );
 
-  const dateFormatter = (date) => {
+  const dateFormatter = (date: string | Date) => {
     return moment(date).format("HH:mm:ss");
   };
 
@@ -295,9 +289,25 @@ export default function SessionPage({
           {sessionData && (
             <div>
               <p>Session title: {sessionData.title}</p>
-              <p>Session woods: {sessionData.woods.concat(" ")}</p>
-              <p>Session products: {sessionData.products.concat(" ")}</p>
+              <p>Session woods: {sessionData.woods.join(", ")}</p>
+              <p>Session products: {sessionData.products.join(", ")}</p>
               <p>Session description: {sessionData.description}</p>
+              <p>
+                Current temp1:{" "}
+                {tempSensor1Readings.at(tempSensor1Readings.length - 1)?.value}
+              </p>
+              <p>
+                Current temp2:{" "}
+                {tempSensor2Readings.at(tempSensor2Readings.length - 1)?.value}
+              </p>
+              <p>
+                Current temp3:{" "}
+                {tempSensor3Readings.at(tempSensor3Readings.length - 1)?.value}
+              </p>
+              <p>
+                Current hum1:{" "}
+                {humSensor1Readings.at(humSensor1Readings.length - 1)?.value}
+              </p>
             </div>
           )}
           {sessionFinished !== undefined && !sessionFinished && (
