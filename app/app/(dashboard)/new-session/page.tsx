@@ -119,9 +119,10 @@ const NewSessionPage = () => {
     resolver: zodResolver(NewSmokingSchema),
   });
 
-  const onSubmit = async (data: NewSmokingSchemaType) => {
+  const handleFormSubmit = async (data: NewSmokingSchemaType) => {
     //maybe move to on success callback in mutation, idk
     debounceStopSmokingSession();
+    console.log(data);
     const res = await createNewSmokingSession(data);
     if (res.success === true && res.data) {
       router.push(`/session/${JSON.parse(res.data).sessionId}`, {
@@ -168,7 +169,7 @@ const NewSessionPage = () => {
           <form
             key={0}
             className="flex flex-col gap-1"
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmit(handleFormSubmit)}
           >
             <input {...register("title")} placeholder="title" />
             <p className="text-red-600">{errors.title?.message}</p>
@@ -217,7 +218,7 @@ const NewSessionPage = () => {
             />
             <p className="text-red-600">{errors.woods?.message}</p>
 
-            <input {...register("description")} placeholder="description" />
+            <textarea {...register("description")} placeholder="description" />
             <p className="text-red-600">{errors.description?.message}</p>
           </form>
         </div>
@@ -225,7 +226,7 @@ const NewSessionPage = () => {
           <form
             key={1}
             className="flex flex-col gap-1"
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmit(handleFormSubmit)}
           >
             <input
               {...register("tempSensor1Name")}

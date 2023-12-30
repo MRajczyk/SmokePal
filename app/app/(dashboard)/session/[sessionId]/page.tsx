@@ -291,7 +291,7 @@ export default function SessionPage({
               <p>Session title: {sessionData.title}</p>
               <p>Session woods: {sessionData.woods.join(", ")}</p>
               <p>Session products: {sessionData.products.join(", ")}</p>
-              <p>Session description: {sessionData.description}</p>
+              <textarea value={sessionData.description ?? ""}></textarea>
               <p>
                 Current temp1:{" "}
                 {tempSensor1Readings.at(tempSensor1Readings.length - 1)?.value}

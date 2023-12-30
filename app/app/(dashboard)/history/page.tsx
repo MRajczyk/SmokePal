@@ -19,7 +19,7 @@ import moment from "moment";
 import Pagination from "@mui/material/Pagination";
 
 const HistoryPage = () => {
-  const ITEMS_PER_PAGE = 2;
+  const ITEMS_PER_PAGE = 10;
   const searchParams = useSearchParams();
   const [page, setPage] = React.useState(1);
   const [maxPages, setMaxPages] = React.useState(1);
