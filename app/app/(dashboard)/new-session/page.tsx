@@ -20,6 +20,8 @@ import { fetcher } from "@/lib/utils";
 import defaultResponseSchema from "@/schemas/defaultResponseSchema";
 import { createNewProductType } from "@/app/actions/createNewProductType";
 import { createNewWoodType } from "@/app/actions/createNewWoodType";
+import { v4 as uuidv4 } from "uuid";
+import ImageCarousel from "@/components/ui/imageCarousel";
 
 const OptionsSchema = z.object({
   label: z.string(),
@@ -32,6 +34,19 @@ const NewSessionSelectSchema = z.object({
   name: z.string(),
 });
 type NewSessionSelectSchemaType = z.infer<typeof NewSessionSelectSchema>;
+
+const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
+
+export type fileUploadSchemaType = {
+  temporaryID: string;
+  file: File;
+  b64String: string;
+};
 
 const NewSessionPage = () => {
   const router = useRouter();
@@ -46,6 +61,35 @@ const NewSessionPage = () => {
   );
   const [isLoadingWood, setIsLoadingWood] = useState(false);
   const [optionsWood, setOptionsWood] = useState<OptionsSchemaType[]>([]);
+
+  const [images, setImages] = useState<fileUploadSchemaType[]>([]);
+
+  function handleAddImage(file: File) {
+    if (file.size > 5000000) {
+      //TODO: displayt erorr maybe
+      console.log("File is too big!");
+      return;
+    }
+
+    if (!ACCEPTED_IMAGE_TYPES.find((type) => type === file.type)) {
+      //TODO: displayt erorr maybe
+      console.log("Unsupported file type");
+      return;
+    }
+
+    setImages([
+      ...images,
+      {
+        temporaryID: uuidv4(),
+        file: file,
+        b64String: URL.createObjectURL(file),
+      },
+    ]);
+  }
+
+  function handleRemoveImage(imageUUID: string) {
+    setImages(images.filter((image) => image.temporaryID !== imageUUID));
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -122,8 +166,12 @@ const NewSessionPage = () => {
   const handleFormSubmit = async (data: NewSmokingSchemaType) => {
     //maybe move to on success callback in mutation, idk
     debounceStopSmokingSession();
-    console.log(data);
-    const res = await createNewSmokingSession(data);
+    const formData = new FormData();
+    for (let i = 0; i < images.length; ++i) {
+      formData.append("files[]", images[i].file);
+    }
+
+    const res = await createNewSmokingSession(data, formData);
     if (res.success === true && res.data) {
       router.push(`/session/${JSON.parse(res.data).sessionId}`, {
         scroll: false,
@@ -166,61 +214,72 @@ const NewSessionPage = () => {
       </div>
       <div className="grid grid-cols-2 w-full h-full">
         <div className="flex border-2 border-red-600 mx-4 mb-4">
-          <form
-            key={0}
-            className="flex flex-col gap-1"
-            onSubmit={handleSubmit(handleFormSubmit)}
-          >
-            <input {...register("title")} placeholder="title" />
-            <p className="text-red-600">{errors.title?.message}</p>
+          <div className="flex flex-col gap-1">
+            <form
+              key={0}
+              className="flex flex-col gap-1"
+              onSubmit={handleSubmit(handleFormSubmit)}
+            >
+              <input {...register("title")} placeholder="title" />
+              <p className="text-red-600">{errors.title?.message}</p>
 
-            <Controller
-              control={control}
-              name="products"
-              rules={{ required: true }}
-              render={({ field: { onChange, onBlur, value, ref } }) => (
-                <CreatableSelect
-                  isMulti
-                  placeholder="Select product..."
-                  onChange={onChange} // send value to hook form
-                  onBlur={onBlur} // notify when input is touched/blur
-                  ref={ref}
-                  value={value}
-                  isClearable
-                  isDisabled={isLoadingProducts}
-                  isLoading={isLoadingProducts}
-                  onCreateOption={handleCreateProducts}
-                  options={optionsProducts}
-                />
-              )}
+              <Controller
+                control={control}
+                name="products"
+                rules={{ required: true }}
+                render={({ field: { onChange, onBlur, value, ref } }) => (
+                  <CreatableSelect
+                    isMulti
+                    placeholder="Select product..."
+                    onChange={onChange} // send value to hook form
+                    onBlur={onBlur} // notify when input is touched/blur
+                    ref={ref}
+                    value={value}
+                    isClearable
+                    isDisabled={isLoadingProducts}
+                    isLoading={isLoadingProducts}
+                    onCreateOption={handleCreateProducts}
+                    options={optionsProducts}
+                  />
+                )}
+              />
+              <p className="text-red-600">{errors.products?.message}</p>
+
+              <Controller
+                control={control}
+                name="woods"
+                rules={{ required: true }}
+                render={({ field: { onChange, onBlur, value, ref } }) => (
+                  <CreatableSelect
+                    isMulti
+                    placeholder="Select wood..."
+                    onChange={onChange} // send value to hook form
+                    onBlur={onBlur} // notify when input is touched/blur
+                    ref={ref}
+                    value={value}
+                    isClearable
+                    isDisabled={isLoadingWood}
+                    isLoading={isLoadingWood}
+                    onCreateOption={handleCreateWood}
+                    options={optionsWood}
+                  />
+                )}
+              />
+              <p className="text-red-600">{errors.woods?.message}</p>
+
+              <textarea
+                {...register("description")}
+                placeholder="description"
+              />
+              <p className="text-red-600">{errors.description?.message}</p>
+            </form>
+            <ImageCarousel
+              handleAddImage={handleAddImage}
+              handleRemoveImage={handleRemoveImage}
+              images={images}
+              editing={true}
             />
-            <p className="text-red-600">{errors.products?.message}</p>
-
-            <Controller
-              control={control}
-              name="woods"
-              rules={{ required: true }}
-              render={({ field: { onChange, onBlur, value, ref } }) => (
-                <CreatableSelect
-                  isMulti
-                  placeholder="Select wood..."
-                  onChange={onChange} // send value to hook form
-                  onBlur={onBlur} // notify when input is touched/blur
-                  ref={ref}
-                  value={value}
-                  isClearable
-                  isDisabled={isLoadingWood}
-                  isLoading={isLoadingWood}
-                  onCreateOption={handleCreateWood}
-                  options={optionsWood}
-                />
-              )}
-            />
-            <p className="text-red-600">{errors.woods?.message}</p>
-
-            <textarea {...register("description")} placeholder="description" />
-            <p className="text-red-600">{errors.description?.message}</p>
-          </form>
+          </div>
         </div>
         <div className="flex border-2 border-red-600 mx-4 mb-4">
           <form

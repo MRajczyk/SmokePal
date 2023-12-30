@@ -7,7 +7,10 @@ import {
   type NewSmokingSchemaType,
 } from "@/schemas/NewSmokingSchema";
 
-export async function createNewSmokingSession(data: NewSmokingSchemaType) {
+export async function createNewSmokingSession(
+  data: NewSmokingSchemaType,
+  imagesFormData: FormData
+) {
   const session = await getServerSession(authOptions);
   if (!session) {
     // TODO: maybe redirect to login page?
@@ -51,6 +54,36 @@ export async function createNewSmokingSession(data: NewSmokingSchemaType) {
     if (!newSession.id) {
       return { success: false, message: "Could not create new session" };
     }
+
+    const files = imagesFormData.getAll("files[]");
+
+    // files.forEach((file) => {
+    //   let fileBytes;
+    //   const parsedFile: File = file;
+    //   parsedFile.arrayBuffer().then((byteArray) => {
+    //     fileBytes = new Uint8Array(byteArray);
+    //     console.log(fileBytes);
+
+    //     prisma.smokingSessionPhoto.create({
+    //       data: {
+    //         sessionId: newSession.id,
+    //         data: fileBytes,
+    //       },
+    //     });
+    //   });
+
+    files.forEach(async (file) => {
+      const parsedFile: File = file;
+
+      const res = await prisma.smokingSessionPhoto.create({
+        data: {
+          sessionId: newSession.id,
+          data: Buffer.from(await parsedFile.arrayBuffer()),
+          mime: parsedFile.type,
+        },
+      });
+      console.log(res);
+    });
 
     return {
       success: true,

@@ -36,7 +36,7 @@ export default async function DashboardLayout({
                   src={smokepalLogo}
                   alt="SmokePal Logo"
                   className="cursor-pointer"
-                ></Image>
+                />
               </Link>
               <div className="flex flex-col justify-center items-center gap-[10px]">
                 <Link className="w-12 h-12" href={{ pathname: "/" }}>
@@ -44,35 +44,35 @@ export default async function DashboardLayout({
                     src={homeIcon}
                     alt="Home icon"
                     className="cursor-pointer"
-                  ></Image>
+                  />
                 </Link>
                 <Link className="w-12 h-12" href={{ pathname: "/new-session" }}>
                   <Image
                     src={addIcon}
                     alt="Add icon"
                     className="cursor-pointer"
-                  ></Image>
+                  />
                 </Link>
                 <ActiveSessionButton>
                   <Image
                     src={smokerIcon}
                     alt="Active session"
                     className="cursor-pointer w-12 h-12"
-                  ></Image>
+                  />
                 </ActiveSessionButton>
                 <Link className="w-12 h-12" href={{ pathname: "/history" }}>
                   <Image
                     src={historyIcon}
                     alt="History icon"
                     className="cursor-pointer"
-                  ></Image>
+                  />
                 </Link>
                 {/*TODO: in the future <Link className="w-12 h-12" href={{ pathname: "/recipes" }}>
                   <Image
                     src={recipesIcon}
                     alt="Recipes icon"
                     className="cursor-pointer"
-                  ></Image>
+                  />
                 </Link> */}
               </div>
               <div className="flex flex-col justify-center items-center gap-[10px] mb-10">
@@ -81,14 +81,14 @@ export default async function DashboardLayout({
                     src={settingsIcon}
                     alt="Settings icon"
                     className="cursor-pointer"
-                  ></Image>
+                  />
                 </Link>
                 <LogoutButton>
                   <Image
                     src={logoutIcon}
                     alt="Logout icon"
                     className="cursor-pointer w-12 h-12"
-                  ></Image>
+                  />
                 </LogoutButton>
               </div>
             </div>
