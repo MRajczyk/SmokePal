@@ -35,7 +35,7 @@ const ImageCarousel = ({
       {(editing || (images && images.length > 0)) && (
         <div
           className={cn(
-            "flex flex-row gap-5 border-2 border-solid border-gray-300 h-fit p-4 w-[400px] overflow-x-auto rounded-xl",
+            "flex flex-row shrink-0 gap-5 border-2 border-solid border-gray-300 h-fit p-4 w-[400px] overflow-x-auto rounded-xl",
             className
           )}
         >

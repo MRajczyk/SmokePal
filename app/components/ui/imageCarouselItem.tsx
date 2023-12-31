@@ -34,7 +34,7 @@ const ImageCarouselItem = ({
   }
 
   return (
-    <div className="relative flex shrink-0 rounded-2xl h-[100px]">
+    <div className="relative flex shrink-0 rounded-2xl">
       <Image
         src={b64URL}
         alt="Picture uploaded by user"
