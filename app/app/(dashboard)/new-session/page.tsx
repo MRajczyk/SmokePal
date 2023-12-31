@@ -35,7 +35,7 @@ const NewSessionSelectSchema = z.object({
 });
 type NewSessionSelectSchemaType = z.infer<typeof NewSessionSelectSchema>;
 
-const ACCEPTED_IMAGE_TYPES = [
+export const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",
   "image/png",
@@ -44,7 +44,7 @@ const ACCEPTED_IMAGE_TYPES = [
 
 export type fileUploadSchemaType = {
   temporaryID: string;
-  file: File;
+  file?: File;
   b64String: string;
 };
 
@@ -66,19 +66,19 @@ const NewSessionPage = () => {
 
   function handleAddImage(file: File) {
     if (file.size > 5000000) {
-      //TODO: displayt erorr maybe
+      //TODO: display error maybe
       console.log("File is too big!");
       return;
     }
 
     if (!ACCEPTED_IMAGE_TYPES.find((type) => type === file.type)) {
-      //TODO: displayt erorr maybe
+      //TODO: display error maybe
       console.log("Unsupported file type");
       return;
     }
 
-    setImages([
-      ...images,
+    setImages((prevState) => [
+      ...prevState,
       {
         temporaryID: uuidv4(),
         file: file,
@@ -168,7 +168,10 @@ const NewSessionPage = () => {
     debounceStopSmokingSession();
     const formData = new FormData();
     for (let i = 0; i < images.length; ++i) {
-      formData.append("files[]", images[i].file);
+      if (!images[i].file) {
+        continue;
+      }
+      formData.append("files[]", images[i].file!);
     }
 
     const res = await createNewSmokingSession(data, formData);

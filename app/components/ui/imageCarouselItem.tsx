@@ -8,6 +8,7 @@ interface ImageCarouselItemProps {
   width: number;
   height: number;
   imageUuid: string;
+  handleImageClick?: (uuid: string) => void;
   editing?: boolean;
 }
 
@@ -18,14 +19,22 @@ const ImageCarouselItem = ({
   height,
   imageUuid,
   editing,
+  handleImageClick,
 }: ImageCarouselItemProps) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function removeImage(_e: React.MouseEvent<HTMLImageElement>) {
     handleRemoveImage(imageUuid);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  function imageClickCallback(_e: React.MouseEvent<HTMLImageElement>) {
+    if (handleImageClick) {
+      handleImageClick(imageUuid);
+    }
+  }
+
   return (
-    <div className="relative flex shrink-0 rounded-2xl">
+    <div className="relative flex shrink-0 rounded-2xl h-[100px]">
       <Image
         src={b64URL}
         alt="Picture uploaded by user"
@@ -35,7 +44,9 @@ const ImageCarouselItem = ({
           objectFit: "cover",
           maxHeight: `${height}px`,
           borderRadius: 16,
+          cursor: handleImageClick ? "pointer" : "",
         }}
+        onClick={imageClickCallback}
       />
       {editing && (
         <Image

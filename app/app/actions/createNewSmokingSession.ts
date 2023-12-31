@@ -57,32 +57,18 @@ export async function createNewSmokingSession(
 
     const files = imagesFormData.getAll("files[]");
 
-    // files.forEach((file) => {
-    //   let fileBytes;
-    //   const parsedFile: File = file;
-    //   parsedFile.arrayBuffer().then((byteArray) => {
-    //     fileBytes = new Uint8Array(byteArray);
-    //     console.log(fileBytes);
-
-    //     prisma.smokingSessionPhoto.create({
-    //       data: {
-    //         sessionId: newSession.id,
-    //         data: fileBytes,
-    //       },
-    //     });
-    //   });
-
     files.forEach(async (file) => {
-      const parsedFile: File = file;
+      if (file instanceof File) {
+        const parsedFile: File = file;
 
-      const res = await prisma.smokingSessionPhoto.create({
-        data: {
-          sessionId: newSession.id,
-          data: Buffer.from(await parsedFile.arrayBuffer()),
-          mime: parsedFile.type,
-        },
-      });
-      console.log(res);
+        await prisma.smokingSessionPhoto.create({
+          data: {
+            sessionId: newSession.id,
+            data: Buffer.from(await parsedFile.arrayBuffer()),
+            mime: parsedFile.type,
+          },
+        });
+      }
     });
 
     return {

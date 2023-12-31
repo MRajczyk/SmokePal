@@ -28,12 +28,18 @@ export async function getHistoricData(sessionId: string) {
         sessionId: sessionIdNumeric,
       },
     });
+    const sessionPhotos = await prisma.smokingSessionPhoto.findMany({
+      where: {
+        sessionId: sessionIdNumeric,
+      },
+    });
 
     return {
       success: true,
       data: JSON.stringify({
         historicData: historicData,
         sessionData: sessionData,
+        sessionPhotos: sessionPhotos,
       }),
     };
   } catch (e) {
