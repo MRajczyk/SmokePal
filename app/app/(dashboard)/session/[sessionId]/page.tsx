@@ -435,7 +435,7 @@ export default function SessionPage({
           {tempSensor1Readings.length > 0 && (
             <LineChart width={600} height={300}>
               <Line
-                name="Temperature 1"
+                name={sessionData?.tempSensor1Name ?? "Temperature 1"}
                 data={tempSensor1Readings}
                 type="monotone"
                 dataKey="value"
@@ -444,7 +444,7 @@ export default function SessionPage({
                 dot={false}
               />
               <Line
-                name="Temperature 2"
+                name={sessionData?.tempSensor2Name ?? "Temperature 2"}
                 data={tempSensor2Readings}
                 type="monotone"
                 dataKey="value"
@@ -453,7 +453,7 @@ export default function SessionPage({
                 dot={false}
               />
               <Line
-                name="Temperature 3"
+                name={sessionData?.tempSensor3Name ?? "Temperature 3"}
                 data={tempSensor3Readings}
                 type="monotone"
                 dataKey="value"
