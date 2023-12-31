@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,21 @@ import { getHistoricData } from "@/app/actions/getHistoricData";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { type SmokingSession } from "@prisma/client";
+import Image from "next/image";
+import { fileUploadSchemaType } from "../../new-session/page";
+import { v4 as uuidv4 } from "uuid";
+import ImageCarousel from "@/components/ui/imageCarousel";
+import { ACCEPTED_IMAGE_TYPES } from "../../new-session/page";
+import { Lightbox } from "react-modal-image";
+
+function arrayBufferToBase64(buffer: Buffer, mime: string) {
+  let binary = "";
+  const bytes = buffer.data;
+  bytes.forEach((b) => (binary += String.fromCharCode(b)));
+  const res = `data:${mime};base64,` + btoa(binary);
+
+  return res;
+}
 
 const sensorReadingSchema = z.object({
   sensorName: z.string(),
@@ -36,6 +52,48 @@ export default function SessionPage({
   const [sessionData, setSessionData] = useState<SmokingSession | undefined>(
     undefined
   );
+
+  function handleAddImage(file: File) {
+    if (file.size > 5000000) {
+      //TODO: display error maybe
+      console.log("File is too big!");
+      return;
+    }
+
+    if (!ACCEPTED_IMAGE_TYPES.find((type) => type === file.type)) {
+      //TODO: display error maybe
+      console.log("Unsupported file type");
+      return;
+    }
+
+    setImages((prevState) => [
+      ...prevState,
+      {
+        temporaryID: uuidv4(),
+        file: file,
+        b64String: URL.createObjectURL(file),
+      },
+    ]);
+  }
+
+  function handleRemoveImage(imageUUID: string) {
+    setImages(images.filter((image) => image.temporaryID !== imageUUID));
+  }
+
+  function handleImageClick(imageUUID: string) {
+    setModalImageURL(
+      images.find((img) => img.temporaryID === imageUUID)!.b64String
+    );
+    setImageModalOpen(true);
+  }
+
+  const [images, setImages] = useState<fileUploadSchemaType[]>([]);
+  const [imageModalOpen, setImageModalOpen] = useState<boolean>(false);
+  const [modalImageURL, setModalImageURL] = useState<string>("");
+
+  const closeLightbox = () => {
+    setImageModalOpen(false);
+  };
 
   const searchParams = useSearchParams();
   const fromHistory = searchParams.get("fromHistory");
@@ -118,14 +176,7 @@ export default function SessionPage({
         );
       }
     }
-  }, [
-    lastMessage,
-    setMessageHistory,
-    setTempSensor1Readings,
-    setTempSensor2Readings,
-    setTempSensor3Readings,
-    setHumSensor1Readings,
-  ]);
+  }, [lastMessage]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -135,6 +186,14 @@ export default function SessionPage({
         return;
       }
       const session = await JSON.parse(res.data);
+      const tempArrayForImages: fileUploadSchemaType[] = [];
+      session.sessionPhotos.forEach((imagesEntry) => {
+        tempArrayForImages.push({
+          temporaryID: uuidv4(),
+          b64String: arrayBufferToBase64(imagesEntry.data, imagesEntry.mime),
+        });
+      });
+      setImages(tempArrayForImages);
       setSessionFinished(session.sessionData.finished);
       setSessionData(session.sessionData);
       const historicData = session.historicData;
@@ -283,21 +342,45 @@ export default function SessionPage({
     true
   );
 
-  const dateFormatter = (date) => {
+  const dateFormatter = (date: string | Date) => {
     return moment(date).format("HH:mm:ss");
   };
 
   return (
     <div className="flex flex-col items-center">
+      {imageModalOpen && (
+        <Lightbox
+          medium={modalImageURL}
+          large={modalImageURL}
+          alt="Enlarged smoking session image"
+          onClose={closeLightbox}
+        />
+      )}
       {params.sessionId > 0 ? (
         <div>
           <p>Session id: {params.sessionId}</p>
           {sessionData && (
             <div>
               <p>Session title: {sessionData.title}</p>
-              <p>Session woods: {sessionData.woods.concat(" ")}</p>
-              <p>Session products: {sessionData.products.concat(" ")}</p>
-              <p>Session description: {sessionData.description}</p>
+              <p>Session woods: {sessionData.woods.join(", ")}</p>
+              <p>Session products: {sessionData.products.join(", ")}</p>
+              <textarea value={sessionData.description ?? ""}></textarea>
+              <p>
+                Current temp1:{" "}
+                {tempSensor1Readings.at(tempSensor1Readings.length - 1)?.value}
+              </p>
+              <p>
+                Current temp2:{" "}
+                {tempSensor2Readings.at(tempSensor2Readings.length - 1)?.value}
+              </p>
+              <p>
+                Current temp3:{" "}
+                {tempSensor3Readings.at(tempSensor3Readings.length - 1)?.value}
+              </p>
+              <p>
+                Current hum1:{" "}
+                {humSensor1Readings.at(humSensor1Readings.length - 1)?.value}
+              </p>
             </div>
           )}
           {sessionFinished !== undefined && !sessionFinished && (
@@ -352,7 +435,7 @@ export default function SessionPage({
           {tempSensor1Readings.length > 0 && (
             <LineChart width={600} height={300}>
               <Line
-                name="Temperature 1"
+                name={sessionData?.tempSensor1Name ?? "Temperature 1"}
                 data={tempSensor1Readings}
                 type="monotone"
                 dataKey="value"
@@ -361,7 +444,7 @@ export default function SessionPage({
                 dot={false}
               />
               <Line
-                name="Temperature 2"
+                name={sessionData?.tempSensor2Name ?? "Temperature 2"}
                 data={tempSensor2Readings}
                 type="monotone"
                 dataKey="value"
@@ -370,7 +453,7 @@ export default function SessionPage({
                 dot={false}
               />
               <Line
-                name="Temperature 3"
+                name={sessionData?.tempSensor3Name ?? "Temperature 3"}
                 data={tempSensor3Readings}
                 type="monotone"
                 dataKey="value"
@@ -403,6 +486,15 @@ export default function SessionPage({
           <Link href={"/history"}>Go back to history</Link>
         </Button>
       )}
+
+      <ImageCarousel
+        handleAddImage={handleAddImage}
+        handleRemoveImage={handleRemoveImage}
+        handleImageClick={handleImageClick}
+        images={images}
+        editing={false}
+        className="mt-4"
+      />
     </div>
   );
 }

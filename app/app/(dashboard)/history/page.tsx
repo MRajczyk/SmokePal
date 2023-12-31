@@ -6,18 +6,41 @@ import {
   TableBody,
   TableCaption,
   TableCell,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAllSmokingSessions } from "@/app/actions/getAllSmokingSessions";
+import { getSmokingSessions } from "@/app/actions/getSmokingSessions";
 import type { SmokingSession } from "@prisma/client";
 import { useSearchParams } from "next/navigation";
 import moment from "moment";
+import Pagination from "@mui/material/Pagination";
 
 const HistoryPage = () => {
+  const ITEMS_PER_PAGE = 10;
   const searchParams = useSearchParams();
+  const [page, setPage] = React.useState(1);
+  const [maxPages, setMaxPages] = React.useState(1);
+
+  const handlePageChange = async (
+    event: React.ChangeEvent<unknown>,
+    newPage: number
+  ) => {
+    setPage(newPage);
+    const res = await getSmokingSessions(newPage, ITEMS_PER_PAGE);
+    if (!res.data) {
+      console.log("no previous sessions available");
+      return;
+    } else {
+      const sessions = await JSON.parse(res.data);
+      // console.log(sessions.smokingSessions);
+      setMaxPages(Math.ceil(sessions.count / ITEMS_PER_PAGE));
+      setPreviousSessions(sessions.smokingSessions);
+    }
+  };
+
   const createQueryString = useCallback(
     (name: string, value: string) => {
       const params = new URLSearchParams(searchParams);
@@ -34,14 +57,15 @@ const HistoryPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await getAllSmokingSessions();
+      const res = await getSmokingSessions(page, ITEMS_PER_PAGE);
       if (!res.data) {
         console.log("no previous sessions available");
         return;
       } else {
-        const previous = await JSON.parse(res.data);
-        console.log(previous.smokingSessions);
-        setPreviousSessions(previous.smokingSessions);
+        const sessions = await JSON.parse(res.data);
+        // console.log(sessions.smokingSessions);
+        setMaxPages(Math.ceil(sessions.count / ITEMS_PER_PAGE));
+        setPreviousSessions(sessions.smokingSessions);
       }
     };
 
@@ -130,12 +154,18 @@ const HistoryPage = () => {
               </TableRow>
             ))}
           </TableBody>
-          {/* <TableFooter>
+          <TableFooter>
             <TableRow>
-              <TableCell colSpan={3}>Total</TableCell>
-              <TableCell className="text-right">$2,500.00</TableCell>
+              <TableCell colSpan={5} align="center">
+                <Pagination
+                  count={maxPages}
+                  page={page}
+                  color="primary"
+                  onChange={handlePageChange}
+                />
+              </TableCell>
             </TableRow>
-          </TableFooter> */}
+          </TableFooter>
         </Table>
       )}
       {previousSessions.length <= 0 && <p>Loading previous sessions...</p>}

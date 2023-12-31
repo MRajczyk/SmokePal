@@ -19,3 +19,7 @@ body {
     radial-gradient(ellipse at bottom, #f7db3d, transparent);
   height: "100%";
 }
+
+.MuiPagination-ul {
+  justify-content: center;
+}
