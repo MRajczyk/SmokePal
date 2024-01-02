@@ -53,6 +53,8 @@ export default function SessionPage({
     undefined
   );
 
+  const [editing, setEditing] = useState<boolean>(false);
+
   function handleAddImage(file: File) {
     if (file.size > 5000000) {
       //TODO: display error maybe
