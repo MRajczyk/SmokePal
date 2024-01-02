@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import debounce from "just-debounce-it";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { SUBMIT_DEBOUNCE_MS } from "@/lib/utils";
 import { useMutation } from "react-query";
 import { createZodFetcher } from "zod-fetch";
@@ -16,12 +18,25 @@ import { getHistoricData } from "@/app/actions/getHistoricData";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { type SmokingSession } from "@prisma/client";
-import Image from "next/image";
 import { fileUploadSchemaType } from "../../new-session/page";
 import { v4 as uuidv4 } from "uuid";
 import ImageCarousel from "@/components/ui/imageCarousel";
 import { ACCEPTED_IMAGE_TYPES } from "../../new-session/page";
 import { Lightbox } from "react-modal-image";
+import {
+  UpdateSmokingSchema,
+  UpdateSmokingSchemaForm,
+  UpdateSmokingSchemaFormType,
+} from "@/schemas/UpdateSmokingSchema";
+import { OptionsSchema, OptionsSchemaType } from "../../new-session/page";
+import { getNewSessionInitialData } from "@/app/actions/getNewSessionInit";
+import {
+  SessionSelectSchema,
+  type SessionSelectSchemaType,
+} from "../../new-session/page";
+import { createNewWoodType } from "@/app/actions/createNewWoodType";
+import { createNewProductType } from "@/app/actions/createNewProductType";
+import CreatableSelect from "react-select/creatable";
 
 function arrayBufferToBase64(buffer: Buffer, mime: string) {
   let binary = "";
@@ -47,13 +62,25 @@ export default function SessionPage({
 }: {
   params: { sessionId: number };
 }) {
+  const [editing, setEditing] = useState<boolean>(false);
+
   const socketUrl = "ws://localhost:7071";
   const [sessionFinished, setSessionFinished] = useState(undefined);
   const [sessionData, setSessionData] = useState<SmokingSession | undefined>(
     undefined
   );
 
-  const [editing, setEditing] = useState<boolean>(false);
+  const createOption = (label: string) => ({
+    label,
+    value: label.toLowerCase().replace(/\W/g, ""),
+  });
+
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+  const [optionsProducts, setOptionsProducts] = useState<OptionsSchemaType[]>(
+    []
+  );
+  const [isLoadingWood, setIsLoadingWood] = useState(false);
+  const [optionsWood, setOptionsWood] = useState<OptionsSchemaType[]>([]);
 
   function handleAddImage(file: File) {
     if (file.size > 5000000) {
@@ -78,6 +105,33 @@ export default function SessionPage({
     ]);
   }
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await getNewSessionInitialData();
+
+      if (res.success === true) {
+        const data: {
+          woodTypes: SessionSelectSchemaType[];
+          productTypes: SessionSelectSchemaType[];
+        } = JSON.parse(res.data ?? "");
+
+        const productTypes: OptionsSchemaType[] = [];
+        data.productTypes.forEach((productType: SessionSelectSchemaType) => {
+          productTypes.push(createOption(productType.name));
+        });
+        setOptionsProducts(productTypes);
+
+        const woodTypes: OptionsSchemaType[] = [];
+        data.woodTypes.forEach((woodType: SessionSelectSchemaType) => {
+          woodTypes.push(createOption(woodType.name));
+        });
+        setOptionsWood(woodTypes);
+      }
+    };
+
+    fetchData().catch(console.error);
+  }, []);
+
   function handleRemoveImage(imageUUID: string) {
     setImages(images.filter((image) => image.temporaryID !== imageUUID));
   }
@@ -90,6 +144,9 @@ export default function SessionPage({
   }
 
   const [images, setImages] = useState<fileUploadSchemaType[]>([]);
+  const [initialStateImages, setInitialStateImages] = useState<
+    fileUploadSchemaType[]
+  >([]);
   const [imageModalOpen, setImageModalOpen] = useState<boolean>(false);
   const [modalImageURL, setModalImageURL] = useState<string>("");
 
@@ -180,97 +237,97 @@ export default function SessionPage({
     }
   }, [lastMessage]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await getHistoricData(params.sessionId.toString());
-      if (!res.data) {
-        console.log("no data available");
-        return;
-      }
-      const session = await JSON.parse(res.data);
-      const tempArrayForImages: fileUploadSchemaType[] = [];
-      session.sessionPhotos.forEach((imagesEntry) => {
-        tempArrayForImages.push({
-          temporaryID: uuidv4(),
-          b64String: arrayBufferToBase64(imagesEntry.data, imagesEntry.mime),
-        });
+  const fetchHistoricData = async () => {
+    const res = await getHistoricData(params.sessionId.toString());
+    if (!res.data) {
+      console.log("no data available");
+      return;
+    }
+    const session = await JSON.parse(res.data);
+    const tempArrayForImages: fileUploadSchemaType[] = [];
+    session.sessionPhotos.forEach((imagesEntry) => {
+      tempArrayForImages.push({
+        temporaryID: uuidv4(),
+        b64String: arrayBufferToBase64(imagesEntry.data, imagesEntry.mime),
       });
-      setImages(tempArrayForImages);
-      setSessionFinished(session.sessionData.finished);
-      setSessionData(session.sessionData);
-      const historicData = session.historicData;
-      const hum1Array: sensorReadingSchemaType[] = [];
-      const temp1Array: sensorReadingSchemaType[] = [];
-      const temp2Array: sensorReadingSchemaType[] = [];
-      const temp3Array: sensorReadingSchemaType[] = [];
+    });
+    setImages(tempArrayForImages);
+    setSessionFinished(session.sessionData.finished);
+    setSessionData(session.sessionData);
+    const historicData = session.historicData;
+    const hum1Array: sensorReadingSchemaType[] = [];
+    const temp1Array: sensorReadingSchemaType[] = [];
+    const temp2Array: sensorReadingSchemaType[] = [];
+    const temp3Array: sensorReadingSchemaType[] = [];
 
-      historicData.forEach(
-        (reading: {
-          sensorName: string;
-          value: number;
-          timestamp: string;
-          type: string;
-        }) => {
-          if (reading.sensorName === "Hum1") {
-            hum1Array.push({
-              sensorName: reading.sensorName,
-              value: reading.value,
-              timestamp: reading.timestamp,
-              timestampUnix: moment(reading.timestamp).valueOf(),
-              type: reading.type,
-            });
-          } else if (reading.sensorName === "Temp1") {
-            temp1Array.push({
-              sensorName: reading.sensorName,
-              value: reading.value,
-              timestamp: reading.timestamp,
-              timestampUnix: moment(reading.timestamp).valueOf(),
-              type: reading.type,
-            });
-          } else if (reading.sensorName === "Temp2") {
-            temp2Array.push({
-              sensorName: reading.sensorName,
-              value: reading.value,
-              timestamp: reading.timestamp,
-              timestampUnix: moment(reading.timestamp).valueOf(),
-              type: reading.type,
-            });
-          } else if (reading.sensorName === "Temp3") {
-            temp3Array.push({
-              sensorName: reading.sensorName,
-              value: reading.value,
-              timestamp: reading.timestamp,
-              timestampUnix: moment(reading.timestamp).valueOf(),
-              type: reading.type,
-            });
-          }
+    historicData.forEach(
+      (reading: {
+        sensorName: string;
+        value: number;
+        timestamp: string;
+        type: string;
+      }) => {
+        if (reading.sensorName === "Hum1") {
+          hum1Array.push({
+            sensorName: reading.sensorName,
+            value: reading.value,
+            timestamp: reading.timestamp,
+            timestampUnix: moment(reading.timestamp).valueOf(),
+            type: reading.type,
+          });
+        } else if (reading.sensorName === "Temp1") {
+          temp1Array.push({
+            sensorName: reading.sensorName,
+            value: reading.value,
+            timestamp: reading.timestamp,
+            timestampUnix: moment(reading.timestamp).valueOf(),
+            type: reading.type,
+          });
+        } else if (reading.sensorName === "Temp2") {
+          temp2Array.push({
+            sensorName: reading.sensorName,
+            value: reading.value,
+            timestamp: reading.timestamp,
+            timestampUnix: moment(reading.timestamp).valueOf(),
+            type: reading.type,
+          });
+        } else if (reading.sensorName === "Temp3") {
+          temp3Array.push({
+            sensorName: reading.sensorName,
+            value: reading.value,
+            timestamp: reading.timestamp,
+            timestampUnix: moment(reading.timestamp).valueOf(),
+            type: reading.type,
+          });
         }
-      );
+      }
+    );
 
-      setTempSensor1Readings((prev) =>
-        prev
-          .concat(temp1Array)
-          .sort((a, b) => (a.timestampUnix > b.timestampUnix ? 1 : -1))
-      );
-      setTempSensor2Readings((prev) =>
-        prev
-          .concat(temp2Array)
-          .sort((a, b) => (a.timestampUnix > b.timestampUnix ? 1 : -1))
-      );
-      setTempSensor3Readings((prev) =>
-        prev
-          .concat(temp3Array)
-          .sort((a, b) => (a.timestampUnix > b.timestampUnix ? 1 : -1))
-      );
-      setHumSensor1Readings((prev) =>
-        prev
-          .concat(hum1Array)
-          .sort((a, b) => (a.timestampUnix > b.timestampUnix ? 1 : -1))
-      );
-    };
+    setTempSensor1Readings((prev) =>
+      prev
+        .concat(temp1Array)
+        .sort((a, b) => (a.timestampUnix > b.timestampUnix ? 1 : -1))
+    );
+    setTempSensor2Readings((prev) =>
+      prev
+        .concat(temp2Array)
+        .sort((a, b) => (a.timestampUnix > b.timestampUnix ? 1 : -1))
+    );
+    setTempSensor3Readings((prev) =>
+      prev
+        .concat(temp3Array)
+        .sort((a, b) => (a.timestampUnix > b.timestampUnix ? 1 : -1))
+    );
+    setHumSensor1Readings((prev) =>
+      prev
+        .concat(hum1Array)
+        .sort((a, b) => (a.timestampUnix > b.timestampUnix ? 1 : -1))
+    );
+  };
 
+  useEffect(() => {
     if (params.sessionId) {
-      fetchData().catch(console.error);
+      fetchHistoricData().catch(console.error);
     }
   }, []);
 
@@ -344,9 +401,95 @@ export default function SessionPage({
     true
   );
 
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+    getValues,
+    setValue,
+  } = useForm<UpdateSmokingSchemaFormType>({
+    mode: "all",
+    resolver: zodResolver(UpdateSmokingSchemaForm),
+  });
+
+  const handleUpdateFormSubmission = async (
+    data: UpdateSmokingSchemaFormType
+  ) => {
+    setEditing(false);
+    console.log(data);
+    // debounceStopSmokingSession();
+    // const formData = new FormData();
+    // for (let i = 0; i < images.length; ++i) {
+    //   if (!images[i].file) {
+    //     continue;
+    //   }
+    //   formData.append("files[]", images[i].file!);
+    // }
+    // const res = await createNewSmokingSession(data, formData);
+    // if (res.success === true && res.data) {
+    //   router.push(`/session/${JSON.parse(res.data).sessionId}`, {
+    //     scroll: false,
+    //   });
+    // } else {
+    //   alert("Could not create new session");
+    // }
+  };
+
+  const debounceUpdateSmokingSession = debounce(
+    (data: UpdateSmokingSchemaFormType) => handleUpdateFormSubmission(data),
+    SUBMIT_DEBOUNCE_MS,
+    true
+  );
+
   const dateFormatter = (date: string | Date) => {
     return moment(date).format("HH:mm:ss");
   };
+
+  const handleCreateProducts = async (inputValue: string) => {
+    setIsLoadingProducts(true);
+    const res = await createNewProductType(inputValue);
+    if (res.success) {
+      const newOption = createOption(inputValue);
+      setOptionsProducts((prev) => [...prev, newOption]);
+      const selectedProducts: OptionsSchemaType[] = [];
+      selectedProducts.concat(getValues("products"));
+      selectedProducts.push(newOption);
+      setValue("products", selectedProducts);
+      setIsLoadingProducts(false);
+    }
+  };
+
+  const handleCreateWood = async (inputValue: string) => {
+    setIsLoadingWood(true);
+    const res = await createNewWoodType(inputValue);
+    if (res.success) {
+      const newOption = createOption(inputValue);
+      setOptionsWood((prev) => [...prev, newOption]);
+      const selectedWoods: OptionsSchemaType[] = [];
+      selectedWoods.concat(getValues("woods"));
+      selectedWoods.push(newOption);
+      setValue("woods", selectedWoods);
+      setIsLoadingWood(false);
+    }
+  };
+
+  function enableEditingMode() {
+    setValue("title", sessionData?.title ?? "");
+
+    //TODO: handle selecting options on load
+    setValue("products", []);
+    setValue("woods", []);
+
+    setValue("description", sessionData?.description ?? "");
+    setValue("tempSensor1Name", sessionData?.tempSensor1Name ?? "");
+    setValue("tempSensor2Name", sessionData?.tempSensor2Name ?? "");
+    setValue("tempSensor3Name", sessionData?.tempSensor3Name ?? "");
+
+    setEditing(true);
+  }
+
+  function handleReject() {}
 
   return (
     <div className="flex flex-col items-center">
@@ -360,13 +503,133 @@ export default function SessionPage({
       )}
       {params.sessionId > 0 ? (
         <div>
+          {!editing && (
+            <Button
+              variant={"destructive"}
+              className="w-[300px] mt-4"
+              onClick={enableEditingMode}
+            >
+              Edit
+            </Button>
+          )}
+          {editing && (
+            <form
+              key={1}
+              className="flex flex-col gap-1"
+              onSubmit={handleSubmit(debounceUpdateSmokingSession)}
+            >
+              <Button
+                variant={"default"}
+                className="w-[300px] mt-4 bg-orange-400"
+                type="submit"
+              >
+                Save
+              </Button>
+            </form>
+          )}
           <p>Session id: {params.sessionId}</p>
           {sessionData && (
             <div>
-              <p>Session title: {sessionData.title}</p>
-              <p>Session woods: {sessionData.woods.join(", ")}</p>
-              <p>Session products: {sessionData.products.join(", ")}</p>
-              <textarea value={sessionData.description ?? ""}></textarea>
+              {editing ? (
+                <div className="flex flex-col gap-1">
+                  <form
+                    key={0}
+                    className="flex flex-col gap-1"
+                    onSubmit={handleSubmit(debounceUpdateSmokingSession)}
+                  >
+                    <input {...register("title")} placeholder="title" />
+                    <p className="text-red-600">{errors.title?.message}</p>
+
+                    <Controller
+                      control={control}
+                      name="products"
+                      rules={{ required: true }}
+                      render={({ field: { onChange, onBlur, value, ref } }) => (
+                        <CreatableSelect
+                          isMulti
+                          placeholder="Select product..."
+                          onChange={onChange} // send value to hook form
+                          onBlur={onBlur} // notify when input is touched/blur
+                          ref={ref}
+                          value={value}
+                          isClearable
+                          isDisabled={isLoadingProducts}
+                          isLoading={isLoadingProducts}
+                          onCreateOption={handleCreateProducts}
+                          options={optionsProducts}
+                        />
+                      )}
+                    />
+                    <p className="text-red-600">{errors.products?.message}</p>
+
+                    <Controller
+                      control={control}
+                      name="woods"
+                      rules={{ required: true }}
+                      render={({ field: { onChange, onBlur, value, ref } }) => (
+                        <CreatableSelect
+                          isMulti
+                          placeholder="Select wood..."
+                          onChange={onChange} // send value to hook form
+                          onBlur={onBlur} // notify when input is touched/blur
+                          ref={ref}
+                          value={value}
+                          isClearable
+                          isDisabled={isLoadingWood}
+                          isLoading={isLoadingWood}
+                          onCreateOption={handleCreateWood}
+                          options={optionsWood}
+                        />
+                      )}
+                    />
+                    <p className="text-red-600">{errors.woods?.message}</p>
+
+                    <textarea
+                      {...register("description")}
+                      placeholder="description"
+                      className="resize-none"
+                    />
+                    <p className="text-red-600">
+                      {errors.description?.message}
+                    </p>
+
+                    <input
+                      {...register("tempSensor1Name")}
+                      placeholder="Red sensor name"
+                    />
+                    <p className="text-red-600">
+                      {errors.tempSensor1Name?.message}
+                    </p>
+
+                    <input
+                      {...register("tempSensor2Name")}
+                      placeholder="Green sensor name"
+                    />
+                    <p className="text-red-600">
+                      {errors.tempSensor2Name?.message}
+                    </p>
+
+                    <input
+                      {...register("tempSensor3Name")}
+                      placeholder="Blue sensor name"
+                    />
+                    <p className="text-red-600">
+                      {errors.tempSensor3Name?.message}
+                    </p>
+                  </form>
+                </div>
+              ) : (
+                <div>
+                  <p>Session title: {sessionData.title}</p>
+                  <p>Session woods: {sessionData.woods.join(", ")}</p>
+                  <p>Session products: {sessionData.products.join(", ")}</p>
+                  <textarea
+                    disabled
+                    value={sessionData.description ?? ""}
+                    className="resize-none"
+                  />
+                </div>
+              )}
               <p>
                 Current temp1:{" "}
                 {tempSensor1Readings.at(tempSensor1Readings.length - 1)?.value}
@@ -483,12 +746,6 @@ export default function SessionPage({
       ) : (
         <div>Invalid session id</div>
       )}
-      {fromHistory && fromHistory === "true" && (
-        <Button asChild variant={"destructive"} className="w-[300px] mt-10">
-          <Link href={"/history"}>Go back to history</Link>
-        </Button>
-      )}
-
       <ImageCarousel
         handleAddImage={handleAddImage}
         handleRemoveImage={handleRemoveImage}
@@ -497,6 +754,11 @@ export default function SessionPage({
         editing={false}
         className="mt-4"
       />
+      {fromHistory && fromHistory === "true" && (
+        <Button asChild variant={"destructive"} className="w-[300px] mt-4">
+          <Link href={"/history"}>Go back to history</Link>
+        </Button>
+      )}
     </div>
   );
 }

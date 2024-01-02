@@ -42,7 +42,7 @@ const ImageCarouselItem = ({
         height={height}
         style={{
           objectFit: "cover",
-          maxHeight: `${height}px`,
+          minHeight: `${height}px`,
           borderRadius: 16,
           cursor: handleImageClick ? "pointer" : "",
         }}
