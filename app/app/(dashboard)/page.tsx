@@ -6,7 +6,7 @@ import WeatherBanner from "@/components/dashboard/weather";
 
 export default function Home() {
   return (
-    <div className="flex w-full h-full flex-col">
+    <div className="flex w-full h-full flex-col overflow-y-auto">
       <div className="flex w-full p-8 pb-4">
         <DashboardHeader />
       </div>
