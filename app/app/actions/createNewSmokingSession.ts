@@ -57,7 +57,7 @@ export async function createNewSmokingSession(
 
     const files = imagesFormData.getAll("files[]");
 
-    files.forEach(async (file) => {
+    for (const file of files) {
       if (file instanceof File) {
         const parsedFile: File = file;
 
@@ -69,7 +69,7 @@ export async function createNewSmokingSession(
           },
         });
       }
-    });
+    }
 
     return {
       success: true,

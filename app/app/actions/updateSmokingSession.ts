@@ -7,10 +7,10 @@ import {
   type UpdateSmokingSchemaType,
 } from "@/schemas/UpdateSmokingSchema";
 
-export async function createNewSmokingSession(
+export async function updateSmokingSession(
   data: UpdateSmokingSchemaType,
   imagesFormData: FormData,
-  imagesIdToDelete: string[]
+  imagesIdToDelete: number[]
 ) {
   const session = await getServerSession(authOptions);
   if (!session) {
@@ -63,7 +63,7 @@ export async function createNewSmokingSession(
 
     const files = imagesFormData.getAll("files[]");
 
-    files.forEach(async (file) => {
+    for (const file of files) {
       if (file instanceof File) {
         const parsedFile: File = file;
 
@@ -75,13 +75,13 @@ export async function createNewSmokingSession(
           },
         });
       }
-    });
+    }
 
     await prisma.smokingSessionPhoto.deleteMany({
       where: {
         id: {
           //TODO: handle non numeric ids
-          in: imagesIdToDelete.map((id) => Number.parseInt(id)),
+          in: imagesIdToDelete,
         },
       },
     });
@@ -90,6 +90,6 @@ export async function createNewSmokingSession(
       success: true,
     };
   } catch (e) {
-    return { success: false, message: "Could not update the session" };
+    return { success: false, message: e.message };
   }
 }

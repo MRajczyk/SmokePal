@@ -17,9 +17,9 @@ import { z } from "zod";
 import { getHistoricData } from "@/app/actions/getHistoricData";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { type SmokingSession } from "@prisma/client";
-import { fileUploadSchemaType } from "../../new-session/page";
+import { SmokingSessionPhoto, type SmokingSession } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
+import { fileUploadSchemaType } from "../../new-session/page";
 import ImageCarousel from "@/components/ui/imageCarousel";
 import { ACCEPTED_IMAGE_TYPES } from "../../new-session/page";
 import { Lightbox } from "react-modal-image";
@@ -38,6 +38,7 @@ import { createNewWoodType } from "@/app/actions/createNewWoodType";
 import { createNewProductType } from "@/app/actions/createNewProductType";
 import CreatableSelect from "react-select/creatable";
 import { Ring } from "react-css-spinners";
+import { updateSmokingSession } from "@/app/actions/updateSmokingSession";
 
 function arrayBufferToBase64(buffer: Buffer, mime: string) {
   let binary = "";
@@ -136,6 +137,12 @@ export default function SessionPage({
   }, []);
 
   function handleRemoveImage(imageUUID: string) {
+    const dbIdToBeDeleted = images.find(
+      (img) => img.temporaryID === imageUUID
+    )?.dbId;
+    if (dbIdToBeDeleted) {
+      setImagesIdToBeDeleted([...imagesIdToBeDeleted, dbIdToBeDeleted]);
+    }
     setImages(images.filter((image) => image.temporaryID !== imageUUID));
   }
 
@@ -147,9 +154,7 @@ export default function SessionPage({
   }
 
   const [images, setImages] = useState<fileUploadSchemaType[]>([]);
-  const [initialStateImages, setInitialStateImages] = useState<
-    fileUploadSchemaType[]
-  >([]);
+  const [imagesIdToBeDeleted, setImagesIdToBeDeleted] = useState<number[]>([]);
   const [imageModalOpen, setImageModalOpen] = useState<boolean>(false);
   const [modalImageURL, setModalImageURL] = useState<string>("");
 
@@ -249,10 +254,11 @@ export default function SessionPage({
     }
     const session = await JSON.parse(res.data);
     const tempArrayForImages: fileUploadSchemaType[] = [];
-    session.sessionPhotos.forEach((imagesEntry) => {
+    session.sessionPhotos.forEach((imagesEntry: SmokingSessionPhoto) => {
       tempArrayForImages.push({
         temporaryID: uuidv4(),
         b64String: arrayBufferToBase64(imagesEntry.data, imagesEntry.mime),
+        dbId: imagesEntry.id,
       });
     });
     setImages(tempArrayForImages);
@@ -421,24 +427,34 @@ export default function SessionPage({
   const handleUpdateFormSubmission = async (
     data: UpdateSmokingSchemaFormType
   ) => {
-    setEditing(false);
-    console.log(data);
-    // debounceStopSmokingSession();
-    // const formData = new FormData();
-    // for (let i = 0; i < images.length; ++i) {
-    //   if (!images[i].file) {
-    //     continue;
-    //   }
-    //   formData.append("files[]", images[i].file!);
-    // }
-    // const res = await createNewSmokingSession(data, formData);
-    // if (res.success === true && res.data) {
-    //   router.push(`/session/${JSON.parse(res.data).sessionId}`, {
-    //     scroll: false,
-    //   });
-    // } else {
-    //   alert("Could not create new session");
-    // }
+    if (!sessionData || !sessionData.id || sessionData.finished === undefined) {
+      alert("Could not update session, fields are empty");
+      return;
+    }
+
+    const formData = new FormData();
+    for (let i = 0; i < images.length; ++i) {
+      if (!images[i].file) {
+        continue;
+      }
+      formData.append("files[]", images[i].file!);
+    }
+    const res = await updateSmokingSession(
+      {
+        ...data,
+        id: sessionData.id,
+        finished: sessionData.finished,
+      },
+      formData,
+      imagesIdToBeDeleted
+    );
+    if (res.success === true) {
+      setEditing(false);
+      setImagesIdToBeDeleted([]);
+      fetchHistoricData();
+    } else {
+      alert(res.message);
+    }
   };
 
   const debounceUpdateSmokingSession = debounce(
@@ -482,9 +498,25 @@ export default function SessionPage({
   function enableEditingMode() {
     setValue("title", sessionData?.title ?? "");
 
-    //TODO: handle selecting options on load
-    setValue("products", []);
-    setValue("woods", []);
+    if (sessionData?.products) {
+      const selectedProducts: OptionsSchemaType[] = [];
+      sessionData.products.forEach((product) => {
+        selectedProducts.push(createOption(product));
+      });
+      setValue("products", selectedProducts);
+    } else {
+      setValue("products", []);
+    }
+
+    if (sessionData?.woods) {
+      const selectedWoods: OptionsSchemaType[] = [];
+      sessionData.products.forEach((wood) => {
+        selectedWoods.push(createOption(wood));
+      });
+      setValue("woods", selectedWoods);
+    } else {
+      setValue("woods", []);
+    }
 
     setValue("description", sessionData?.description ?? "");
     setValue("tempSensor1Name", sessionData?.tempSensor1Name ?? "");
@@ -775,7 +807,7 @@ export default function SessionPage({
         handleRemoveImage={handleRemoveImage}
         handleImageClick={handleImageClick}
         images={images}
-        editing={false}
+        editing={editing}
         className="mt-4"
       />
       {fromHistory && fromHistory === "true" && (

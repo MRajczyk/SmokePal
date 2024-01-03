@@ -46,6 +46,7 @@ export type fileUploadSchemaType = {
   temporaryID: string;
   file?: File;
   b64String: string;
+  dbId?: number;
 };
 
 const NewSessionPage = () => {
