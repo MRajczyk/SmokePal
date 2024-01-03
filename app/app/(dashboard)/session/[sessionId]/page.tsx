@@ -37,6 +37,7 @@ import {
 import { createNewWoodType } from "@/app/actions/createNewWoodType";
 import { createNewProductType } from "@/app/actions/createNewProductType";
 import CreatableSelect from "react-select/creatable";
+import { Ring } from "react-css-spinners";
 
 function arrayBufferToBase64(buffer: Buffer, mime: string) {
   let binary = "";
@@ -62,6 +63,8 @@ export default function SessionPage({
 }: {
   params: { sessionId: number };
 }) {
+  const [fetchingHistoricalData, setFetchingHistoricalData] =
+    useState<boolean>(false);
   const [editing, setEditing] = useState<boolean>(false);
 
   const socketUrl = "ws://localhost:7071";
@@ -238,6 +241,7 @@ export default function SessionPage({
   }, [lastMessage]);
 
   const fetchHistoricData = async () => {
+    setFetchingHistoricalData(true);
     const res = await getHistoricData(params.sessionId.toString());
     if (!res.data) {
       console.log("no data available");
@@ -323,6 +327,7 @@ export default function SessionPage({
         .concat(hum1Array)
         .sort((a, b) => (a.timestampUnix > b.timestampUnix ? 1 : -1))
     );
+    setFetchingHistoricalData(false);
   };
 
   useEffect(() => {
@@ -502,247 +507,266 @@ export default function SessionPage({
         />
       )}
       {params.sessionId > 0 ? (
-        <div>
-          {!editing && (
-            <Button
-              variant={"destructive"}
-              className="w-[300px] mt-4"
-              onClick={enableEditingMode}
-            >
-              Edit
-            </Button>
-          )}
-          {editing && (
-            <form
-              key={1}
-              className="flex flex-col gap-1"
-              onSubmit={handleSubmit(debounceUpdateSmokingSession)}
-            >
+        fetchingHistoricalData ? (
+          <div className="w-full h-full flex justify-center items-center">
+            <Ring color="orange" size={100} />
+          </div>
+        ) : (
+          <div>
+            {!editing && (
               <Button
-                variant={"default"}
-                className="w-[300px] mt-4 bg-orange-400"
-                type="submit"
+                variant={"destructive"}
+                className="w-[300px] mt-4"
+                onClick={enableEditingMode}
               >
-                Save
+                Edit
               </Button>
-            </form>
-          )}
-          <p>Session id: {params.sessionId}</p>
-          {sessionData && (
-            <div>
-              {editing ? (
-                <div className="flex flex-col gap-1">
-                  <form
-                    key={0}
-                    className="flex flex-col gap-1"
-                    onSubmit={handleSubmit(debounceUpdateSmokingSession)}
-                  >
-                    <input {...register("title")} placeholder="title" />
-                    <p className="text-red-600">{errors.title?.message}</p>
+            )}
+            {editing && (
+              <form
+                key={1}
+                className="flex flex-col gap-1"
+                onSubmit={handleSubmit(debounceUpdateSmokingSession)}
+              >
+                <Button
+                  variant={"default"}
+                  className="w-[300px] mt-4 bg-orange-400"
+                  type="submit"
+                >
+                  Save
+                </Button>
+              </form>
+            )}
+            <p>Session id: {params.sessionId}</p>
+            {sessionData && (
+              <div>
+                {editing ? (
+                  <div className="flex flex-col gap-1">
+                    <form
+                      key={0}
+                      className="flex flex-col gap-1"
+                      onSubmit={handleSubmit(debounceUpdateSmokingSession)}
+                    >
+                      <input {...register("title")} placeholder="title" />
+                      <p className="text-red-600">{errors.title?.message}</p>
 
-                    <Controller
-                      control={control}
-                      name="products"
-                      rules={{ required: true }}
-                      render={({ field: { onChange, onBlur, value, ref } }) => (
-                        <CreatableSelect
-                          isMulti
-                          placeholder="Select product..."
-                          onChange={onChange} // send value to hook form
-                          onBlur={onBlur} // notify when input is touched/blur
-                          ref={ref}
-                          value={value}
-                          isClearable
-                          isDisabled={isLoadingProducts}
-                          isLoading={isLoadingProducts}
-                          onCreateOption={handleCreateProducts}
-                          options={optionsProducts}
-                        />
-                      )}
-                    />
-                    <p className="text-red-600">{errors.products?.message}</p>
+                      <Controller
+                        control={control}
+                        name="products"
+                        rules={{ required: true }}
+                        render={({
+                          field: { onChange, onBlur, value, ref },
+                        }) => (
+                          <CreatableSelect
+                            isMulti
+                            placeholder="Select product..."
+                            onChange={onChange} // send value to hook form
+                            onBlur={onBlur} // notify when input is touched/blur
+                            ref={ref}
+                            value={value}
+                            isClearable
+                            isDisabled={isLoadingProducts}
+                            isLoading={isLoadingProducts}
+                            onCreateOption={handleCreateProducts}
+                            options={optionsProducts}
+                          />
+                        )}
+                      />
+                      <p className="text-red-600">{errors.products?.message}</p>
 
-                    <Controller
-                      control={control}
-                      name="woods"
-                      rules={{ required: true }}
-                      render={({ field: { onChange, onBlur, value, ref } }) => (
-                        <CreatableSelect
-                          isMulti
-                          placeholder="Select wood..."
-                          onChange={onChange} // send value to hook form
-                          onBlur={onBlur} // notify when input is touched/blur
-                          ref={ref}
-                          value={value}
-                          isClearable
-                          isDisabled={isLoadingWood}
-                          isLoading={isLoadingWood}
-                          onCreateOption={handleCreateWood}
-                          options={optionsWood}
-                        />
-                      )}
-                    />
-                    <p className="text-red-600">{errors.woods?.message}</p>
+                      <Controller
+                        control={control}
+                        name="woods"
+                        rules={{ required: true }}
+                        render={({
+                          field: { onChange, onBlur, value, ref },
+                        }) => (
+                          <CreatableSelect
+                            isMulti
+                            placeholder="Select wood..."
+                            onChange={onChange} // send value to hook form
+                            onBlur={onBlur} // notify when input is touched/blur
+                            ref={ref}
+                            value={value}
+                            isClearable
+                            isDisabled={isLoadingWood}
+                            isLoading={isLoadingWood}
+                            onCreateOption={handleCreateWood}
+                            options={optionsWood}
+                          />
+                        )}
+                      />
+                      <p className="text-red-600">{errors.woods?.message}</p>
 
+                      <textarea
+                        {...register("description")}
+                        placeholder="description"
+                        className="resize-none"
+                      />
+                      <p className="text-red-600">
+                        {errors.description?.message}
+                      </p>
+
+                      <input
+                        {...register("tempSensor1Name")}
+                        placeholder="Red sensor name"
+                      />
+                      <p className="text-red-600">
+                        {errors.tempSensor1Name?.message}
+                      </p>
+
+                      <input
+                        {...register("tempSensor2Name")}
+                        placeholder="Green sensor name"
+                      />
+                      <p className="text-red-600">
+                        {errors.tempSensor2Name?.message}
+                      </p>
+
+                      <input
+                        {...register("tempSensor3Name")}
+                        placeholder="Blue sensor name"
+                      />
+                      <p className="text-red-600">
+                        {errors.tempSensor3Name?.message}
+                      </p>
+                    </form>
+                  </div>
+                ) : (
+                  <div>
+                    <p>Session title: {sessionData.title}</p>
+                    <p>Session woods: {sessionData.woods.join(", ")}</p>
+                    <p>Session products: {sessionData.products.join(", ")}</p>
                     <textarea
-                      {...register("description")}
-                      placeholder="description"
+                      disabled
+                      value={sessionData.description ?? ""}
                       className="resize-none"
                     />
-                    <p className="text-red-600">
-                      {errors.description?.message}
-                    </p>
-
-                    <input
-                      {...register("tempSensor1Name")}
-                      placeholder="Red sensor name"
-                    />
-                    <p className="text-red-600">
-                      {errors.tempSensor1Name?.message}
-                    </p>
-
-                    <input
-                      {...register("tempSensor2Name")}
-                      placeholder="Green sensor name"
-                    />
-                    <p className="text-red-600">
-                      {errors.tempSensor2Name?.message}
-                    </p>
-
-                    <input
-                      {...register("tempSensor3Name")}
-                      placeholder="Blue sensor name"
-                    />
-                    <p className="text-red-600">
-                      {errors.tempSensor3Name?.message}
-                    </p>
-                  </form>
-                </div>
-              ) : (
-                <div>
-                  <p>Session title: {sessionData.title}</p>
-                  <p>Session woods: {sessionData.woods.join(", ")}</p>
-                  <p>Session products: {sessionData.products.join(", ")}</p>
-                  <textarea
-                    disabled
-                    value={sessionData.description ?? ""}
-                    className="resize-none"
-                  />
-                </div>
-              )}
-              <p>
-                Current temp1:{" "}
-                {tempSensor1Readings.at(tempSensor1Readings.length - 1)?.value}
-              </p>
-              <p>
-                Current temp2:{" "}
-                {tempSensor2Readings.at(tempSensor2Readings.length - 1)?.value}
-              </p>
-              <p>
-                Current temp3:{" "}
-                {tempSensor3Readings.at(tempSensor3Readings.length - 1)?.value}
-              </p>
-              <p>
-                Current hum1:{" "}
-                {humSensor1Readings.at(humSensor1Readings.length - 1)?.value}
-              </p>
-            </div>
-          )}
-          {sessionFinished !== undefined && !sessionFinished && (
-            <div>
-              <Button
-                variant="default"
-                onClick={() => {
-                  debounceStartSmokingSession();
-                }}
-              >
-                Start
-              </Button>
-              <Button
-                variant="default"
-                onClick={() => debounceStopSmokingSession()}
-              >
-                Stop
-              </Button>
-            </div>
-          )}
-          <br />
-          <p>The WebSocket is currently {connectionStatus}</p>
-          <p>Humidity readings over time</p>
-          {humSensor1Readings.length > 0 && (
-            <LineChart width={600} height={300}>
-              <Line
-                name="Humidity"
-                data={humSensor1Readings}
-                type="monotone"
-                dataKey="value"
-                stroke="black"
-                strokeWidth={2}
-                dot={false}
-              />
-              {/* <CartesianGrid stroke="#ccc" /> */}
-              <XAxis
-                dataKey={"timestampUnix"}
-                domain={[
-                  humSensor1Readings.at(0)!.timestampUnix,
-                  humSensor1Readings.at(humSensor1Readings.length - 1)!
-                    .timestampUnix,
-                ]}
-                type="number"
-                tickFormatter={dateFormatter}
-                interval="preserveStartEnd"
-              />
-              <YAxis />
-              <Legend />
-            </LineChart>
-          )}
-          <p>Temperature readings over time</p>
-          {tempSensor1Readings.length > 0 && (
-            <LineChart width={600} height={300}>
-              <Line
-                name={sessionData?.tempSensor1Name ?? "Temperature 1"}
-                data={tempSensor1Readings}
-                type="monotone"
-                dataKey="value"
-                stroke="red"
-                strokeWidth={2}
-                dot={false}
-              />
-              <Line
-                name={sessionData?.tempSensor2Name ?? "Temperature 2"}
-                data={tempSensor2Readings}
-                type="monotone"
-                dataKey="value"
-                stroke="green"
-                strokeWidth={2}
-                dot={false}
-              />
-              <Line
-                name={sessionData?.tempSensor3Name ?? "Temperature 3"}
-                data={tempSensor3Readings}
-                type="monotone"
-                dataKey="value"
-                stroke="blue"
-                strokeWidth={2}
-                dot={false}
-              />
-              {/* <CartesianGrid stroke="#ccc" /> */}
-              <XAxis
-                dataKey={"timestampUnix"}
-                domain={[
-                  tempSensor1Readings.at(0)!.timestampUnix,
-                  tempSensor1Readings.at(tempSensor1Readings.length - 1)!
-                    .timestampUnix,
-                ]}
-                type="number"
-                tickFormatter={dateFormatter}
-                interval="preserveStartEnd"
-              />
-              <YAxis />
-              <Legend />
-            </LineChart>
-          )}
-        </div>
+                  </div>
+                )}
+                <p>
+                  Current temp1:{" "}
+                  {
+                    tempSensor1Readings.at(tempSensor1Readings.length - 1)
+                      ?.value
+                  }
+                </p>
+                <p>
+                  Current temp2:{" "}
+                  {
+                    tempSensor2Readings.at(tempSensor2Readings.length - 1)
+                      ?.value
+                  }
+                </p>
+                <p>
+                  Current temp3:{" "}
+                  {
+                    tempSensor3Readings.at(tempSensor3Readings.length - 1)
+                      ?.value
+                  }
+                </p>
+                <p>
+                  Current hum1:{" "}
+                  {humSensor1Readings.at(humSensor1Readings.length - 1)?.value}
+                </p>
+              </div>
+            )}
+            {sessionFinished !== undefined && !sessionFinished && (
+              <div>
+                <Button
+                  variant="default"
+                  onClick={() => {
+                    debounceStartSmokingSession();
+                  }}
+                >
+                  Start
+                </Button>
+                <Button
+                  variant="default"
+                  onClick={() => debounceStopSmokingSession()}
+                >
+                  Stop
+                </Button>
+              </div>
+            )}
+            <br />
+            <p>The WebSocket is currently {connectionStatus}</p>
+            <p>Humidity readings over time</p>
+            {humSensor1Readings.length > 0 && (
+              <LineChart width={600} height={300}>
+                <Line
+                  name="Humidity"
+                  data={humSensor1Readings}
+                  type="monotone"
+                  dataKey="value"
+                  stroke="black"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                {/* <CartesianGrid stroke="#ccc" /> */}
+                <XAxis
+                  dataKey={"timestampUnix"}
+                  domain={[
+                    humSensor1Readings.at(0)!.timestampUnix,
+                    humSensor1Readings.at(humSensor1Readings.length - 1)!
+                      .timestampUnix,
+                  ]}
+                  type="number"
+                  tickFormatter={dateFormatter}
+                  interval="preserveStartEnd"
+                />
+                <YAxis />
+                <Legend />
+              </LineChart>
+            )}
+            <p>Temperature readings over time</p>
+            {tempSensor1Readings.length > 0 && (
+              <LineChart width={600} height={300}>
+                <Line
+                  name={sessionData?.tempSensor1Name ?? "Temperature 1"}
+                  data={tempSensor1Readings}
+                  type="monotone"
+                  dataKey="value"
+                  stroke="red"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  name={sessionData?.tempSensor2Name ?? "Temperature 2"}
+                  data={tempSensor2Readings}
+                  type="monotone"
+                  dataKey="value"
+                  stroke="green"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  name={sessionData?.tempSensor3Name ?? "Temperature 3"}
+                  data={tempSensor3Readings}
+                  type="monotone"
+                  dataKey="value"
+                  stroke="blue"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                {/* <CartesianGrid stroke="#ccc" /> */}
+                <XAxis
+                  dataKey={"timestampUnix"}
+                  domain={[
+                    tempSensor1Readings.at(0)!.timestampUnix,
+                    tempSensor1Readings.at(tempSensor1Readings.length - 1)!
+                      .timestampUnix,
+                  ]}
+                  type="number"
+                  tickFormatter={dateFormatter}
+                  interval="preserveStartEnd"
+                />
+                <YAxis />
+                <Legend />
+              </LineChart>
+            )}
+          </div>
+        )
       ) : (
         <div>Invalid session id</div>
       )}
