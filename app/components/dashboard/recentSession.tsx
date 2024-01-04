@@ -5,7 +5,7 @@ import { type SmokingSession } from "@prisma/client";
 import { sensorReadingSchemaType } from "@/app/(dashboard)/session/[sessionId]/page";
 import moment from "moment";
 import Link from "next/link";
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, Legend } from "recharts";
+import { LineChart, Line, XAxis, YAxis } from "recharts";
 import { Ring } from "react-css-spinners";
 
 const RecentSession = () => {
@@ -25,9 +25,6 @@ const RecentSession = () => {
   const [tempSensor3Readings, setTempSensor3Readings] = useState<
     sensorReadingSchemaType[]
   >([]);
-  const [humSensor1Readings, setHumSensor1Readings] = useState<
-    sensorReadingSchemaType[]
-  >([]);
 
   const fetchHistoricData = async () => {
     setFetchingHistoricalData(true);
@@ -39,7 +36,6 @@ const RecentSession = () => {
       return;
     }
     const session = await JSON.parse(res.data);
-    console.log(session);
     setSessionData(session.sessionData);
     const historicData = session.historicData;
     const hum1Array: sensorReadingSchemaType[] = [];
@@ -103,11 +99,6 @@ const RecentSession = () => {
     setTempSensor3Readings((prev) =>
       prev
         .concat(temp3Array)
-        .sort((a, b) => (a.timestampUnix > b.timestampUnix ? 1 : -1))
-    );
-    setHumSensor1Readings((prev) =>
-      prev
-        .concat(hum1Array)
         .sort((a, b) => (a.timestampUnix > b.timestampUnix ? 1 : -1))
     );
     setFetchingHistoricalData(false);

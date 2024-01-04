@@ -12,7 +12,7 @@ const StartSessionBanner = () => {
         className="flex items-center justify-center w-[400px] h-[80px]"
       >
         <Link href="/new-session" className="flex">
-          <span className="text-4xl mr-2">Start smoking</span>
+          <span className="text-4xl mr-2">Start new session!</span>
           <Image
             src={addIcon}
             alt="Add icon"
