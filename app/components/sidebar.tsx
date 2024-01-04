@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { LogoutButton } from "@/components/ui/logoutButton";
 import { ActiveSessionButton } from "@/components/ui/activeSessionButton";
 import SmokepalLogo from "@/public/assets/logoNoLogotype.svg";

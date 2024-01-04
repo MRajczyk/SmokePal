@@ -1,10 +1,10 @@
+"use client";
 import React from "react";
-import { authOptions } from "@/server/auth";
-import { getServerSession } from "next-auth";
 import moment from "moment";
+import { useSession } from "next-auth/react";
 
 const DashboardHeader = async () => {
-  const session = await getServerSession(authOptions);
+  const { data: session } = useSession();
   return (
     <div className="flex w-full justify-between text-3xl font-mediumn">
       <div>Hi, {session?.user.username}</div>
