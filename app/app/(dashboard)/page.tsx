@@ -3,6 +3,7 @@ import DashboardHeader from "@/components/dashboard/header";
 import StartSessionBanner from "@/components/dashboard/startSessionBanner";
 import RecentSession from "@/components/dashboard/recentSession";
 import WeatherBanner from "@/components/dashboard/weather";
+import HistoryBanner from "@/components/dashboard/historyBanner";
 
 export default function Home() {
   return (
@@ -21,7 +22,7 @@ export default function Home() {
           <RecentSession />
         </div>
         <div className="flex col-span-2 row-span-1 w-full pt-4 pl-4">
-          <div className="bg-purple-300 w-full">Go to history</div>
+          <HistoryBanner />
         </div>
       </div>
     </div>
