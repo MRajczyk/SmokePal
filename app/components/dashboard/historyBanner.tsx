@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import historyIcon from "@/public/assets/history_placeholder.svg";
+import historyArrow from "@/public/assets/historyArrow.svg?url";
 
 const HistoryBanner = () => {
   return (
@@ -14,7 +14,7 @@ const HistoryBanner = () => {
         <Link href="/history" className="flex">
           <span className="text-4xl mr-2">Go to history</span>
           <Image
-            src={historyIcon}
+            src={historyArrow}
             alt="History icon"
             className="inline-block cursor-pointer"
             width={40}

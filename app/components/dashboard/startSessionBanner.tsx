@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "../ui/button";
-import addIcon from "@/public/assets/add_placeholder.svg";
+import StartSessionImg from "@/public/assets/startSessionImg.svg?url";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -15,10 +15,11 @@ const StartSessionBanner = () => {
         <Link href="/new-session" className="flex">
           <span className="text-4xl mr-2">Start new session!</span>
           <Image
-            src={addIcon}
+            src={StartSessionImg}
             alt="Add icon"
             className="inline-block cursor-pointer"
-            width={40}
+            width={90}
+            height={90}
           />
         </Link>
       </Button>

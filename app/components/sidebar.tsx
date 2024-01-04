@@ -4,46 +4,93 @@ import Link from "next/link";
 import Image from "next/image";
 import { LogoutButton } from "@/components/ui/logoutButton";
 import { ActiveSessionButton } from "@/components/ui/activeSessionButton";
-import smokepalLogo from "@/public/assets/logo.svg";
-import addIcon from "@/public/assets/add_placeholder.svg";
-import historyIcon from "@/public/assets/history_placeholder.svg";
-import logoutIcon from "@/public/assets/logout_placeholder.svg";
-// import recipesIcon from "@/public/assets/recipes_placeholder.svg";
-import smokerIcon from "@/public/assets/smoker_placeholder.svg";
-import settingsIcon from "@/public/assets/settings_placeholder.svg";
-import homeIcon from "@/public/assets/home_placeholder.svg";
+import SmokepalLogo from "@/public/assets/logoNoLogotype.svg";
+import HomeIcon from "@/public/assets/home.svg";
+import AddIcon from "@/public/assets/add.svg";
+import ActiveIcon from "@/public/assets/active.svg";
+import HistoryIcon from "@/public/assets/history.svg";
+import LogoutIcon from "@/public/assets/logout.svg";
+import SettingsIcon from "@/public/assets/settings.svg";
+// import recipesIcon from "@/public/assets/recipes.svg";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const Sidebar = () => {
   const pathname = usePathname().split("/")[1];
+  console.log(pathname);
 
   return (
-    <div className="bg-orange-600 w-[100px] flex flex-col justify-between items-center h-full sticky top-0">
-      <Link href={{ pathname: "/" }}>
-        <Image
-          src={smokepalLogo}
+    <div className="bg-[#15191C] w-[138px] flex flex-col justify-between items-center h-full sticky top-0">
+      <Link className="m-6" href={{ pathname: "/" }}>
+        <SmokepalLogo
           alt="SmokePal Logo"
           className="cursor-pointer"
+          width={90}
         />
       </Link>
       <div className="flex flex-col justify-center items-center gap-[10px]">
-        <Link className="w-12 h-12" href={{ pathname: "/" }}>
-          <Image src={homeIcon} alt="Home icon" className="cursor-pointer" />
-        </Link>
-        <Link className="w-12 h-12" href={{ pathname: "/new-session" }}>
-          <Image src={addIcon} alt="Add icon" className="cursor-pointer" />
-        </Link>
-        <ActiveSessionButton>
-          <Image
-            src={smokerIcon}
-            alt="Active session"
-            className="cursor-pointer w-12 h-12"
+        <Link
+          className={cn(
+            "flex w-20 h-20 items-center justify-center rounded-[40px]",
+            pathname === ""
+              ? "bg-[#F4EDE5] fill-[#15191C]"
+              : "bg-transparent fill-[#F4EDE5]"
+          )}
+          href={{ pathname: "/" }}
+        >
+          <HomeIcon
+            alt="Home icon"
+            className="cursor-pointer"
+            width={40}
+            height={40}
           />
-        </ActiveSessionButton>
-        <Link className="w-12 h-12" href={{ pathname: "/history" }}>
-          <Image
-            src={historyIcon}
+        </Link>
+        <Link
+          className={cn(
+            "flex w-20 h-20 items-center justify-center rounded-[40px]",
+            pathname === "new-session"
+              ? "bg-[#F4EDE5] fill-[#15191C]"
+              : "bg-transparent fill-[#F4EDE5]"
+          )}
+          href={{ pathname: "/new-session" }}
+        >
+          <AddIcon
+            alt="Add icon"
+            className="cursor-pointer"
+            width={40}
+            height={40}
+          />
+        </Link>
+        <div
+          className={cn(
+            "flex w-20 h-20 items-center justify-center rounded-[40px]",
+            pathname === "session"
+              ? "bg-[#F4EDE5] fill-[#15191C]"
+              : "bg-transparent fill-[#F4EDE5]"
+          )}
+        >
+          <ActiveSessionButton>
+            <ActiveIcon
+              alt="Active session"
+              width={40}
+              height={43}
+              className="cursor-pointer"
+            />
+          </ActiveSessionButton>
+        </div>
+        <Link
+          className={cn(
+            "flex w-20 h-20 items-center justify-center rounded-[40px]",
+            pathname === "history"
+              ? "bg-[#F4EDE5] fill-[#15191C]"
+              : "bg-transparent fill-[#F4EDE5]"
+          )}
+          href={{ pathname: "/history" }}
+        >
+          <HistoryIcon
             alt="History icon"
+            width={40}
+            height={40}
             className="cursor-pointer"
           />
         </Link>
@@ -52,26 +99,39 @@ const Sidebar = () => {
                     src={recipesIcon}
                     alt="Recipes icon"
                     className="cursor-pointer"
+                    width={40}
+                    height={40}
                   />
                 </Link> */}
       </div>
       <div className="flex flex-col justify-center items-center gap-[10px] mb-10">
-        <Link className="w-12 h-12" href={{ pathname: "/settings" }}>
-          <Image
-            src={settingsIcon}
+        <Link
+          className={cn(
+            "flex w-20 h-20 items-center justify-center rounded-[40px]",
+            pathname === "settings"
+              ? "bg-[#F4EDE5] fill-[#15191C]"
+              : "bg-transparent fill-[#F4EDE5]"
+          )}
+          href={{ pathname: "settings" }}
+        >
+          <SettingsIcon
             alt="Settings icon"
             className="cursor-pointer"
+            width={40}
+            height={43}
           />
         </Link>
-        <LogoutButton>
-          <Image
-            src={logoutIcon}
-            alt="Logout icon"
-            className="cursor-pointer w-12 h-12"
-          />
-        </LogoutButton>
+        <div className="flex w-20 h-20 items-center justify-center rounded-[40px] fill-[#F4EDE5]">
+          <LogoutButton>
+            <LogoutIcon
+              alt="Logout icon"
+              width={40}
+              height={40}
+              className="cursor-pointer"
+            />
+          </LogoutButton>
+        </div>
       </div>
-      <p>Current pathname: {pathname}</p>
     </div>
   );
 };

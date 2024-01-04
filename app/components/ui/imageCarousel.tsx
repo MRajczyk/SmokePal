@@ -61,8 +61,7 @@ const ImageCarousel = ({
                 onChange={addImage}
                 type="file"
               />
-              <Image
-                src={AddIcon}
+              <AddIcon
                 alt="Add image icon"
                 width={60}
                 height={60}
