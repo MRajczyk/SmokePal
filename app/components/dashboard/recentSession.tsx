@@ -122,7 +122,9 @@ const RecentSession = () => {
       className="w-full bg-orange-300 flex items-center justify-start flex-col gap-2 overflow-y-auto p-4"
     >
       {fetchingHistoricalData ? (
-        <Ring color="white" size={100} />
+        <div className="w-full h-full flex justify-center items-center">
+          <Ring color="white" size={100} />
+        </div>
       ) : (
         <div className="flex flex-col gap-2">
           <p className="self-start text-3xl">Recent smoking session</p>

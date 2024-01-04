@@ -17,10 +17,12 @@ import type { SmokingSession } from "@prisma/client";
 import { useSearchParams } from "next/navigation";
 import moment from "moment";
 import Pagination from "@mui/material/Pagination";
+import { Ring } from "react-css-spinners";
 
 const HistoryPage = () => {
   const ITEMS_PER_PAGE = 10;
   const searchParams = useSearchParams();
+  const [fetchingData, setFetchingData] = useState<boolean>(false);
   const [page, setPage] = React.useState(1);
   const [maxPages, setMaxPages] = React.useState(1);
 
@@ -57,6 +59,7 @@ const HistoryPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setFetchingData(true);
       const res = await getSmokingSessions(page, ITEMS_PER_PAGE);
       if (!res.data) {
         console.log("no previous sessions available");
@@ -67,14 +70,19 @@ const HistoryPage = () => {
         setMaxPages(Math.ceil(sessions.count / ITEMS_PER_PAGE));
         setPreviousSessions(sessions.smokingSessions);
       }
+      setFetchingData(false);
     };
 
     fetchData().catch(console.error);
   }, []);
 
   return (
-    <div className="w-[1000px] pt-[100px]">
-      {previousSessions.length > 0 && (
+    <div className="w-[1400px] pt-[100px]">
+      {fetchingData ? (
+        <div className="w-full h-full flex justify-center items-center">
+          <Ring color="orange" size={100} />
+        </div>
+      ) : (
         <Table>
           <TableCaption>A list of all your smoking sessions</TableCaption>
           <TableHeader>
@@ -168,7 +176,6 @@ const HistoryPage = () => {
           </TableFooter>
         </Table>
       )}
-      {previousSessions.length <= 0 && <p>Loading previous sessions...</p>}
     </div>
   );
 };
