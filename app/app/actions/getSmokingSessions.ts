@@ -16,6 +16,9 @@ export async function getSmokingSessions(page: number, pageItemsCount: number) {
       prisma.smokingSession.findMany({
         take: pageItemsCount,
         skip: (page - 1) * pageItemsCount,
+        orderBy: {
+          id: "desc",
+        },
       }),
     ]);
     return {

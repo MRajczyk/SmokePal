@@ -6,7 +6,7 @@ import moment from "moment";
 const DashboardHeader = async () => {
   const session = await getServerSession(authOptions);
   return (
-    <div className="flex w-full justify-between bg-green-200 text-3xl">
+    <div className="flex w-full justify-between text-3xl font-mediumn">
       <div>Hi, {session?.user.username}</div>
       <div>Today is {moment().format("ddd, DD.MM.YYYY")}</div>
     </div>

@@ -2,14 +2,15 @@
 import { ForecastResponse } from "@/schemas/weatherTypes/weatherForecast";
 import { CurrentResponse } from "@/schemas/weatherTypes/weatherCurrent";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import { Ring } from "react-css-spinners";
+import WeatherToday from "./weatherToday";
+import WeatherForecast from "./weatherForecast";
 
 const WeatherBanner = () => {
   const OPENWEATHER_CURRENT_URL =
-    "http://api.openweathermap.org/data/2.5/weather?q=Myszkow&units=metric&appid=";
+    "http://api.openweathermap.org/data/2.5/weather?q=Lodz&units=metric&appid=";
   const OPENWEATHER_FORECAST_URL =
-    "http://api.openweathermap.org/data/2.5/forecast?q=Myszkow&units=metric&appid=";
+    "http://api.openweathermap.org/data/2.5/forecast?q=Lodz&units=metric&appid=";
 
   const [fetchingData, setFetchingData] = useState<boolean>(false);
   const [errorFetching, setErrorFetching] = useState<boolean>(false);
@@ -66,24 +67,17 @@ const WeatherBanner = () => {
         </div>
       ) : errorFetching ? (
         <p>Error fetching weather data...</p>
-      ) : (
-        <div className="flex flex-row items-center">
-          <p className="text-2xl">
-            {currentWeather?.name + " " + currentWeather?.main.temp + "°C"}
-          </p>
-          <Image
-            src={
-              "/assets/weatherIcons/_" +
-              currentWeather?.weather[0].icon +
-              ".png"
-            }
-            alt={
-              currentWeather?.weather[0].icon + " icon from OpenWeatherMap api"
-            }
-            width={100}
-            height={100}
+      ) : currentWeather && forecast ? (
+        <div>
+          <WeatherToday
+            iconCode={currentWeather?.weather[0].icon}
+            city={currentWeather?.name}
+            reading={currentWeather?.main.temp}
           />
+          <WeatherForecast forecastData={forecast} />
         </div>
+      ) : (
+        <p>Weather data unavailable</p>
       )}
     </div>
   );

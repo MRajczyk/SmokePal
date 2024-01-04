@@ -127,14 +127,10 @@ const RecentSession = () => {
         </div>
       ) : (
         <div className="flex flex-col gap-2">
-          <p className="self-start text-3xl">Recent smoking session</p>
-          <p className="self-start">
-            Product(s): {sessionData?.products.join(" ")}
-          </p>
-          <p className="self-start">Wood(s): {sessionData?.woods.join(" ")}</p>
-          <p className="self-start">
-            {moment(sessionData?.dateStart).format("ddd, DD.MM.YYYY")}
-          </p>
+          <p>Recent smoking session</p>
+          <p>Product(s): {sessionData?.products.join(" ")}</p>
+          <p>Wood(s): {sessionData?.woods.join(" ")}</p>
+          <p>{moment(sessionData?.dateStart).format("ddd, DD.MM.YYYY")}</p>
           {tempSensor1Readings.length > 0 && (
             <LineChart width={700} height={400}>
               <Line

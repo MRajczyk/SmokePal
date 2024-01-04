@@ -14,11 +14,14 @@ export default function Home() {
         <div className="flex col-span-3 row-span-1 w-full pr-4 pb-4">
           <StartSessionBanner />
         </div>
-        <div className="flex col-span-2 row-span-5 w-full pl-4">
+        <div className="flex col-span-2 row-span-4 w-full pl-4 pb-4">
           <WeatherBanner />
         </div>
         <div className="flex col-span-3 row-span-4 w-full pr-4 pt-4">
           <RecentSession />
+        </div>
+        <div className="flex col-span-2 row-span-1 w-full pt-4 pl-4">
+          <div className="bg-purple-300 w-full">Go to history</div>
         </div>
       </div>
     </div>

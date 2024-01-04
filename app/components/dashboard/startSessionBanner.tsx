@@ -6,10 +6,11 @@ import Link from "next/link";
 
 const StartSessionBanner = () => {
   return (
-    <div className="flex w-full h-full bg-slate-300 items-center justify-center">
+    <div className="flex w-full h-full items-center justify-center bg-transparent">
       <Button
         asChild
-        className="flex items-center justify-center w-[400px] h-[80px]"
+        className="flex items-center justify-center w-full h-full rounded-3xl"
+        variant="destructive"
       >
         <Link href="/new-session" className="flex">
           <span className="text-4xl mr-2">Start new session!</span>
