@@ -3,13 +3,14 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/server/auth";
 import {
-  NewSmokingSchema,
-  type NewSmokingSchemaType,
-} from "@/schemas/NewSmokingSchema";
+  UpdateSmokingSchema,
+  type UpdateSmokingSchemaType,
+} from "@/schemas/UpdateSmokingSchema";
 
-export async function createNewSmokingSession(
-  data: NewSmokingSchemaType,
-  imagesFormData: FormData
+export async function updateSmokingSession(
+  data: UpdateSmokingSchemaType,
+  imagesFormData: FormData,
+  imagesIdToDelete: number[]
 ) {
   const session = await getServerSession(authOptions);
   if (!session) {
@@ -17,7 +18,7 @@ export async function createNewSmokingSession(
     return { success: false, message: "Unauthorized" };
   }
 
-  const parseResult = NewSmokingSchema.safeParse(data);
+  const parseResult = UpdateSmokingSchema.safeParse(data);
   if (!parseResult.success) {
     return { success: false, message: "Invalid new session data" };
   }
@@ -25,19 +26,27 @@ export async function createNewSmokingSession(
 
   try {
     //first end all possible not-finished sessions
-    await prisma.smokingSession.updateMany({
+    const sessionInstance = await prisma.smokingSession.findFirst({
       where: {
-        finished: false,
-      },
-      data: {
-        finished: true,
+        id: parseResult.data.id,
       },
     });
 
-    const newSession = await prisma.smokingSession.create({
+    if (!sessionInstance) {
+      return { success: false, message: "Invalid session Id" };
+    }
+
+    if (sessionInstance.authorId !== userFromSession.id) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    //TODO: in the future handle all of these in a single transaction maybe
+    const updatedSession = await prisma.smokingSession.update({
+      where: {
+        id: parseResult.data.id,
+      },
       data: {
-        authorId: userFromSession.id,
-        finished: false,
+        finished: parseResult.data.finished,
         title: parseResult.data.title,
         products: parseResult.data.products.map((item) => {
           return item.value;
@@ -51,9 +60,6 @@ export async function createNewSmokingSession(
         tempSensor3Name: parseResult.data.tempSensor3Name,
       },
     });
-    if (!newSession.id) {
-      return { success: false, message: "Could not create new session" };
-    }
 
     const files = imagesFormData.getAll("files[]");
 
@@ -63,7 +69,7 @@ export async function createNewSmokingSession(
 
         await prisma.smokingSessionPhoto.create({
           data: {
-            sessionId: newSession.id,
+            sessionId: updatedSession.id,
             data: Buffer.from(await parsedFile.arrayBuffer()),
             mime: parsedFile.type,
           },
@@ -71,11 +77,19 @@ export async function createNewSmokingSession(
       }
     }
 
+    await prisma.smokingSessionPhoto.deleteMany({
+      where: {
+        id: {
+          //TODO: handle non numeric ids
+          in: imagesIdToDelete,
+        },
+      },
+    });
+
     return {
       success: true,
-      data: JSON.stringify({ sessionId: newSession.id }),
     };
   } catch (e) {
-    return { success: false, message: "Could not create new session" };
+    return { success: false, message: e.message };
   }
 }

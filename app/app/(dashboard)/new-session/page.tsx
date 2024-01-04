@@ -23,17 +23,17 @@ import { createNewWoodType } from "@/app/actions/createNewWoodType";
 import { v4 as uuidv4 } from "uuid";
 import ImageCarousel from "@/components/ui/imageCarousel";
 
-const OptionsSchema = z.object({
+export const OptionsSchema = z.object({
   label: z.string(),
   value: z.string(),
 });
-type OptionsSchemaType = z.infer<typeof OptionsSchema>;
+export type OptionsSchemaType = z.infer<typeof OptionsSchema>;
 
-const NewSessionSelectSchema = z.object({
+export const SessionSelectSchema = z.object({
   id: z.number(),
   name: z.string(),
 });
-type NewSessionSelectSchemaType = z.infer<typeof NewSessionSelectSchema>;
+export type SessionSelectSchemaType = z.infer<typeof SessionSelectSchema>;
 
 export const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
@@ -46,6 +46,7 @@ export type fileUploadSchemaType = {
   temporaryID: string;
   file?: File;
   b64String: string;
+  dbId?: number;
 };
 
 const NewSessionPage = () => {
@@ -97,18 +98,18 @@ const NewSessionPage = () => {
 
       if (res.success === true) {
         const data: {
-          woodTypes: NewSessionSelectSchemaType[];
-          productTypes: NewSessionSelectSchemaType[];
+          woodTypes: SessionSelectSchemaType[];
+          productTypes: SessionSelectSchemaType[];
         } = JSON.parse(res.data ?? "");
 
         const productTypes: OptionsSchemaType[] = [];
-        data.productTypes.forEach((productType: NewSessionSelectSchemaType) => {
+        data.productTypes.forEach((productType: SessionSelectSchemaType) => {
           productTypes.push(createOption(productType.name));
         });
         setOptionsProducts(productTypes);
 
         const woodTypes: OptionsSchemaType[] = [];
-        data.woodTypes.forEach((woodType: NewSessionSelectSchemaType) => {
+        data.woodTypes.forEach((woodType: SessionSelectSchemaType) => {
           woodTypes.push(createOption(woodType.name));
         });
         setOptionsWood(woodTypes);
@@ -189,11 +190,12 @@ const NewSessionPage = () => {
     const res = await createNewProductType(inputValue);
     if (res.success) {
       const newOption = createOption(inputValue);
-      setIsLoadingProducts(false);
       setOptionsProducts((prev) => [...prev, newOption]);
-      const selectedProducts = getValues("products");
+      const selectedProducts: OptionsSchemaType[] = [];
+      selectedProducts.concat(getValues("products"));
       selectedProducts.push(newOption);
       setValue("products", selectedProducts);
+      setIsLoadingProducts(false);
     }
   };
 
@@ -202,11 +204,12 @@ const NewSessionPage = () => {
     const res = await createNewWoodType(inputValue);
     if (res.success) {
       const newOption = createOption(inputValue);
-      setIsLoadingWood(false);
       setOptionsWood((prev) => [...prev, newOption]);
-      const selectedWoods = getValues("woods");
+      const selectedWoods: OptionsSchemaType[] = [];
+      selectedWoods.concat(getValues("woods"));
       selectedWoods.push(newOption);
       setValue("woods", selectedWoods);
+      setIsLoadingWood(false);
     }
   };
 
@@ -229,7 +232,6 @@ const NewSessionPage = () => {
               <Controller
                 control={control}
                 name="products"
-                rules={{ required: true }}
                 render={({ field: { onChange, onBlur, value, ref } }) => (
                   <CreatableSelect
                     isMulti
@@ -251,7 +253,6 @@ const NewSessionPage = () => {
               <Controller
                 control={control}
                 name="woods"
-                rules={{ required: true }}
                 render={({ field: { onChange, onBlur, value, ref } }) => (
                   <CreatableSelect
                     isMulti
@@ -273,6 +274,7 @@ const NewSessionPage = () => {
               <textarea
                 {...register("description")}
                 placeholder="description"
+                className="resize-none"
               />
               <p className="text-red-600">{errors.description?.message}</p>
             </form>

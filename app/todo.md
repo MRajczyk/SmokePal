@@ -1,10 +1,5 @@
-dalej:
-Po wejsciu na session page fetch całości danych
-reszte dopisywac do listy co przychodzi z websocketu
-i moze przy kazdym wystartowaniu najpierw fetch z bazy?
+jezeli obrazek bedzie z fetcha w useeffect to nie wysyłaj go w submicie forma (rozpoznje się go bo nie ma file, jedynie b64 string)
+jezeli user chce usunac zdjecie dodaj do tablicy i przekaż w akcji serwerowej updatesmokingschema
 
-pierwszy pomysl trzymac wszystkie pomiary w tablicy
-i przy ewentualnym wyborze ktoregos z czujnikow filtrować do
-innej tablicy, zeby nie tracic danych zeby nie trzeba bylo refetchowac
-
-unikalne readingi cza ogarnac, kurde xd
+wazne - zrobic loading state na fetch danych, zeby za szybko nie dalo sie wklikac w edycje czy inne
+zobaczyc czemu zod najpierw wypluwa required zamiast od razu custom error message w newsmokingschema

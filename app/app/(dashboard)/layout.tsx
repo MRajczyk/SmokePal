@@ -15,6 +15,13 @@ import logoutIcon from "@/public/assets/logout_placeholder.svg";
 import smokerIcon from "@/public/assets/smoker_placeholder.svg";
 import settingsIcon from "@/public/assets/settings_placeholder.svg";
 import homeIcon from "@/public/assets/home_placeholder.svg";
+import { Poppins } from "next/font/google";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+});
 
 export default async function DashboardLayout({
   children,
@@ -26,7 +33,7 @@ export default async function DashboardLayout({
     redirect("/auth/login");
   }
   return (
-    <main className="w-full h-full">
+    <main className={`${poppins.className} w-full h-full`}>
       <QueryClientProviderWrapper>
         <Provider session={session}>
           <div className="w-full h-full flex flex-row">
