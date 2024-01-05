@@ -477,12 +477,12 @@ export default function SessionPage({
     if (res.success) {
       const newOption = createOption(inputValue);
       setOptionsProducts((prev) => [...prev, newOption]);
-      const selectedProducts: SelectOptionsSchemaType[] = [];
-      selectedProducts.concat(getValues("products"));
+      const selectedProducts: SelectOptionsSchemaType[] =
+        getValues("products") ?? [];
       selectedProducts.push(newOption);
       setValue("products", selectedProducts);
-      setIsLoadingProducts(false);
     }
+    setIsLoadingProducts(false);
   };
 
   const handleCreateWood = async (inputValue: string) => {
@@ -491,12 +491,11 @@ export default function SessionPage({
     if (res.success) {
       const newOption = createOption(inputValue);
       setOptionsWood((prev) => [...prev, newOption]);
-      const selectedWoods: SelectOptionsSchemaType[] = [];
-      selectedWoods.concat(getValues("woods"));
+      const selectedWoods: SelectOptionsSchemaType[] = getValues("woods") ?? [];
       selectedWoods.push(newOption);
       setValue("woods", selectedWoods);
-      setIsLoadingWood(false);
     }
+    setIsLoadingWood(false);
   };
 
   function enableEditingMode() {
