@@ -19,7 +19,7 @@ const ChangeUsernameForm = () => {
     formState: { errors },
     resetField,
   } = useForm<PasswordChangeSchemaType>({
-    mode: "onChange",
+    mode: "all",
     resolver: zodResolver(PasswordChangeSchema),
   });
 
@@ -37,27 +37,43 @@ const ChangeUsernameForm = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-[200px] h-[200px] bg-orange-300 rounded-xl">
-      <form className="flex flex-col gap-1" onSubmit={handleSubmit(onSubmit)}>
+    <div className="flex flex-col items-center justify-center w-full h-full">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
         <input
           placeholder="Current password"
           type="password"
+          className="w-[490px] h-[100px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
           {...register("password")}
-        ></input>
-        <p className="text-red-600">{errors.password?.message}</p>
+        />
+        {errors.password && (
+          <p className="text-red-600">{errors.password.message}</p>
+        )}
         <input
           placeholder="New password"
           type="password"
+          className="w-[490px] h-[100px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
           {...register("newPassword")}
-        ></input>
-        <p className="text-red-600">{errors.newPassword?.message}</p>
+        />
+        {errors.newPassword && (
+          <p className="text-red-600">{errors.newPassword.message}</p>
+        )}
         <input
           placeholder="Confirm new password"
           type="password"
+          className="w-[490px] h-[100px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
           {...register("confirm")}
-        ></input>
-        <p className="text-red-600">{errors.confirm?.message}</p>
-        <Button type="submit">Change password</Button>
+        />
+        {errors.confirm && (
+          <p className="text-red-600">{errors.confirm.message}</p>
+        )}
+        <Button
+          type="submit"
+          variant="gradient"
+          size="auth"
+          className="rounded-[20px] w-[490px]"
+        >
+          Change password
+        </Button>
       </form>
       <p className="text-red-600">{errorMessage}</p>
       <p className="text-green-600">{successMessage}</p>

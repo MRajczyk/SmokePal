@@ -10,7 +10,7 @@ const StartSessionBanner = () => {
     <div className="flex w-full h-full items-center justify-center bg-transparent">
       <Button
         asChild
-        className="flex items-center justify-center w-full h-full rounded-3xl p-8"
+        className="flex items-center justify-center w-full h-full rounded-[20px] p-8"
         variant="gradient"
       >
         <Link href="/new-session" className="w-full text-left">

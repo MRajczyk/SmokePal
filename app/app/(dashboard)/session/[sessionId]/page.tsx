@@ -510,7 +510,7 @@ export default function SessionPage({
   function handleReject() {}
 
   return (
-    <div className="flex w-full h-full flex-col items-center justify-center">
+    <div className="flex w-full h-full flex-col items-center justify-start">
       {imageModalOpen && (
         <Lightbox
           medium={modalImageURL}
@@ -521,7 +521,9 @@ export default function SessionPage({
       )}
       {params.sessionId > 0 ? (
         fetchingHistoricalData ? (
-          <Ring color="orange" size={100} />
+          <div className="flex w-full h-full flex-col items-center justify-center">
+            <Ring color="orange" size={100} />
+          </div>
         ) : (
           <div>
             {!editing && (
