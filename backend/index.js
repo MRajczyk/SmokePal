@@ -131,21 +131,32 @@ app.get("/", (req, res) => {
   res.send("im not a teapot but im alive");
 });
 
-app.get("/token-test", async (req, res) => {
-  const token =
-    "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..E7KwaS6YqQhhl7g3.x17OTTyqn3BuHNDlruV8u0gnZpxD6FPZ3yOIpXghCn4VDdsIkHRDTz41K0VoUd16KurcJheKO7RjuU2P-olfRfvTNKPk0fXxjAyNaB4_zsXeoAuWY8bnnusEpyB7zX4B71vhppFib6T6g827YmmzdRL0hAmVEeUp7Cp0hFPpZe2lhmw0hfdp0flCVxvqAONTQscvn198zZl9.VYO7akZPPTSWCyUvBb1mbw";
-
-  const decodedToken = await nextAuthJWT.decode({
-    token: token,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
-  console.log(decodedToken);
-
-  res.status(200).json({ message: "im not a teapot but im alive" });
-});
-
 app.post("/api/start", async (req, res) => {
-  //TODO: think about any kind of identity validation, maybe decode jwt token, tbd
+  const authHeader = req.header("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(404).send(
+      JSON.stringify({
+        message: "Forbidden",
+      })
+    );
+  }
+
+  const token = authHeader.substring(7, authHeader.length);
+  try {
+    //if successfully decoded, then the token is valid
+    const decodedToken = await nextAuthJWT.decode({
+      token: token,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+    //TODO: check expiry date of the token (is it needed?)
+  } catch (e) {
+    return res.status(404).send(
+      JSON.stringify({
+        message: "Forbidden",
+      })
+    );
+  }
+
   if (
     !req.body.sessionId ||
     Number.isNaN(Number.parseInt(req.body.sessionId))
@@ -174,10 +185,34 @@ app.post("/api/start", async (req, res) => {
     })
   );
 });
-app.post("/api/stop", (req, res) => {
-  //TODO: think about any kind of identity validation, maybe decode jwt token, tbd
+
+app.post("/api/stop", async (req, res) => {
+  const authHeader = req.header("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(404).send(
+      JSON.stringify({
+        message: "Forbidden",
+      })
+    );
+  }
+
+  const token = authHeader.substring(7, authHeader.length);
+  try {
+    //if successfully decoded, then the token is valid
+    const decodedToken = await nextAuthJWT.decode({
+      token: token,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+    //TODO: check expiry date of the token (is it needed?)
+  } catch (e) {
+    return res.status(404).send(
+      JSON.stringify({
+        message: "Forbidden",
+      })
+    );
+  }
+
   console.log("stopping all websockets connections");
-  //TODO: I don't think closing should be handled this way, but dunno - think about mechanism to resume broadcasting
   clients.forEach((ws) => {
     ws.close();
   });

@@ -1,11 +1,13 @@
 "use server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/server/auth";
+import { createZodFetcher } from "zod-fetch";
+import defaultResponseSchema from "@/schemas/defaultResponseSchema";
+import { fetcher } from "@/lib/utils";
 import { getToken } from "next-auth/jwt";
 import { headers, cookies } from "next/headers";
-import { decode } from "next-auth/jwt";
 
-export async function testGetToken() {
+export async function stopSmokingSessionAction() {
   const session = await getServerSession(authOptions);
   if (!session) {
     // TODO: maybe redirect to login page?
@@ -24,11 +26,21 @@ export async function testGetToken() {
     } as any,
     raw: true,
   });
-  console.log("token", token);
-  console.log(
-    "decoded",
-    await decode({ token: token, secret: process.env.NEXTAUTH_SECRET! })
-  );
 
-  return { success: true };
+  try {
+    const fetch = createZodFetcher(fetcher);
+    return fetch(
+      defaultResponseSchema,
+      process.env.NEXT_PUBLIC_BACKEND_URL + "/api/stop",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+  } catch (e) {
+    return { success: false, message: "Could not fetch the data" };
+  }
 }
