@@ -61,14 +61,14 @@ mqttClient.on("message", async (topic, message) => {
           );
         });
         try {
-          console.log("creating sensorReading: ", {
-            sessionId: currentSessionId,
-            sensorName: reading.sensorName,
-            //check whether adding error handling is advisable
-            value: Number.parseFloat(reading.reading),
-            type: reading.type == "TEMP" ? ReadingType.TEMP : ReadingType.HUM,
-            timestamp: timestamp,
-          });
+          // console.log("creating sensorReading: ", {
+          //   sessionId: currentSessionId,
+          //   sensorName: reading.sensorName,
+          //   //check whether adding error handling is advisable
+          //   value: Number.parseFloat(reading.reading),
+          //   type: reading.type == "TEMP" ? ReadingType.TEMP : ReadingType.HUM,
+          //   timestamp: timestamp,
+          // });
           await prisma.smokingSensorReading.create({
             data: {
               sessionId: currentSessionId,
