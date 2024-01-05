@@ -12,6 +12,7 @@ const buttonVariants = cva(
         default: "bg-white text-black hover:bg-white/90",
         destructive: "bg-red-600 text-white hover:bg-red-600/90",
         ghost: "bg-transparent",
+        auth: "bg-gradient-to-r from-[#D1271C] to-[#F4981D] text-[#F4EDE5] font-bold text-2xl",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -19,6 +20,7 @@ const buttonVariants = cva(
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
         logout: "h-12 w-12",
+        auth: "w-[470px] h-[90px]",
       },
     },
     defaultVariants: {
