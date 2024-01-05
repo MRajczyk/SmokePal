@@ -1,9 +1,8 @@
 "use client";
 import React, { useRef } from "react";
-import { fileUploadSchemaType } from "@/app/(dashboard)/new-session/page";
+import { type fileUploadSchemaType } from "@/schemas/NewSessionSchemas";
 import ImageCarouselItem from "./imageCarouselItem";
 import AddIcon from "@/public/assets/add_icon.svg";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface ImageCarouselProps {
@@ -23,6 +22,7 @@ const ImageCarousel = ({
   editing,
   className,
 }: ImageCarouselProps) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function addImage(e: any) {
     console.log("remove clicked", e);
     handleAddImage(e.target.files[0]);

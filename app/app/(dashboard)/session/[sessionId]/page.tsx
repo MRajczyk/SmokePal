@@ -19,31 +19,35 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SmokingSessionPhoto, type SmokingSession } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
-import { fileUploadSchemaType } from "../../new-session/page";
 import ImageCarousel from "@/components/ui/imageCarousel";
-import { ACCEPTED_IMAGE_TYPES } from "../../new-session/page";
 import { Lightbox } from "react-modal-image";
 import {
   UpdateSmokingSchema,
   UpdateSmokingSchemaForm,
   UpdateSmokingSchemaFormType,
 } from "@/schemas/UpdateSmokingSchema";
-import { OptionsSchema, OptionsSchemaType } from "../../new-session/page";
-import { getNewSessionInitialData } from "@/app/actions/getNewSessionInit";
 import {
-  SessionSelectSchema,
+  type SelectOptionsSchemaType,
   type SessionSelectSchemaType,
-} from "../../new-session/page";
+} from "@/schemas/NewSessionSchemas";
+import {
+  ACCEPTED_IMAGE_TYPES,
+  type fileUploadSchemaType,
+} from "@/schemas/NewSessionSchemas";
+import { getNewSessionInitialData } from "@/app/actions/getNewSessionInit";
+
 import { createNewWoodType } from "@/app/actions/createNewWoodType";
 import { createNewProductType } from "@/app/actions/createNewProductType";
 import CreatableSelect from "react-select/creatable";
 import { Ring } from "react-css-spinners";
 import { updateSmokingSession } from "@/app/actions/updateSmokingSession";
 
-function arrayBufferToBase64(buffer: Buffer, mime: string) {
+//buffer is of type buffer but theres typing error as i cant get data property to be recognized by ts
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function arrayBufferToBase64(buffer: any, mime: string) {
   let binary = "";
   const bytes = buffer.data;
-  bytes.forEach((b) => (binary += String.fromCharCode(b)));
+  bytes.forEach((b: number) => (binary += String.fromCharCode(b)));
   const res = `data:${mime};base64,` + btoa(binary);
 
   return res;
@@ -80,11 +84,11 @@ export default function SessionPage({
   });
 
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
-  const [optionsProducts, setOptionsProducts] = useState<OptionsSchemaType[]>(
-    []
-  );
+  const [optionsProducts, setOptionsProducts] = useState<
+    SelectOptionsSchemaType[]
+  >([]);
   const [isLoadingWood, setIsLoadingWood] = useState(false);
-  const [optionsWood, setOptionsWood] = useState<OptionsSchemaType[]>([]);
+  const [optionsWood, setOptionsWood] = useState<SelectOptionsSchemaType[]>([]);
 
   function handleAddImage(file: File) {
     if (file.size > 5000000) {
@@ -119,13 +123,13 @@ export default function SessionPage({
           productTypes: SessionSelectSchemaType[];
         } = JSON.parse(res.data ?? "");
 
-        const productTypes: OptionsSchemaType[] = [];
+        const productTypes: SelectOptionsSchemaType[] = [];
         data.productTypes.forEach((productType: SessionSelectSchemaType) => {
           productTypes.push(createOption(productType.name));
         });
         setOptionsProducts(productTypes);
 
-        const woodTypes: OptionsSchemaType[] = [];
+        const woodTypes: SelectOptionsSchemaType[] = [];
         data.woodTypes.forEach((woodType: SessionSelectSchemaType) => {
           woodTypes.push(createOption(woodType.name));
         });
@@ -473,7 +477,7 @@ export default function SessionPage({
     if (res.success) {
       const newOption = createOption(inputValue);
       setOptionsProducts((prev) => [...prev, newOption]);
-      const selectedProducts: OptionsSchemaType[] = [];
+      const selectedProducts: SelectOptionsSchemaType[] = [];
       selectedProducts.concat(getValues("products"));
       selectedProducts.push(newOption);
       setValue("products", selectedProducts);
@@ -487,7 +491,7 @@ export default function SessionPage({
     if (res.success) {
       const newOption = createOption(inputValue);
       setOptionsWood((prev) => [...prev, newOption]);
-      const selectedWoods: OptionsSchemaType[] = [];
+      const selectedWoods: SelectOptionsSchemaType[] = [];
       selectedWoods.concat(getValues("woods"));
       selectedWoods.push(newOption);
       setValue("woods", selectedWoods);
@@ -499,7 +503,7 @@ export default function SessionPage({
     setValue("title", sessionData?.title ?? "");
 
     if (sessionData?.products) {
-      const selectedProducts: OptionsSchemaType[] = [];
+      const selectedProducts: SelectOptionsSchemaType[] = [];
       sessionData.products.forEach((product) => {
         selectedProducts.push(createOption(product));
       });
@@ -509,7 +513,7 @@ export default function SessionPage({
     }
 
     if (sessionData?.woods) {
-      const selectedWoods: OptionsSchemaType[] = [];
+      const selectedWoods: SelectOptionsSchemaType[] = [];
       sessionData.products.forEach((wood) => {
         selectedWoods.push(createOption(wood));
       });

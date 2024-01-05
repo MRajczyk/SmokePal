@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import Link from "next/link";
+// @ts-expect-error this library doesnt support typescript at all.............
 import historyArrow from "@/public/assets/historyArrow.svg?url";
 
 const HistoryBanner = () => {

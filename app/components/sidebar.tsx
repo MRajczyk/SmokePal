@@ -30,7 +30,7 @@ const Sidebar = () => {
       <div className="flex flex-col justify-center items-center gap-[10px]">
         <Link
           className={cn(
-            "flex w-20 h-20 items-center justify-center rounded-[40px]",
+            "flex w-20 h-20 items-center justify-center rounded-[40px] transition-colors duration-500",
             pathname === ""
               ? "bg-[#F4EDE5] fill-[#15191C]"
               : "bg-transparent fill-[#F4EDE5]"
@@ -46,7 +46,7 @@ const Sidebar = () => {
         </Link>
         <Link
           className={cn(
-            "flex w-20 h-20 items-center justify-center rounded-[40px]",
+            "flex w-20 h-20 items-center justify-center rounded-[40px] transition-colors duration-500",
             pathname === "new-session"
               ? "bg-[#F4EDE5] fill-[#15191C]"
               : "bg-transparent fill-[#F4EDE5]"
@@ -62,7 +62,7 @@ const Sidebar = () => {
         </Link>
         <div
           className={cn(
-            "flex w-20 h-20 items-center justify-center rounded-[40px]",
+            "flex w-20 h-20 items-center justify-center rounded-[40px] transition-colors duration-500",
             pathname === "session"
               ? "bg-[#F4EDE5] fill-[#15191C]"
               : "bg-transparent fill-[#F4EDE5]"
@@ -79,7 +79,7 @@ const Sidebar = () => {
         </div>
         <Link
           className={cn(
-            "flex w-20 h-20 items-center justify-center rounded-[40px]",
+            "flex w-20 h-20 items-center justify-center rounded-[40px] transition-colors duration-500",
             pathname === "history"
               ? "bg-[#F4EDE5] fill-[#15191C]"
               : "bg-transparent fill-[#F4EDE5]"
@@ -106,12 +106,12 @@ const Sidebar = () => {
       <div className="flex flex-col justify-center items-center gap-[10px] mb-10">
         <Link
           className={cn(
-            "flex w-20 h-20 items-center justify-center rounded-[40px]",
+            "flex w-20 h-20 items-center justify-center rounded-[40px] transition-colors duration-500",
             pathname === "settings"
               ? "bg-[#F4EDE5] fill-[#15191C]"
               : "bg-transparent fill-[#F4EDE5]"
           )}
-          href={{ pathname: "settings" }}
+          href={{ pathname: "/settings" }}
         >
           <SettingsIcon
             alt="Settings icon"

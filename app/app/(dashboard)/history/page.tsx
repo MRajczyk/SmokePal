@@ -4,7 +4,6 @@ import Link from "next/link";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   TableFooter,

@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "../ui/button";
+// @ts-expect-error this library doesnt support typescript at all.............
 import StartSessionImg from "@/public/assets/startSessionImg.svg?url";
 import Image from "next/image";
 import Link from "next/link";
