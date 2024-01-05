@@ -4,8 +4,10 @@ import StartSessionBanner from "@/components/dashboard/startSessionBanner";
 import RecentSession from "@/components/dashboard/recentSession";
 import WeatherBanner from "@/components/dashboard/weather";
 import HistoryBanner from "@/components/dashboard/historyBanner";
+import { testGetToken } from "../actions/testGetToken";
 
 export default function Home() {
+  testGetToken();
   return (
     <div className="flex w-full h-full flex-col">
       <div className="flex w-full p-8 pb-4">

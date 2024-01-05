@@ -3,7 +3,10 @@ require("dotenv").config();
 const moment = require("moment");
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const nextAuthJWT = require("next-auth/jwt");
 const app = express();
+app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({
@@ -126,6 +129,19 @@ mqttClient.on("message", async (topic, message) => {
 
 app.get("/", (req, res) => {
   res.send("im not a teapot but im alive");
+});
+
+app.get("/token-test", async (req, res) => {
+  const token =
+    "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..E7KwaS6YqQhhl7g3.x17OTTyqn3BuHNDlruV8u0gnZpxD6FPZ3yOIpXghCn4VDdsIkHRDTz41K0VoUd16KurcJheKO7RjuU2P-olfRfvTNKPk0fXxjAyNaB4_zsXeoAuWY8bnnusEpyB7zX4B71vhppFib6T6g827YmmzdRL0hAmVEeUp7Cp0hFPpZe2lhmw0hfdp0flCVxvqAONTQscvn198zZl9.VYO7akZPPTSWCyUvBb1mbw";
+
+  const decodedToken = await nextAuthJWT.decode({
+    token: token,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+  console.log(decodedToken);
+
+  res.status(200).json({ message: "im not a teapot but im alive" });
 });
 
 app.post("/api/start", async (req, res) => {
