@@ -3,7 +3,10 @@ require("dotenv").config();
 const moment = require("moment");
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const nextAuthJWT = require("next-auth/jwt");
 const app = express();
+app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({
@@ -58,14 +61,14 @@ mqttClient.on("message", async (topic, message) => {
           );
         });
         try {
-          console.log("creating sensorReading: ", {
-            sessionId: currentSessionId,
-            sensorName: reading.sensorName,
-            //check whether adding error handling is advisable
-            value: Number.parseFloat(reading.reading),
-            type: reading.type == "TEMP" ? ReadingType.TEMP : ReadingType.HUM,
-            timestamp: timestamp,
-          });
+          // console.log("creating sensorReading: ", {
+          //   sessionId: currentSessionId,
+          //   sensorName: reading.sensorName,
+          //   //check whether adding error handling is advisable
+          //   value: Number.parseFloat(reading.reading),
+          //   type: reading.type == "TEMP" ? ReadingType.TEMP : ReadingType.HUM,
+          //   timestamp: timestamp,
+          // });
           await prisma.smokingSensorReading.create({
             data: {
               sessionId: currentSessionId,
@@ -129,7 +132,31 @@ app.get("/", (req, res) => {
 });
 
 app.post("/api/start", async (req, res) => {
-  //TODO: think about any kind of identity validation, maybe decode jwt token, tbd
+  const authHeader = req.header("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(404).send(
+      JSON.stringify({
+        message: "Forbidden",
+      })
+    );
+  }
+
+  const token = authHeader.substring(7, authHeader.length);
+  try {
+    //if successfully decoded, then the token is valid
+    const decodedToken = await nextAuthJWT.decode({
+      token: token,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+    //TODO: check expiry date of the token (is it needed?)
+  } catch (e) {
+    return res.status(404).send(
+      JSON.stringify({
+        message: "Forbidden",
+      })
+    );
+  }
+
   if (
     !req.body.sessionId ||
     Number.isNaN(Number.parseInt(req.body.sessionId))
@@ -158,10 +185,34 @@ app.post("/api/start", async (req, res) => {
     })
   );
 });
-app.post("/api/stop", (req, res) => {
-  //TODO: think about any kind of identity validation, maybe decode jwt token, tbd
+
+app.post("/api/stop", async (req, res) => {
+  const authHeader = req.header("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(404).send(
+      JSON.stringify({
+        message: "Forbidden",
+      })
+    );
+  }
+
+  const token = authHeader.substring(7, authHeader.length);
+  try {
+    //if successfully decoded, then the token is valid
+    const decodedToken = await nextAuthJWT.decode({
+      token: token,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+    //TODO: check expiry date of the token (is it needed?)
+  } catch (e) {
+    return res.status(404).send(
+      JSON.stringify({
+        message: "Forbidden",
+      })
+    );
+  }
+
   console.log("stopping all websockets connections");
-  //TODO: I don't think closing should be handled this way, but dunno - think about mechanism to resume broadcasting
   clients.forEach((ws) => {
     ws.close();
   });

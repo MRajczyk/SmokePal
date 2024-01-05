@@ -61,7 +61,7 @@ export default function LoginPage() {
         <p className="text-red-600">{errors.password?.message}</p>
         <p className="text-red-600">{loginError}</p>
 
-        <Button type="submit" variant="auth" size="auth">
+        <Button type="submit" variant="gradient" size="auth">
           Log in to Your Account
         </Button>
         <span className="text-[#6C6B6A] mt-4">

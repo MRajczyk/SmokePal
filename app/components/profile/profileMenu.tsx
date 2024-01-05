@@ -1,5 +1,7 @@
+"use client";
 import React from "react";
 import ProfileTab from "@/components/profile/profileTab";
+import { cn } from "@/lib/utils";
 
 export interface Tab {
   href: string;
@@ -21,18 +23,18 @@ const settingsTabs: Tab[] = [
   },
 ];
 
-const ProfileMenu = () => {
+const ProfileMenu = ({ className }: { className: string }) => {
   return (
-    <>
-      <div className="flex w-full h-full bg-white items-center flex-col gap-4 justify-start rounded-3xl">
-        <h1 className="text-3xl pt-8 pb-6">
-          <b>Settings</b>
-        </h1>
-        {settingsTabs.map(({ title, href }) => (
-          <ProfileTab title={title} href={href} key={title} />
-        ))}
-      </div>
-    </>
+    <div
+      className={cn(
+        "flex w-full h-full bg-[#15191C] items-center flex-col gap-4 justify-center rounded-[20px]",
+        className
+      )}
+    >
+      {settingsTabs.map(({ title, href }) => (
+        <ProfileTab title={title} href={href} key={title} />
+      ))}
+    </div>
   );
 };
 

@@ -41,6 +41,8 @@ import { createNewProductType } from "@/app/actions/createNewProductType";
 import CreatableSelect from "react-select/creatable";
 import { Ring } from "react-css-spinners";
 import { updateSmokingSession } from "@/app/actions/updateSmokingSession";
+import { startSmokingSessionAction } from "@/app/actions/startSmokingSessionAction";
+import { stopSmokingSessionAction } from "@/app/actions/stopSmokingSessionAction";
 
 //buffer is of type buffer but theres typing error as i cant get data property to be recognized by ts
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -347,21 +349,7 @@ export default function SessionPage({
   }, []);
 
   async function startSmokingSession() {
-    const fetch = createZodFetcher(fetcher);
-    return fetch(
-      defaultResponseSchema,
-      process.env.NEXT_PUBLIC_BACKEND_URL + "/api/start",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          //add error handling for missing session id i guess, or just use !
-          sessionId: params.sessionId,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    startSmokingSessionAction(params.sessionId);
   }
 
   const {
@@ -384,17 +372,7 @@ export default function SessionPage({
   );
 
   async function stopSmokingSession() {
-    const fetch = createZodFetcher(fetcher);
-    return fetch(
-      defaultResponseSchema,
-      process.env.NEXT_PUBLIC_BACKEND_URL + "/api/stop",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    stopSmokingSessionAction();
   }
 
   const {
@@ -532,7 +510,7 @@ export default function SessionPage({
   function handleReject() {}
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex w-full h-full flex-col items-center justify-start">
       {imageModalOpen && (
         <Lightbox
           medium={modalImageURL}
@@ -543,7 +521,7 @@ export default function SessionPage({
       )}
       {params.sessionId > 0 ? (
         fetchingHistoricalData ? (
-          <div className="w-full h-full flex justify-center items-center">
+          <div className="flex w-full h-full flex-col items-center justify-center">
             <Ring color="orange" size={100} />
           </div>
         ) : (

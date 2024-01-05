@@ -13,7 +13,12 @@ const ChangeEmailForm = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const { data: session, update } = useSession();
 
-  const { register, handleSubmit, resetField } = useForm<EmailSchemaType>({
+  const {
+    register,
+    handleSubmit,
+    resetField,
+    formState: { errors },
+  } = useForm<EmailSchemaType>({
     mode: "onChange",
     resolver: zodResolver(EmailSchema),
   });
@@ -30,14 +35,28 @@ const ChangeEmailForm = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-[200px] h-[200px] bg-orange-300 rounded-xl">
-      <form className="flex flex-col gap-1" onSubmit={handleSubmit(onSubmit)}>
-        <h3 className="text-center">Current email:</h3>
-        <p className="text-center">
-          <b>{session?.user.email}</b>
-        </p>
-        <input placeholder="New email" {...register("email")}></input>
-        <Button type="submit">Change email</Button>
+    <div className="flex flex-col items-center justify-center w-full h-full">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+        <h3 className="text-center text-[#F4EDE5]">Current email:</h3>
+        <div className="w-[490px] h-[100px] p-[38px] rounded-[9px] bg-[#1E2122] text-[#F4EDE5] flex items-center justify-center">
+          <p className="text-center text-4xl font-semibold">
+            {session?.user.email}
+          </p>
+        </div>
+        <input
+          placeholder="New email"
+          className="w-[490px] h-[100px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+          {...register("email")}
+        />
+        <p className="text-red-600">{errors.email?.message}</p>
+        <Button
+          type="submit"
+          variant="gradient"
+          size="auth"
+          className="rounded-[20px] w-[490px]"
+        >
+          Change email
+        </Button>
       </form>
       <p className="text-red-600">{errorMessage}</p>
       <p className="text-green-600">{successMessage}</p>

@@ -2,7 +2,9 @@
 import React, { useRef } from "react";
 import { type fileUploadSchemaType } from "@/schemas/NewSessionSchemas";
 import ImageCarouselItem from "./imageCarouselItem";
-import AddIcon from "@/public/assets/add_icon.svg";
+// @ts-expect-error this library doesnt support typescript at all.............
+import AddIcon from "@/public/assets/add_icon.svg?url";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface ImageCarouselProps {
@@ -35,7 +37,7 @@ const ImageCarousel = ({
       {(editing || (images && images.length > 0)) && (
         <div
           className={cn(
-            "flex flex-row shrink-0 gap-5 border-2 border-solid border-gray-300 h-fit p-4 w-[400px] overflow-x-auto rounded-xl",
+            "flex flex-row shrink-0 gap-5 border-2 border-solid border-gray-300 h-fit p-2 w-[400px] overflow-x-auto rounded-xl",
             className
           )}
         >
@@ -45,15 +47,15 @@ const ImageCarousel = ({
                 key={image.temporaryID}
                 handleRemoveImage={handleRemoveImage}
                 b64URL={image.b64String}
-                width={100}
-                height={100}
+                width={120}
+                height={120}
                 imageUuid={image.temporaryID}
                 editing={editing}
                 handleImageClick={handleImageClick}
               />
             ))}
           {editing && (
-            <div className="flex shrink-0 w-[100px] h-[100px] items-center justify-center bg-gray-100 rounded-2xl">
+            <div className="flex shrink-0 w-[120px] h-[120px] items-center justify-center bg-gray-100 rounded-2xl">
               <input
                 id="img_input"
                 ref={fileInput}
@@ -61,11 +63,10 @@ const ImageCarousel = ({
                 onChange={addImage}
                 type="file"
               />
-              <AddIcon
+              <Image
+                src={AddIcon}
                 alt="Add image icon"
-                width={60}
-                height={60}
-                className="cursor-pointer opacity-50"
+                className="cursor-pointer"
                 onClick={() => fileInput?.current?.click()}
               />
             </div>

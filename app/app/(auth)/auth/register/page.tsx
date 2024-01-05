@@ -80,7 +80,7 @@ export default function RegisterPage() {
         />
         <p className="text-red-600">{errors.confirm?.message}</p>
 
-        <Button type="submit" variant="auth" size="auth">
+        <Button type="submit" variant="gradient" size="auth">
           Create Account
         </Button>
         <span className="text-[#6C6B6A] mt-4">
