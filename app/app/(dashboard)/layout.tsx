@@ -37,7 +37,7 @@ export default async function DashboardLayout({
                 fill
                 className="absolute opacity-60"
               />
-              <div className="flex flex-col z-[1] text-center items-center justify-center">
+              <div className="flex w-full h-full flex-col z-[1] text-center items-center justify-center">
                 {children}
               </div>
             </div>

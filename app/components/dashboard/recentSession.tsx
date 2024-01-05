@@ -7,6 +7,7 @@ import moment from "moment";
 import Link from "next/link";
 import { LineChart, Line, XAxis, YAxis } from "recharts";
 import { Ring } from "react-css-spinners";
+import DashboardPill from "./pill";
 
 const RecentSession = () => {
   const [fetchingHistoricalDataFailed, setFetchingHistoricalDataFailed] =
@@ -119,20 +120,36 @@ const RecentSession = () => {
           ? "/"
           : `/session/${sessionData?.id ?? -1}?fromHistory=false`
       }
-      className="w-full bg-orange-300 flex items-center justify-start flex-col gap-2 overflow-y-auto p-4"
+      className="w-full p-8 bg-[#E3DBD1] rounded-[20px] flex items-center justify-start flex-col gap-2 overflow-y-auto"
     >
       {fetchingHistoricalData ? (
         <div className="w-full h-full flex justify-center items-center">
           <Ring color="white" size={100} />
         </div>
       ) : (
-        <div className="flex flex-col gap-2">
-          <p>Recent smoking session</p>
-          <p>Product(s): {sessionData?.products.join(" ")}</p>
-          <p>Wood(s): {sessionData?.woods.join(" ")}</p>
-          <p>{moment(sessionData?.dateStart).format("ddd, DD.MM.YYYY")}</p>
+        <div className="flex flex-col gap-2 w-full items-center">
+          <span className="flex flex-row justify-between items-center w-full">
+            <p className="text-3xl font-semibold inline-block">
+              Recent smoking session
+            </p>
+            <p className="text-base inline-block">
+              {moment(sessionData?.dateStart).format("ddd, DD.MM.YYYY")}
+            </p>
+          </span>
+          <span className="flex flex-row justify-start items-center w-full gap-2 mt-1">
+            <p>Products(s):</p>
+            {sessionData?.products &&
+              sessionData?.products.map((product) => (
+                <DashboardPill value={product} />
+              ))}
+          </span>
+          <span className="flex flex-row justify-start items-center w-full gap-2">
+            <p>Wood(s)</p>
+            {sessionData?.woods &&
+              sessionData?.woods.map((wood) => <DashboardPill value={wood} />)}
+          </span>
           {tempSensor1Readings.length > 0 && (
-            <LineChart width={700} height={400}>
+            <LineChart width={720} height={300} className="mt-6">
               <Line
                 name={sessionData?.tempSensor1Name ?? "Temperature 1"}
                 data={tempSensor1Readings}
@@ -160,7 +177,6 @@ const RecentSession = () => {
                 strokeWidth={2}
                 dot={false}
               />
-              {/* <CartesianGrid stroke="#ccc" /> */}
               <XAxis
                 dataKey={"timestampUnix"}
                 domain={[

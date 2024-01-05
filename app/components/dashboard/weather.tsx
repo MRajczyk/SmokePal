@@ -60,7 +60,7 @@ const WeatherBanner = () => {
     fetchData();
   }, []);
   return (
-    <div className="w-full bg-red-300 p-4 flex items-center justify-start flex-col gap-2 ">
+    <div className="w-full h-full bg-[#E3DBD1] p-8 flex items-center justify-start flex-col gap-2 rounded-[20px]">
       {fetchingData ? (
         <div className="w-full h-full flex justify-center items-center">
           <Ring color="orange" size={100} />
@@ -68,7 +68,7 @@ const WeatherBanner = () => {
       ) : errorFetching ? (
         <p>Error fetching weather data...</p>
       ) : currentWeather && forecast ? (
-        <div>
+        <div className="flex flex-col justify-start items-center w-full">
           <WeatherToday
             iconCode={currentWeather?.weather[0].icon}
             city={currentWeather?.name}

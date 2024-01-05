@@ -11,14 +11,16 @@ const WeatherForecastRecord = ({
   reading: number;
 }) => {
   return (
-    <div className="flex flex-row items-center">
+    <div className="flex flex-row w-full items-center justify-between">
+      <p className="text-3xl">{dayName}</p>
       <Image
         src={"/assets/weatherIcons/_" + iconCode + ".png"}
         alt={iconCode + " icon from OpenWeatherMap api"}
-        width={100}
-        height={100}
+        width={60}
+        height={60}
+        className="ml-[80px]"
       />
-      <p className="text-3xl">{dayName + " " + reading + "°C"}</p>
+      <p className="text-3xl">{reading + "°C"}</p>
     </div>
   );
 };

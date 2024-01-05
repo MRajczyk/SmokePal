@@ -10,11 +10,17 @@ const StartSessionBanner = () => {
     <div className="flex w-full h-full items-center justify-center bg-transparent">
       <Button
         asChild
-        className="flex items-center justify-center w-full h-full rounded-3xl"
+        className="flex items-center justify-center w-full h-full rounded-3xl p-8"
         variant="gradient"
       >
-        <Link href="/new-session" className="flex">
-          <span className="text-4xl mr-2">Start new session!</span>
+        <Link href="/new-session" className="w-full text-left">
+          <span className="flex flex-col gap-2 text-4xl mr-2 w-full break-all text-wrap">
+            Start new session!
+            <p className="text-base font-normal w-full break-all text-wrap whitespace-normal">
+              Start new session with SmokePal. Ignite the fire, set themood, and
+              let SmokePal be your guide to a journey of smoky perfection.
+            </p>
+          </span>
           <Image
             src={StartSessionImg}
             alt="Add icon"
