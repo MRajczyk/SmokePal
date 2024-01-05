@@ -12,7 +12,8 @@ const buttonVariants = cva(
         default: "bg-white text-black hover:bg-white/90",
         destructive: "bg-red-600 text-white hover:bg-red-600/90",
         ghost: "bg-transparent",
-        auth: "bg-gradient-to-r from-[#D1271C] to-[#F4981D] text-[#F4EDE5] font-bold text-2xl rounded-[10px]",
+        gradient:
+          "bg-gradient-to-r from-[#D1271C] to-[#F4981D] text-[#F4EDE5] font-bold text-2xl rounded-[10px]",
       },
       size: {
         default: "h-10 px-4 py-2",

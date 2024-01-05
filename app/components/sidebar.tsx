@@ -16,7 +16,6 @@ import { cn } from "@/lib/utils";
 
 const Sidebar = () => {
   const pathname = usePathname().split("/")[1];
-  console.log(pathname);
 
   return (
     <div className="bg-[#15191C] w-[138px] flex flex-col justify-between items-center h-full sticky top-0">

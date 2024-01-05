@@ -11,7 +11,7 @@ const StartSessionBanner = () => {
       <Button
         asChild
         className="flex items-center justify-center w-full h-full rounded-3xl"
-        variant="destructive"
+        variant="gradient"
       >
         <Link href="/new-session" className="flex">
           <span className="text-4xl mr-2">Start new session!</span>
