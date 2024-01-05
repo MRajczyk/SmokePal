@@ -7,6 +7,9 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LoginSchema, type LoginSchemaType } from "@/schemas/UserSchemas";
+// @ts-expect-error this library doesnt support typescript at all.............
+import Logotype from "@/public/assets/logotype.svg?url";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,23 +36,40 @@ export default function LoginPage() {
   };
 
   return (
-    <div>
-      <form className="flex flex-col gap-1" onSubmit={handleSubmit(onSubmit)}>
-        <input {...register("email")} placeholder="email" />
+    <div className="flex flex-col gap-6 items-center justify-center">
+      <h2 className="text-3xl text-[#F4EDE5]">Log in to Your</h2>
+      <Image src={Logotype} alt="Picture of smoked meat" />
+      <p className="text-base text-[#6C6B6A]">Your Own Smoking Companion</p>
+
+      <form
+        className="flex flex-col gap-2 mt-2 items-center"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <input
+          {...register("email")}
+          placeholder="email"
+          className="w-[470px] h-[90px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+        />
         <p className="text-red-600">{errors.email?.message}</p>
 
         <input
           type="password"
           {...register("password")}
           placeholder="password"
+          className="w-[470px] h-[90px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
         />
         <p className="text-red-600">{errors.password?.message}</p>
         <p className="text-red-600">{loginError}</p>
 
-        <Button type="submit"> Login</Button>
-        <Link className="text-blue-700" href="/auth/register">
-          Go to register
-        </Link>
+        <Button type="submit" variant="auth" size="auth">
+          Log in to Your Account
+        </Button>
+        <span className="text-[#6C6B6A] mt-4">
+          Not a member yet?
+          <Link className="text-[#F4EDE5] ml-2 font-bold" href="/auth/register">
+            Go to register
+          </Link>
+        </span>
       </form>
     </div>
   );

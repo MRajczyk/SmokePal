@@ -12,10 +12,8 @@ export function LogoutButton({
 }) {
   return (
     <Button
-      asChild
       className={className}
       variant="ghost"
-      size={"logout"}
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onClick={(e) => {
         signOut();

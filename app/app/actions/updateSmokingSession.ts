@@ -89,7 +89,8 @@ export async function updateSmokingSession(
     return {
       success: true,
     };
-  } catch (e) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
     return { success: false, message: e.message };
   }
 }

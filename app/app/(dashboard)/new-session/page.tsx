@@ -9,7 +9,6 @@ import {
   NewSmokingSchema,
   type NewSmokingSchemaType,
 } from "@/schemas/NewSmokingSchema";
-import { z } from "zod";
 import { createNewSmokingSession } from "@/app/actions/createNewSmokingSession";
 import { useRouter } from "next/navigation";
 import debounce from "just-debounce-it";
@@ -22,32 +21,14 @@ import { createNewProductType } from "@/app/actions/createNewProductType";
 import { createNewWoodType } from "@/app/actions/createNewWoodType";
 import { v4 as uuidv4 } from "uuid";
 import ImageCarousel from "@/components/ui/imageCarousel";
-
-export const OptionsSchema = z.object({
-  label: z.string(),
-  value: z.string(),
-});
-export type OptionsSchemaType = z.infer<typeof OptionsSchema>;
-
-export const SessionSelectSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-});
-export type SessionSelectSchemaType = z.infer<typeof SessionSelectSchema>;
-
-export const ACCEPTED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
-];
-
-export type fileUploadSchemaType = {
-  temporaryID: string;
-  file?: File;
-  b64String: string;
-  dbId?: number;
-};
+import {
+  type SelectOptionsSchemaType,
+  type SessionSelectSchemaType,
+} from "@/schemas/NewSessionSchemas";
+import {
+  ACCEPTED_IMAGE_TYPES,
+  type fileUploadSchemaType,
+} from "@/schemas/NewSessionSchemas";
 
 const NewSessionPage = () => {
   const router = useRouter();
@@ -57,11 +38,11 @@ const NewSessionPage = () => {
   });
 
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
-  const [optionsProducts, setOptionsProducts] = useState<OptionsSchemaType[]>(
-    []
-  );
+  const [optionsProducts, setOptionsProducts] = useState<
+    SelectOptionsSchemaType[]
+  >([]);
   const [isLoadingWood, setIsLoadingWood] = useState(false);
-  const [optionsWood, setOptionsWood] = useState<OptionsSchemaType[]>([]);
+  const [optionsWood, setOptionsWood] = useState<SelectOptionsSchemaType[]>([]);
 
   const [images, setImages] = useState<fileUploadSchemaType[]>([]);
 
@@ -102,13 +83,13 @@ const NewSessionPage = () => {
           productTypes: SessionSelectSchemaType[];
         } = JSON.parse(res.data ?? "");
 
-        const productTypes: OptionsSchemaType[] = [];
+        const productTypes: SelectOptionsSchemaType[] = [];
         data.productTypes.forEach((productType: SessionSelectSchemaType) => {
           productTypes.push(createOption(productType.name));
         });
         setOptionsProducts(productTypes);
 
-        const woodTypes: OptionsSchemaType[] = [];
+        const woodTypes: SelectOptionsSchemaType[] = [];
         data.woodTypes.forEach((woodType: SessionSelectSchemaType) => {
           woodTypes.push(createOption(woodType.name));
         });
@@ -191,12 +172,12 @@ const NewSessionPage = () => {
     if (res.success) {
       const newOption = createOption(inputValue);
       setOptionsProducts((prev) => [...prev, newOption]);
-      const selectedProducts: OptionsSchemaType[] = [];
-      selectedProducts.concat(getValues("products"));
+      const selectedProducts: SelectOptionsSchemaType[] =
+        getValues("products") ?? [];
       selectedProducts.push(newOption);
       setValue("products", selectedProducts);
-      setIsLoadingProducts(false);
     }
+    setIsLoadingProducts(false);
   };
 
   const handleCreateWood = async (inputValue: string) => {
@@ -205,12 +186,11 @@ const NewSessionPage = () => {
     if (res.success) {
       const newOption = createOption(inputValue);
       setOptionsWood((prev) => [...prev, newOption]);
-      const selectedWoods: OptionsSchemaType[] = [];
-      selectedWoods.concat(getValues("woods"));
+      const selectedWoods: SelectOptionsSchemaType[] = getValues("woods") ?? [];
       selectedWoods.push(newOption);
       setValue("woods", selectedWoods);
-      setIsLoadingWood(false);
     }
+    setIsLoadingWood(false);
   };
 
   return (

@@ -28,10 +28,8 @@ export function ActiveSessionButton({
 
   return (
     <Button
-      asChild
       className={className}
       variant="ghost"
-      size={"logout"}
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       onClick={async (e) => {
         const res = await getActiveSessionId();

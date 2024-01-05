@@ -15,11 +15,11 @@
 }
 
 body {
-  background: radial-gradient(ellipse at top, #e66465, transparent),
-    radial-gradient(ellipse at bottom, #f7db3d, transparent);
-  height: "100%";
+  background-color: #f4ede5;
 }
 
 .MuiPagination-ul {
   justify-content: center;
 }
+
+/* #f4ede5 */
