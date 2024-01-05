@@ -4,6 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import CreatableSelect from "react-select/creatable";
+import { StylesConfig } from "react-select";
 import { getNewSessionInitialData } from "@/app/actions/getNewSessionInit";
 import {
   NewSmokingSchema,
@@ -193,106 +194,185 @@ const NewSessionPage = () => {
     setIsLoadingWood(false);
   };
 
+  const colourStyles: StylesConfig = {
+    control: (styles) => ({
+      ...styles,
+      backgroundColor: "#1E2122",
+      borderWidth: 0,
+      height: 90,
+      color: "#6C6B6A",
+      boxShadow: "none",
+    }),
+    option: (styles, { isFocused, isSelected }) => ({
+      ...styles,
+      color: "#F4EDE6",
+      backgroundColor: isFocused
+        ? "#6C6B6A"
+        : isSelected
+        ? "#6C6B6A"
+        : "#1E2122",
+    }),
+    input: (styles) => ({ ...styles, color: "#6C6B6A" }),
+    placeholder: (styles) => ({ ...styles }),
+    singleValue: (styles) => ({ ...styles }),
+    multiValue: (styles) => ({
+      ...styles,
+      height: 40,
+      borderRadius: 20,
+      padding: 8,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "#F4EDE5",
+    }),
+    indicatorSeparator: (styles) => ({ ...styles, backgroundColor: "#6C6B6A" }),
+    menuList: (styles) => ({ ...styles, backgroundColor: "#1E2122" }),
+    multiValueRemove: (styles) => ({ ...styles, height: 22 }),
+  };
+
   return (
-    <div className="flex flex-col w-full h-full">
-      <div className="text-4xl p-8">
-        <b>Nowe wędzenie</b>
+    <div className="flex flex-col w-full h-full items-center justify-start">
+      <div className="text-4xl p-8 text-[#F4EDE5] font-semibold">
+        Start new session
       </div>
-      <div className="grid grid-cols-2 w-full h-full">
-        <div className="flex border-2 border-red-600 mx-4 mb-4">
-          <div className="flex flex-col gap-1">
-            <form
-              key={0}
-              className="flex flex-col gap-1"
-              onSubmit={handleSubmit(handleFormSubmit)}
-            >
-              <input {...register("title")} placeholder="title" />
-              <p className="text-red-600">{errors.title?.message}</p>
-
-              <Controller
-                control={control}
-                name="products"
-                render={({ field: { onChange, onBlur, value, ref } }) => (
-                  <CreatableSelect
-                    isMulti
-                    placeholder="Select product..."
-                    onChange={onChange} // send value to hook form
-                    onBlur={onBlur} // notify when input is touched/blur
-                    ref={ref}
-                    value={value}
-                    isClearable
-                    isDisabled={isLoadingProducts}
-                    isLoading={isLoadingProducts}
-                    onCreateOption={handleCreateProducts}
-                    options={optionsProducts}
-                  />
-                )}
-              />
-              <p className="text-red-600">{errors.products?.message}</p>
-
-              <Controller
-                control={control}
-                name="woods"
-                render={({ field: { onChange, onBlur, value, ref } }) => (
-                  <CreatableSelect
-                    isMulti
-                    placeholder="Select wood..."
-                    onChange={onChange} // send value to hook form
-                    onBlur={onBlur} // notify when input is touched/blur
-                    ref={ref}
-                    value={value}
-                    isClearable
-                    isDisabled={isLoadingWood}
-                    isLoading={isLoadingWood}
-                    onCreateOption={handleCreateWood}
-                    options={optionsWood}
-                  />
-                )}
-              />
-              <p className="text-red-600">{errors.woods?.message}</p>
-
-              <textarea
-                {...register("description")}
-                placeholder="description"
-                className="resize-none"
-              />
-              <p className="text-red-600">{errors.description?.message}</p>
-            </form>
-            <ImageCarousel
-              handleAddImage={handleAddImage}
-              handleRemoveImage={handleRemoveImage}
-              images={images}
-              editing={true}
-            />
-          </div>
-        </div>
-        <div className="flex border-2 border-red-600 mx-4 mb-4">
+      <div className="grid grid-cols-2 w-[1300px] gap-4 grid-rows-4 h-full mb-[100px]">
+        <div className="flex row-span-4 bg-[#15191C] col-span-1 flex-col gap-1 justify-start items-center w-full p-[50px] rounded-[20px]">
           <form
-            key={1}
-            className="flex flex-col gap-1"
+            key={0}
+            className="flex flex-col gap-[6px] w-[470px]"
             onSubmit={handleSubmit(handleFormSubmit)}
           >
             <input
-              {...register("tempSensor1Name")}
-              placeholder="Red sensor name"
+              {...register("title")}
+              placeholder="Title"
+              className="w-full h-[90px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
             />
-            <p className="text-red-600">{errors.tempSensor1Name?.message}</p>
+            <p className="text-red-600">{errors.title?.message}</p>
 
-            <input
-              {...register("tempSensor2Name")}
-              placeholder="Green sensor name"
+            <Controller
+              control={control}
+              name="products"
+              render={({ field: { onChange, onBlur, value, ref } }) => (
+                <CreatableSelect
+                  isMulti
+                  placeholder="Select product..."
+                  onChange={onChange} // send value to hook form
+                  onBlur={onBlur} // notify when input is touched/blur
+                  ref={ref}
+                  value={value}
+                  isClearable
+                  isDisabled={isLoadingProducts}
+                  isLoading={isLoadingProducts}
+                  onCreateOption={handleCreateProducts}
+                  options={optionsProducts}
+                  styles={colourStyles}
+                />
+              )}
             />
-            <p className="text-red-600">{errors.tempSensor2Name?.message}</p>
+            <p className="text-red-600">{errors.products?.message}</p>
 
-            <input
-              {...register("tempSensor3Name")}
-              placeholder="Blue sensor name"
+            <Controller
+              control={control}
+              name="woods"
+              render={({ field: { onChange, onBlur, value, ref } }) => (
+                <CreatableSelect
+                  isMulti
+                  placeholder="Select wood..."
+                  onChange={onChange} // send value to hook form
+                  onBlur={onBlur} // notify when input is touched/blur
+                  ref={ref}
+                  value={value}
+                  isClearable
+                  isDisabled={isLoadingWood}
+                  isLoading={isLoadingWood}
+                  onCreateOption={handleCreateWood}
+                  options={optionsWood}
+                  styles={colourStyles}
+                />
+              )}
             />
-            <p className="text-red-600">{errors.tempSensor3Name?.message}</p>
+            <p className="text-red-600">{errors.woods?.message}</p>
 
-            <Button type="submit">Rozpocznij wędzenie</Button>
+            <textarea
+              {...register("description")}
+              placeholder="Add a description..."
+              className="w-full h-[140px] p-[38px] resize-none rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+            />
+            <p className="text-red-600">{errors.description?.message}</p>
+          </form>
+          <ImageCarousel
+            handleAddImage={handleAddImage}
+            handleRemoveImage={handleRemoveImage}
+            images={images}
+            editing={true}
+            className="w-[470px] rounded-[9px] bg-transparent text-[#F4EDE5] border-[#1E2122] border-2"
+          />
+        </div>
+        <div className="flex bg-[#15191C] col-span-1 row-span-3 flex-col gap-1 justify-start items-center w-full p-[50px] rounded-[20px]">
+          <form
+            key={1}
+            className="flex flex-col gap-3"
+            onSubmit={handleSubmit(handleFormSubmit)}
+          >
+            <div>
+              <span className="flex flex-row gap-2 justify-start items-center text-[#F4EDE5] mb-3">
+                <div className="bg-[#D1271C] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
+                <p className="inline-block">Red sensor</p>
+              </span>
+              <input
+                {...register("tempSensor1Name")}
+                placeholder="Red sensor name"
+                className="w-[470px] h-[90px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+              />
+              {errors.tempSensor1Name && (
+                <p className="text-red-600 mt-1">
+                  {errors.tempSensor1Name?.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <span className="flex flex-row gap-2 justify-start items-center text-[#F4EDE5] mb-3">
+                <div className="bg-[#F4981D] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
+                <p className="inline-block">Yellow sensor</p>
+              </span>
+              <input
+                {...register("tempSensor2Name")}
+                placeholder="Yellow sensor name"
+                className="w-[470px] h-[90px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+              />
+              {errors.tempSensor2Name && (
+                <p className="text-red-600 mt-1">
+                  {errors.tempSensor2Name?.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <span className="flex flex-row gap-2 justify-start items-center text-[#F4EDE5] mb-3">
+                <div className="bg-[#211ECC] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
+                <p className="inline-block">Blue sensor</p>
+              </span>
+              <input
+                {...register("tempSensor3Name")}
+                placeholder="Blue sensor name"
+                className="w-[470px] h-[90px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+              />
+              {errors.tempSensor3Name && (
+                <p className="text-red-600 mt-1">
+                  {errors.tempSensor3Name?.message}
+                </p>
+              )}
+            </div>
           </form>
         </div>
+        <Button
+          variant={"gradient"}
+          type="submit"
+          className="col-span-1 row-span-1 w-full h-full text-4xl font-semibold"
+        >
+          Start new session!
+        </Button>
       </div>
     </div>
   );
