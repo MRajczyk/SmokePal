@@ -14,9 +14,9 @@ const StartSessionBanner = () => {
         variant="gradient"
       >
         <Link href="/new-session" className="w-full text-left">
-          <span className="flex flex-col gap-2 text-4xl mr-2 w-full break-all text-wrap">
+          <span className="flex flex-col gap-2 text-4xl mr-2 w-full break-words text-wrap">
             Start new session!
-            <p className="text-base font-normal w-full break-all text-wrap whitespace-normal">
+            <p className="text-base font-normal w-full break-wods text-wrap whitespace-normal">
               Start new session with SmokePal. Ignite the fire, set themood, and
               let SmokePal be your guide to a journey of smoky perfection.
             </p>

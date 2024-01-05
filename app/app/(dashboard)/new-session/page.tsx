@@ -202,6 +202,7 @@ const NewSessionPage = () => {
       height: 90,
       color: "#6C6B6A",
       boxShadow: "none",
+      paddingLeft: 38,
     }),
     option: (styles, { isFocused, isSelected }) => ({
       ...styles,
@@ -212,7 +213,7 @@ const NewSessionPage = () => {
         ? "#6C6B6A"
         : "#1E2122",
     }),
-    input: (styles) => ({ ...styles, color: "#6C6B6A" }),
+    input: (styles) => ({ ...styles, color: "#F4EDE5" }),
     placeholder: (styles) => ({ ...styles }),
     singleValue: (styles) => ({ ...styles }),
     multiValue: (styles) => ({
@@ -231,11 +232,11 @@ const NewSessionPage = () => {
   };
 
   return (
-    <div className="flex flex-col w-full h-full items-center justify-start">
+    <div className="flex flex-col w-full h-full items-center justify-center">
       <div className="text-4xl p-8 text-[#F4EDE5] font-semibold">
         Start new session
       </div>
-      <div className="grid grid-cols-2 w-[1300px] gap-4 grid-rows-4 h-full mb-[100px]">
+      <div className="grid grid-cols-2 w-[1400px] gap-4 grid-rows-4 h-full mb-[100px]">
         <div className="flex row-span-4 bg-[#15191C] col-span-1 flex-col gap-1 justify-start items-center w-full p-[50px] rounded-[20px]">
           <form
             key={0}
@@ -369,7 +370,7 @@ const NewSessionPage = () => {
         <Button
           variant={"gradient"}
           type="submit"
-          className="col-span-1 row-span-1 w-full h-full text-4xl font-semibold"
+          className="col-span-1 row-span-1 w-full h-full text-4xl font-semibold rounded-[20px]"
         >
           Start new session!
         </Button>

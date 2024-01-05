@@ -7,7 +7,7 @@ import HistoryBanner from "@/components/dashboard/historyBanner";
 
 export default function Home() {
   return (
-    <div className="flex w-full h-full flex-col">
+    <div className="flex  w-[1400px] h-full flex-col">
       <div className="flex w-full p-8 pb-4">
         <DashboardHeader />
       </div>

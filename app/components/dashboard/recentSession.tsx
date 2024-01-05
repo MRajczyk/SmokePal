@@ -149,7 +149,7 @@ const RecentSession = () => {
               sessionData?.woods.map((wood) => <DashboardPill value={wood} />)}
           </span>
           {tempSensor1Readings.length > 0 && (
-            <LineChart width={720} height={300} className="mt-6">
+            <LineChart width={700} height={300} className="mt-6 pr-10">
               <Line
                 name={sessionData?.tempSensor1Name ?? "Temperature 1"}
                 data={tempSensor1Readings}

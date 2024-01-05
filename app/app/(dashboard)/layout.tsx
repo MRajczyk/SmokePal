@@ -29,7 +29,7 @@ export default async function DashboardLayout({
         <Provider session={session}>
           <div className="w-full h-full flex flex-row">
             <Sidebar />
-            <div className="relative w-full flex flex-row justify-center overflow-y-auto bg-black">
+            <div className="relative w-full flex flex-row justify-center bg-black">
               <Image
                 src={CoverPhoto}
                 alt="Picture of smoked meat"
@@ -37,7 +37,7 @@ export default async function DashboardLayout({
                 fill
                 className="absolute opacity-60"
               />
-              <div className="flex w-full h-full flex-col z-[1] text-center items-center justify-center">
+              <div className="flex w-full h-full flex-col z-[1] text-center items-center justify-start overflow-y-auto">
                 {children}
               </div>
             </div>
