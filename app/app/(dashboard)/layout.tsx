@@ -1,4 +1,6 @@
 import Provider from "../context/client-provider";
+import Image from "next/image";
+import CoverPhoto from "@/public/assets/bgAuth.jpg";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/server/auth";
 import { redirect } from "next/navigation";
@@ -27,8 +29,17 @@ export default async function DashboardLayout({
         <Provider session={session}>
           <div className="w-full h-full flex flex-row">
             <Sidebar />
-            <div className="w-full flex flex-row justify-center overflow-y-auto">
-              {children}
+            <div className="relative w-full flex flex-row justify-center overflow-y-auto bg-black">
+              <Image
+                src={CoverPhoto}
+                alt="Picture of smoked meat"
+                objectFit="cover"
+                fill
+                className="absolute opacity-60"
+              />
+              <div className="flex flex-col z-[1] text-center items-center justify-center">
+                {children}
+              </div>
             </div>
           </div>
         </Provider>

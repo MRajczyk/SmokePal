@@ -22,13 +22,13 @@ export default function AuthLayout({
   return (
     <main className={`${poppins.className} w-full h-full`}>
       <div className="grid grid-cols-2 w-full h-full">
-        <div className="relative flex col-span-1 w-full overflow-hidden items-center justify-center">
+        <div className="relative flex col-span-1 w-full items-center justify-center bg-black">
           <Image
             src={CoverPhoto}
             alt="Picture of smoked meat"
             objectFit="cover"
             fill
-            className="absolute"
+            className="absolute opacity-60"
           />
           <div className="flex flex-col z-[1] text-center items-center justify-center gap-9">
             <h3 className="text-2xl text-[#F4EDE5] font-bold w-[500px]">
