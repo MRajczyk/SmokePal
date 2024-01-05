@@ -27,7 +27,7 @@ export default async function DashboardLayout({
         <Provider session={session}>
           <div className="w-full h-full flex flex-row">
             <Sidebar />
-            <div className="w-full flex flex-row justify-center overflow-y-auto">
+            <div className="w-full flex flex-row justify-center">
               {children}
             </div>
           </div>

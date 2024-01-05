@@ -7,11 +7,11 @@ import HistoryBanner from "@/components/dashboard/historyBanner";
 
 export default function Home() {
   return (
-    <div className="flex w-full h-full flex-col overflow-y-auto">
+    <div className="flex w-full h-full flex-col">
       <div className="flex w-full p-8 pb-4">
         <DashboardHeader />
       </div>
-      <div className="grid grid-cols-5 grid-rows-5 w-full h-full p-8 pt-4">
+      <div className="grid grid-cols-5 grid-rows-5 w-full h-full p-8 pt-4 pb-4">
         <div className="flex col-span-3 row-span-1 w-full pr-4 pb-4">
           <StartSessionBanner />
         </div>
