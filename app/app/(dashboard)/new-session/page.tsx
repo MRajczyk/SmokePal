@@ -213,7 +213,7 @@ const NewSessionPage = () => {
         : "#1E2122",
     }),
     input: (styles) => ({ ...styles, color: "#F4EDE5" }),
-    placeholder: (styles) => ({ ...styles }),
+    placeholder: (styles) => ({ ...styles, textAlign: "start" }),
     singleValue: (styles) => ({ ...styles }),
     multiValue: (styles) => ({
       ...styles,
@@ -227,7 +227,12 @@ const NewSessionPage = () => {
     }),
     indicatorSeparator: (styles) => ({ ...styles, backgroundColor: "#6C6B6A" }),
     menuList: (styles) => ({ ...styles, backgroundColor: "#1E2122" }),
-    multiValueRemove: (styles) => ({ ...styles, height: 22 }),
+    multiValueRemove: (styles) => ({
+      ...styles,
+      height: 22,
+      width: 22,
+      borderRadius: 11,
+    }),
     valueContainer: (styles) => ({ ...styles, padding: 28 }),
   };
 
@@ -246,7 +251,7 @@ const NewSessionPage = () => {
             <input
               {...register("title")}
               placeholder="Title"
-              className="w-full h-[90px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+              className="w-full h-[90px] p-[28px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
             />
             <p className="text-red-600">{errors.title?.message}</p>
 
@@ -297,7 +302,7 @@ const NewSessionPage = () => {
             <textarea
               {...register("description")}
               placeholder="Add a description..."
-              className="w-full h-[140px] p-[38px] resize-none rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+              className="w-full h-[140px] p-[28px] resize-none rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
             />
             <p className="text-red-600">{errors.description?.message}</p>
           </form>
@@ -323,7 +328,7 @@ const NewSessionPage = () => {
               <input
                 {...register("tempSensor1Name")}
                 placeholder="Red sensor name"
-                className="w-[470px] h-[90px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+                className="w-[470px] h-[90px] p-[28px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
               />
               <p className="text-red-600 mt-1">
                 {errors.tempSensor1Name?.message}
@@ -338,7 +343,7 @@ const NewSessionPage = () => {
               <input
                 {...register("tempSensor2Name")}
                 placeholder="Yellow sensor name"
-                className="w-[470px] h-[90px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+                className="w-[470px] h-[90px] p-[28px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
               />
               {errors.tempSensor2Name && (
                 <p className="text-red-600 mt-1">
@@ -355,7 +360,7 @@ const NewSessionPage = () => {
               <input
                 {...register("tempSensor3Name")}
                 placeholder="Blue sensor name"
-                className="w-[470px] h-[90px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+                className="w-[470px] h-[90px] p-[28px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
               />
               {errors.tempSensor3Name && (
                 <p className="text-red-600 mt-1">
