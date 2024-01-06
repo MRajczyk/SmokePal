@@ -552,6 +552,7 @@ export default function SessionPage({
       borderRadius: 11,
     }),
     valueContainer: (styles) => ({ ...styles, padding: 28 }),
+    container: (styles) => ({ ...styles, width: "100%" }),
   };
 
   return (
@@ -572,15 +573,16 @@ export default function SessionPage({
         ) : (
           <div className="flex w-full h-full flex-col items-center justify-start">
             {editing ? (
-              <div className="flex flex-col w-[500px] justify-center items-center p-8 text-5xl">
+              <div className="flex flex-col w-[1400px] justify-center items-center p-8 text-5xl">
                 <form
                   key={2}
                   onSubmit={handleSubmit(debounceUpdateSmokingSession)}
+                  className="w-full h-full flex justify-center items-center flex-col"
                 >
                   <input
                     {...register("title")}
                     placeholder="Title"
-                    className="w-full h-[90px] p-[28px] rounded-[20px] placeholder:text-[#6C6B6A] bg-[#15191C] text-[#F4EDE5]"
+                    className="inline-block h-[90px] p-[28px] rounded-[20px] placeholder:text-[#6C6B6A] bg-[#15191C] text-[#F4EDE5] text-center"
                   />
                   <p className="text-red-600 text-2xl">
                     {errors.title?.message}
@@ -623,7 +625,7 @@ export default function SessionPage({
                         </span>
                         <input
                           {...register("tempSensor2Name")}
-                          placeholder="Green sensor name"
+                          placeholder="Yellow sensor name"
                           className="w-full h-[90px] p-[28px] rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
                         />
                         <p className="text-red-600">
@@ -693,7 +695,7 @@ export default function SessionPage({
                         </p>
                       </span>
                       <span className="flex flex-row w-full gap-2 justify-start items-start text-[#F4EDE5]">
-                        <div className="bg-[#1E2122] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
+                        <div className="bg-[#444545] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
                         <p className="inline-block">
                           Current humidity:{" "}
                           <span className="font-semibold">
@@ -726,7 +728,7 @@ export default function SessionPage({
                         data={tempSensor2Readings}
                         type="monotone"
                         dataKey="value"
-                        stroke="green"
+                        stroke="#F4981D"
                         strokeWidth={2}
                         dot={false}
                       />
@@ -804,64 +806,79 @@ export default function SessionPage({
                       className="flex flex-col gap-1"
                       onSubmit={handleSubmit(debounceUpdateSmokingSession)}
                     >
-                      <Controller
-                        control={control}
-                        name="products"
-                        rules={{ required: true }}
-                        render={({
-                          field: { onChange, onBlur, value, ref },
-                        }) => (
-                          <CreatableSelect
-                            isMulti
-                            placeholder="Select product..."
-                            onChange={onChange} // send value to hook form
-                            onBlur={onBlur} // notify when input is touched/blur
-                            ref={ref}
-                            value={value}
-                            isClearable
-                            isDisabled={isLoadingProducts}
-                            isLoading={isLoadingProducts}
-                            onCreateOption={handleCreateProducts}
-                            options={optionsProducts}
-                            styles={colourStyles}
-                          />
-                        )}
-                      />
-                      <p className="text-red-600">{errors.products?.message}</p>
-
-                      <Controller
-                        control={control}
-                        name="woods"
-                        rules={{ required: true }}
-                        render={({
-                          field: { onChange, onBlur, value, ref },
-                        }) => (
-                          <CreatableSelect
-                            isMulti
-                            placeholder="Select wood..."
-                            onChange={onChange} // send value to hook form
-                            onBlur={onBlur} // notify when input is touched/blur
-                            ref={ref}
-                            value={value}
-                            isClearable
-                            isDisabled={isLoadingWood}
-                            isLoading={isLoadingWood}
-                            onCreateOption={handleCreateWood}
-                            options={optionsWood}
-                            styles={colourStyles}
-                          />
-                        )}
-                      />
-                      <p className="text-red-600">{errors.woods?.message}</p>
-
-                      <textarea
-                        {...register("description")}
-                        placeholder="Description"
-                        className="w-full h-[140px] p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
-                      />
-                      <p className="text-red-600">
-                        {errors.description?.message}
-                      </p>
+                      <div className="flex w-full gap-1 items-center flex-col justify-start">
+                        <p className="self-start text-[#F4EDE5] font-semibold">
+                          Products(s):
+                        </p>
+                        <Controller
+                          control={control}
+                          name="products"
+                          rules={{ required: true }}
+                          render={({
+                            field: { onChange, onBlur, value, ref },
+                          }) => (
+                            <CreatableSelect
+                              isMulti
+                              placeholder="Select product..."
+                              onChange={onChange} // send value to hook form
+                              onBlur={onBlur} // notify when input is touched/blur
+                              ref={ref}
+                              value={value}
+                              isClearable
+                              isDisabled={isLoadingProducts}
+                              isLoading={isLoadingProducts}
+                              onCreateOption={handleCreateProducts}
+                              options={optionsProducts}
+                              styles={colourStyles}
+                            />
+                          )}
+                        />
+                        <p className="text-red-600">
+                          {errors.products?.message}
+                        </p>
+                      </div>
+                      <div className="flex w-full gap-1 items-center flex-col justify-start">
+                        <p className="self-start text-[#F4EDE5] font-semibold">
+                          Products(s):
+                        </p>
+                        <Controller
+                          control={control}
+                          name="woods"
+                          rules={{ required: true }}
+                          render={({
+                            field: { onChange, onBlur, value, ref },
+                          }) => (
+                            <CreatableSelect
+                              isMulti
+                              placeholder="Select wood..."
+                              onChange={onChange} // send value to hook form
+                              onBlur={onBlur} // notify when input is touched/blur
+                              ref={ref}
+                              value={value}
+                              isClearable
+                              isDisabled={isLoadingWood}
+                              isLoading={isLoadingWood}
+                              onCreateOption={handleCreateWood}
+                              options={optionsWood}
+                              styles={colourStyles}
+                            />
+                          )}
+                        />
+                        <p className="text-red-600">{errors.woods?.message}</p>
+                      </div>
+                      <div className="flex w-full gap-1 items-center flex-col justify-start">
+                        <p className="self-start text-[#F4EDE5] font-semibold">
+                          Description:
+                        </p>
+                        <textarea
+                          {...register("description")}
+                          placeholder="Description"
+                          className="w-full h-[140px] p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+                        />
+                        <p className="text-red-600">
+                          {errors.description?.message}
+                        </p>
+                      </div>
 
                       <ImageCarousel
                         handleAddImage={handleAddImage}
@@ -918,11 +935,16 @@ export default function SessionPage({
                             ))}
                         </div>
                       </div>
-                      <textarea
-                        disabled
-                        value={sessionData?.description ?? ""}
-                        className="w-full h-[140px] p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
-                      />
+                      <div className="flex w-full gap-1 items-center flex-col justify-start">
+                        <p className="self-start text-[#F4EDE5] font-semibold">
+                          Description:
+                        </p>
+                        <textarea
+                          disabled
+                          value={sessionData?.description ?? ""}
+                          className="w-full h-[140px] p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+                        />
+                      </div>
                       <ImageCarousel
                         handleAddImage={handleAddImage}
                         handleRemoveImage={handleRemoveImage}
