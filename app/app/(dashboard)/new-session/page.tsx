@@ -199,10 +199,9 @@ const NewSessionPage = () => {
       ...styles,
       backgroundColor: "#1E2122",
       borderWidth: 0,
-      height: 90,
+      minHeight: 90,
       color: "#6C6B6A",
       boxShadow: "none",
-      paddingLeft: 38,
     }),
     option: (styles, { isFocused, isSelected }) => ({
       ...styles,
@@ -229,6 +228,7 @@ const NewSessionPage = () => {
     indicatorSeparator: (styles) => ({ ...styles, backgroundColor: "#6C6B6A" }),
     menuList: (styles) => ({ ...styles, backgroundColor: "#1E2122" }),
     multiValueRemove: (styles) => ({ ...styles, height: 22 }),
+    valueContainer: (styles) => ({ ...styles, padding: 28 }),
   };
 
   return (
