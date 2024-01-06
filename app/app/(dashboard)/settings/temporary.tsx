@@ -43,8 +43,6 @@ import { Ring } from "react-css-spinners";
 import { updateSmokingSession } from "@/app/actions/updateSmokingSession";
 import { startSmokingSessionAction } from "@/app/actions/startSmokingSessionAction";
 import { stopSmokingSessionAction } from "@/app/actions/stopSmokingSessionAction";
-import { StylesConfig } from "react-select";
-import SessionPill from "@/components/session/sessionPill";
 
 //buffer is of type buffer but theres typing error as i cant get data property to be recognized by ts
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -493,7 +491,7 @@ export default function SessionPage({
 
     if (sessionData?.woods) {
       const selectedWoods: SelectOptionsSchemaType[] = [];
-      sessionData.woods.forEach((wood) => {
+      sessionData.products.forEach((wood) => {
         selectedWoods.push(createOption(wood));
       });
       setValue("woods", selectedWoods);
@@ -511,49 +509,6 @@ export default function SessionPage({
 
   function handleReject() {}
 
-  const colourStyles: StylesConfig = {
-    control: (styles) => ({
-      ...styles,
-      backgroundColor: "#1E2122",
-      borderWidth: 0,
-      minHeight: 90,
-      color: "#6C6B6A",
-      boxShadow: "none",
-      borderRadius: 20,
-    }),
-    option: (styles, { isFocused, isSelected }) => ({
-      ...styles,
-      color: "#F4EDE6",
-      backgroundColor: isFocused
-        ? "#6C6B6A"
-        : isSelected
-        ? "#6C6B6A"
-        : "#1E2122",
-    }),
-    input: (styles) => ({ ...styles, color: "#F4EDE5" }),
-    placeholder: (styles) => ({ ...styles, textAlign: "start" }),
-    singleValue: (styles) => ({ ...styles }),
-    multiValue: (styles) => ({
-      ...styles,
-      height: 40,
-      borderRadius: 20,
-      padding: 8,
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "#F4EDE5",
-    }),
-    indicatorSeparator: (styles) => ({ ...styles, backgroundColor: "#6C6B6A" }),
-    menuList: (styles) => ({ ...styles, backgroundColor: "#1E2122" }),
-    multiValueRemove: (styles) => ({
-      ...styles,
-      height: 22,
-      width: 22,
-      borderRadius: 11,
-    }),
-    valueContainer: (styles) => ({ ...styles, padding: 28 }),
-  };
-
   return (
     <div className="flex w-full h-full flex-col items-center justify-start">
       {imageModalOpen && (
@@ -570,240 +525,44 @@ export default function SessionPage({
             <Ring color="orange" size={100} />
           </div>
         ) : (
-          <div className="flex w-full h-full flex-col items-center justify-start">
-            {editing ? (
-              <div className="flex flex-col w-[500px] justify-center items-center p-8 text-5xl">
-                <form
-                  key={2}
-                  onSubmit={handleSubmit(debounceUpdateSmokingSession)}
-                >
-                  <input
-                    {...register("title")}
-                    placeholder="Title"
-                    className="w-full h-[90px] p-[28px] rounded-[20px] placeholder:text-[#6C6B6A] bg-[#15191C] text-[#F4EDE5]"
-                  />
-                  <p className="text-red-600 text-2xl">
-                    {errors.title?.message}
-                  </p>
-                </form>
-              </div>
-            ) : (
-              <div className="text-5xl p-8 text-[#F4EDE5] font-semibold">
-                <p>{sessionData?.title}</p>
-              </div>
+          <div>
+            {!editing && (
+              <Button
+                variant={"destructive"}
+                className="w-[300px] mt-4"
+                onClick={enableEditingMode}
+              >
+                Edit
+              </Button>
             )}
-            <div className="grid grid-cols-2 w-[1400px] gap-4 h-full pb-[50px]">
-              <div className="flex w-full h-full gap-3 bg-[#15191C] items-center flex-col justify-start rounded-3xl col-span-1 p-10">
+            {editing && (
+              <form
+                key={1}
+                className="flex flex-col gap-1"
+                onSubmit={handleSubmit(debounceUpdateSmokingSession)}
+              >
+                <Button
+                  variant={"default"}
+                  className="w-[300px] mt-4 bg-orange-400"
+                  type="submit"
+                >
+                  Save
+                </Button>
+              </form>
+            )}
+            <p>Session id: {params.sessionId}</p>
+            {sessionData && (
+              <div>
                 {editing ? (
-                  <div className="flex flex-col gap-1 w-full">
+                  <div className="flex flex-col gap-1">
                     <form
                       key={0}
-                      className="flex flex-col gap-3 w-full"
-                      onSubmit={handleSubmit(debounceUpdateSmokingSession)}
-                    >
-                      <div>
-                        <span className="flex flex-row gap-2 justify-start items-center text-[#F4EDE5] mb-3">
-                          <div className="bg-[#D1271C] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
-                          <p className="inline-block">Red sensor</p>
-                        </span>
-                        <input
-                          {...register("tempSensor1Name")}
-                          placeholder="Red sensor name"
-                          className="w-full h-[90px] p-[28px] rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
-                        />
-                        <p className="text-red-600">
-                          {errors.tempSensor1Name?.message}
-                        </p>
-                      </div>
-
-                      <div>
-                        <span className="flex flex-row gap-2 justify-start items-center text-[#F4EDE5] mb-3">
-                          <div className="bg-[#F4981D] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
-                          <p className="inline-block">Yellow sensor</p>
-                        </span>
-                        <input
-                          {...register("tempSensor2Name")}
-                          placeholder="Green sensor name"
-                          className="w-full h-[90px] p-[28px] rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
-                        />
-                        <p className="text-red-600">
-                          {errors.tempSensor2Name?.message}
-                        </p>
-                      </div>
-
-                      <div>
-                        <span className="flex flex-row gap-2 justify-start items-center text-[#F4EDE5] mb-3">
-                          <div className="bg-[#211ECC] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
-                          <p className="inline-block">Blue sensor</p>
-                        </span>
-                        <input
-                          {...register("tempSensor3Name")}
-                          placeholder="Blue sensor name"
-                          className="w-full h-[90px] p-[28px] rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
-                        />
-                        <p className="text-red-600">
-                          {errors.tempSensor3Name?.message}
-                        </p>
-                      </div>
-                    </form>
-                  </div>
-                ) : (
-                  <div className="flex w-full h-full gap-3 items-center flex-col justify-start">
-                    <div className="flex w-full items-center justify-start flex-col gap-2">
-                      <span className="flex flex-row w-full gap-2 justify-start items-start text-[#F4EDE5]">
-                        <div className="bg-[#D1271C] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
-                        <p className="inline-block">
-                          Current temperature:{" "}
-                          <span className="font-semibold">
-                            {
-                              tempSensor1Readings.at(
-                                tempSensor1Readings.length - 1
-                              )?.value
-                            }
-                          </span>{" "}
-                          °C
-                        </p>
-                      </span>
-                      <span className="flex flex-row w-full gap-2 justify-start items-start text-[#F4EDE5]">
-                        <div className="bg-[#F4981D] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
-                        <p className="inline-block">
-                          Current temperature:{" "}
-                          <span className="font-semibold">
-                            {
-                              tempSensor2Readings.at(
-                                tempSensor2Readings.length - 1
-                              )?.value
-                            }
-                          </span>{" "}
-                          °C
-                        </p>
-                      </span>
-                      <span className="flex flex-row w-full gap-2 justify-start items-start text-[#F4EDE5]">
-                        <div className="bg-[#211ECC] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
-                        <p className="inline-block">
-                          Current temperature:{" "}
-                          <span className="font-semibold">
-                            {
-                              tempSensor3Readings.at(
-                                tempSensor3Readings.length - 1
-                              )?.value
-                            }
-                          </span>{" "}
-                          °C
-                        </p>
-                      </span>
-                      <span className="flex flex-row w-full gap-2 justify-start items-start text-[#F4EDE5]">
-                        <div className="bg-[#1E2122] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
-                        <p className="inline-block">
-                          Current humidity:{" "}
-                          <span className="font-semibold">
-                            {
-                              humSensor1Readings.at(
-                                humSensor1Readings.length - 1
-                              )?.value
-                            }{" "}
-                            %
-                          </span>
-                        </p>
-                      </span>
-                    </div>
-                    <LineChart
-                      width={600}
-                      height={300}
-                      className="bg-[#E3DBD1] p-6 pl-0 rounded-[20px]"
-                    >
-                      <Line
-                        name={sessionData?.tempSensor1Name ?? "Temperature 1"}
-                        data={tempSensor1Readings}
-                        type="monotone"
-                        dataKey="value"
-                        stroke="red"
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                      <Line
-                        name={sessionData?.tempSensor2Name ?? "Temperature 2"}
-                        data={tempSensor2Readings}
-                        type="monotone"
-                        dataKey="value"
-                        stroke="green"
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                      <Line
-                        name={sessionData?.tempSensor3Name ?? "Temperature 3"}
-                        data={tempSensor3Readings}
-                        type="monotone"
-                        dataKey="value"
-                        stroke="blue"
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                      {/* <CartesianGrid stroke="#ccc" /> */}
-                      <XAxis
-                        dataKey={"timestampUnix"}
-                        domain={
-                          tempSensor1Readings && tempSensor1Readings.length > 0
-                            ? [
-                                tempSensor1Readings.at(0)!.timestampUnix,
-                                tempSensor1Readings.at(
-                                  tempSensor1Readings.length - 1
-                                )!.timestampUnix,
-                              ]
-                            : []
-                        }
-                        type="number"
-                        tickFormatter={dateFormatter}
-                        interval="preserveStartEnd"
-                      />
-                      <YAxis />
-                      <Legend />
-                    </LineChart>
-                    <LineChart
-                      width={600}
-                      height={300}
-                      className="bg-[#E3DBD1] p-6 pl-0 rounded-[20px]"
-                    >
-                      <Line
-                        name="Humidity"
-                        data={humSensor1Readings}
-                        type="monotone"
-                        dataKey="value"
-                        stroke="black"
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                      {/* <CartesianGrid stroke="#ccc" /> */}
-                      <XAxis
-                        dataKey={"timestampUnix"}
-                        domain={
-                          humSensor1Readings && humSensor1Readings.length > 0
-                            ? [
-                                humSensor1Readings.at(0)!.timestampUnix,
-                                humSensor1Readings.at(
-                                  humSensor1Readings.length - 1
-                                )!.timestampUnix,
-                              ]
-                            : []
-                        }
-                        type="number"
-                        tickFormatter={dateFormatter}
-                        interval="preserveStartEnd"
-                      />
-                      <YAxis />
-                      <Legend />
-                    </LineChart>
-                  </div>
-                )}
-              </div>
-              <div className="flex w-full h-full gap-3 bg-[#15191C] items-center flex-col justify-start rounded-3xl col-span-1 p-10">
-                {editing ? (
-                  <div className="flex flex-col gap-1 w-full">
-                    <form
-                      key={2}
                       className="flex flex-col gap-1"
                       onSubmit={handleSubmit(debounceUpdateSmokingSession)}
                     >
+                      <input {...register("title")} placeholder="title" />
+                      <p className="text-red-600">{errors.title?.message}</p>
+
                       <Controller
                         control={control}
                         name="products"
@@ -823,7 +582,6 @@ export default function SessionPage({
                             isLoading={isLoadingProducts}
                             onCreateOption={handleCreateProducts}
                             options={optionsProducts}
-                            styles={colourStyles}
                           />
                         )}
                       />
@@ -848,7 +606,6 @@ export default function SessionPage({
                             isLoading={isLoadingWood}
                             onCreateOption={handleCreateWood}
                             options={optionsWood}
-                            styles={colourStyles}
                           />
                         )}
                       />
@@ -856,125 +613,188 @@ export default function SessionPage({
 
                       <textarea
                         {...register("description")}
-                        placeholder="Description"
-                        className="w-full h-[140px] p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+                        placeholder="description"
+                        className="resize-none"
                       />
                       <p className="text-red-600">
                         {errors.description?.message}
                       </p>
 
-                      <ImageCarousel
-                        handleAddImage={handleAddImage}
-                        handleImageClick={handleImageClick}
-                        handleRemoveImage={handleRemoveImage}
-                        images={images}
-                        editing={editing}
-                        className="w-full rounded-[20px] bg-transparent text-[#F4EDE5] border-[#1E2122] border-2"
+                      <input
+                        {...register("tempSensor1Name")}
+                        placeholder="Red sensor name"
                       />
+                      <p className="text-red-600">
+                        {errors.tempSensor1Name?.message}
+                      </p>
+
+                      <input
+                        {...register("tempSensor2Name")}
+                        placeholder="Green sensor name"
+                      />
+                      <p className="text-red-600">
+                        {errors.tempSensor2Name?.message}
+                      </p>
+
+                      <input
+                        {...register("tempSensor3Name")}
+                        placeholder="Blue sensor name"
+                      />
+                      <p className="text-red-600">
+                        {errors.tempSensor3Name?.message}
+                      </p>
                     </form>
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-3 justify-start items-center w-full">
-                    {!editing && (
-                      <div className="flex flex-row w-[600px] gap-2 justify-center items-start text-[#F4EDE5]">
-                        <Button
-                          variant="default"
-                          onClick={() => {
-                            debounceStartSmokingSession();
-                          }}
-                          className="w-full h-[100px] p-0 text-2xl rounded-[20px] bg-[#F4EDE5] text-[#15191C]"
-                        >
-                          Start
-                        </Button>
-                        <Button
-                          onClick={() => debounceStopSmokingSession()}
-                          variant={"destructive"}
-                          className="w-full h-[100px] p-0 text-2xl rounded-[20px]"
-                        >
-                          Stop
-                        </Button>
-                      </div>
-                    )}
-                    <div className="flex w-full h-full gap-3 items-center flex-col justify-start">
-                      <div className="flex w-full gap-1 items-center flex-col justify-start">
-                        <p className="self-start text-[#F4EDE5] font-semibold">
-                          Products(s):
-                        </p>
-                        <div className="flex flex-row flex-wrap gap-2 w-full p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]">
-                          {sessionData?.products &&
-                            sessionData?.products.map((product) => (
-                              <SessionPill value={product} />
-                            ))}
-                        </div>
-                      </div>
-                      <div className="flex w-full gap-1 items-center flex-col justify-start">
-                        <p className="self-start text-[#F4EDE5] font-semibold">
-                          Woods(s):
-                        </p>
-                        <div className="flex flex-row flex-wrap gap-2 w-full p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]">
-                          {sessionData?.woods &&
-                            sessionData?.woods.map((wood) => (
-                              <SessionPill value={wood} />
-                            ))}
-                        </div>
-                      </div>
-                      <textarea
-                        disabled
-                        value={sessionData?.description ?? ""}
-                        className="w-full h-[140px] p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
-                      />
-                      <ImageCarousel
-                        handleAddImage={handleAddImage}
-                        handleRemoveImage={handleRemoveImage}
-                        handleImageClick={handleImageClick}
-                        images={images}
-                        editing={editing}
-                        className="w-full rounded-[20px] bg-transparent text-[#F4EDE5] border-[#1E2122] border-2"
-                      />
-                    </div>
+                  <div>
+                    <p>Session title: {sessionData.title}</p>
+                    <p>Session woods: {sessionData.woods.join(", ")}</p>
+                    <p>Session products: {sessionData.products.join(", ")}</p>
+                    <textarea
+                      disabled
+                      value={sessionData.description ?? ""}
+                      className="resize-none"
+                    />
                   </div>
                 )}
-                <div className="flex flex-row w-full gap-2 justify-start items-start text-[#F4EDE5]">
-                  {fromHistory && fromHistory === "true" && !editing && (
-                    <Button
-                      asChild
-                      variant={"default"}
-                      className="w-full p-0 bg-[#1E2122] text-[#F4EDE5] h-[100px] text-2xl rounded-[20px]"
-                    >
-                      <Link href={"/history"}>Go back to history</Link>
-                    </Button>
-                  )}
-                  {!editing && (
-                    <Button
-                      variant={"destructive"}
-                      className="w-full h-[100px] p-0 text-2xl rounded-[20px]"
-                      onClick={enableEditingMode}
-                    >
-                      Edit
-                    </Button>
-                  )}
-                  {editing && (
-                    <form
-                      key={3}
-                      className="w-full h-[100px]"
-                      onSubmit={handleSubmit(debounceUpdateSmokingSession)}
-                    >
-                      <Button
-                        variant={"default"}
-                        className="w-full h-full text-[#F4EDE5] bg-orange-400 text-2xl rounded-[20px] mt-4 p-0"
-                        type="submit"
-                      >
-                        Save
-                      </Button>
-                    </form>
-                  )}
-                </div>
+                <p>
+                  Current temp1:{" "}
+                  {
+                    tempSensor1Readings.at(tempSensor1Readings.length - 1)
+                      ?.value
+                  }
+                </p>
+                <p>
+                  Current temp2:{" "}
+                  {
+                    tempSensor2Readings.at(tempSensor2Readings.length - 1)
+                      ?.value
+                  }
+                </p>
+                <p>
+                  Current temp3:{" "}
+                  {
+                    tempSensor3Readings.at(tempSensor3Readings.length - 1)
+                      ?.value
+                  }
+                </p>
+                <p>
+                  Current hum1:{" "}
+                  {humSensor1Readings.at(humSensor1Readings.length - 1)?.value}
+                </p>
               </div>
-            </div>
+            )}
+            {sessionFinished !== undefined && !sessionFinished && (
+              <div>
+                <Button
+                  variant="default"
+                  onClick={() => {
+                    debounceStartSmokingSession();
+                  }}
+                >
+                  Start
+                </Button>
+                <Button
+                  variant="default"
+                  onClick={() => debounceStopSmokingSession()}
+                >
+                  Stop
+                </Button>
+              </div>
+            )}
+            <br />
+            <p>The WebSocket is currently {connectionStatus}</p>
+            <p>Humidity readings over time</p>
+            {humSensor1Readings.length > 0 && (
+              <LineChart width={600} height={300}>
+                <Line
+                  name="Humidity"
+                  data={humSensor1Readings}
+                  type="monotone"
+                  dataKey="value"
+                  stroke="black"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                {/* <CartesianGrid stroke="#ccc" /> */}
+                <XAxis
+                  dataKey={"timestampUnix"}
+                  domain={[
+                    humSensor1Readings.at(0)!.timestampUnix,
+                    humSensor1Readings.at(humSensor1Readings.length - 1)!
+                      .timestampUnix,
+                  ]}
+                  type="number"
+                  tickFormatter={dateFormatter}
+                  interval="preserveStartEnd"
+                />
+                <YAxis />
+                <Legend />
+              </LineChart>
+            )}
+            <p>Temperature readings over time</p>
+            {tempSensor1Readings.length > 0 && (
+              <LineChart width={600} height={300}>
+                <Line
+                  name={sessionData?.tempSensor1Name ?? "Temperature 1"}
+                  data={tempSensor1Readings}
+                  type="monotone"
+                  dataKey="value"
+                  stroke="red"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  name={sessionData?.tempSensor2Name ?? "Temperature 2"}
+                  data={tempSensor2Readings}
+                  type="monotone"
+                  dataKey="value"
+                  stroke="green"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  name={sessionData?.tempSensor3Name ?? "Temperature 3"}
+                  data={tempSensor3Readings}
+                  type="monotone"
+                  dataKey="value"
+                  stroke="blue"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                {/* <CartesianGrid stroke="#ccc" /> */}
+                <XAxis
+                  dataKey={"timestampUnix"}
+                  domain={[
+                    tempSensor1Readings.at(0)!.timestampUnix,
+                    tempSensor1Readings.at(tempSensor1Readings.length - 1)!
+                      .timestampUnix,
+                  ]}
+                  type="number"
+                  tickFormatter={dateFormatter}
+                  interval="preserveStartEnd"
+                />
+                <YAxis />
+                <Legend />
+              </LineChart>
+            )}
           </div>
         )
       ) : (
         <div>Invalid session id</div>
+      )}
+      <ImageCarousel
+        handleAddImage={handleAddImage}
+        handleRemoveImage={handleRemoveImage}
+        handleImageClick={handleImageClick}
+        images={images}
+        editing={editing}
+        className="mt-4"
+      />
+      {fromHistory && fromHistory === "true" && (
+        <Button asChild variant={"destructive"} className="w-[300px] mt-4">
+          <Link href={"/history"}>Go back to history</Link>
+        </Button>
       )}
     </div>
   );
