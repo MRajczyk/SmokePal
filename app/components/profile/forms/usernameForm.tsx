@@ -23,6 +23,8 @@ const ChangeUsernameForm = () => {
   });
 
   const onSubmit = async (data: UsernameSchemaType) => {
+    setSuccessMessage("");
+    setErrorMessage("");
     const res = await changeUsername(data);
     if (res.success) {
       await update({ username: data.username });
