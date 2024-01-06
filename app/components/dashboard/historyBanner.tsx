@@ -14,7 +14,7 @@ const HistoryBanner = () => {
         variant={"ghost"}
       >
         <Link href="/history" className="flex text-[#F4EDE5]">
-          <span className="flex flex-col gap-2 text-4xl mr-2 w-full break-words text-wrap whitespace-normal text-start">
+          <span className="flex flex-col gap-2 text-4xl mr-2 w-full break-words text-wrap whitespace-normal text-start font-bold">
             Smoking history
             <p className="text-base font-normal w-full break-words text-wrap whitespace-normal">
               Go to history of your smoking sessions and track your flavorful

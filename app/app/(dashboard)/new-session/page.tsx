@@ -232,12 +232,12 @@ const NewSessionPage = () => {
   };
 
   return (
-    <div className="flex flex-col w-full h-full items-center justify-center">
-      <div className="text-4xl p-8 text-[#F4EDE5] font-semibold">
+    <div className="flex flex-col w-full h-full items-center justify-start">
+      <div className="text-5xl p-8 text-[#F4EDE5] font-semibold">
         Start new session
       </div>
       <div className="grid grid-cols-2 w-[1400px] gap-4 grid-rows-4 h-full mb-[100px]">
-        <div className="flex row-span-4 bg-[#15191C] col-span-1 flex-col gap-1 justify-start items-center w-full p-[50px] rounded-[20px]">
+        <div className="flex row-span-4 bg-[#15191C] col-span-1 flex-col gap-1 justify-center items-center w-full p-[50px] rounded-[20px]">
           <form
             key={0}
             className="flex flex-col gap-[6px] w-[470px]"
@@ -309,7 +309,7 @@ const NewSessionPage = () => {
             className="w-[470px] rounded-[9px] bg-transparent text-[#F4EDE5] border-[#1E2122] border-2"
           />
         </div>
-        <div className="flex bg-[#15191C] col-span-1 row-span-3 flex-col gap-1 justify-start items-center w-full p-[50px] rounded-[20px]">
+        <div className="flex bg-[#15191C] col-span-1 row-span-3 flex-col gap-1 justify-center items-center w-full p-[50px] rounded-[20px]">
           <form
             key={1}
             className="flex flex-col gap-3"
@@ -325,11 +325,9 @@ const NewSessionPage = () => {
                 placeholder="Red sensor name"
                 className="w-[470px] h-[90px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
               />
-              {errors.tempSensor1Name && (
-                <p className="text-red-600 mt-1">
-                  {errors.tempSensor1Name?.message}
-                </p>
-              )}
+              <p className="text-red-600 mt-1">
+                {errors.tempSensor1Name?.message}
+              </p>
             </div>
 
             <div>
@@ -367,13 +365,15 @@ const NewSessionPage = () => {
             </div>
           </form>
         </div>
-        <Button
-          variant={"gradient"}
-          type="submit"
-          className="col-span-1 row-span-1 w-full h-full text-4xl font-semibold rounded-[20px]"
-        >
-          Start new session!
-        </Button>
+        <form key={2} onSubmit={handleSubmit(handleFormSubmit)}>
+          <Button
+            variant={"gradient"}
+            type="submit"
+            className="col-span-1 row-span-1 w-full h-full text-4xl font-semibold rounded-[20px]"
+          >
+            Start new session!
+          </Button>
+        </form>
       </div>
     </div>
   );

@@ -76,14 +76,14 @@ const HistoryPage = () => {
   }, []);
 
   return (
-    <div className="w-[1400px] pt-6 h-full flex justify-start items-start">
+    <div className="w-[1400px] h-full flex justify-start items-start">
       {fetchingData ? (
         <div className="w-full h-full flex justify-center items-center">
           <Ring color="orange" size={100} />
         </div>
       ) : (
         <div className="w-full h-full flex justify-start items-center flex-col">
-          <h1 className="mb-6 text-4xl text-[#F4EDE5] font-semibold">
+          <h1 className="p-8 text-5xl text-[#F4EDE5] font-semibold">
             History of smoking sessions
           </h1>
           <div className="w-full h-fit justify-start p-4 bg-[#F4EDE5] rounded-[20px]">
