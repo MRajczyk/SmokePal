@@ -28,7 +28,7 @@ export async function changeUsername(data: UsernameSchemaType) {
       },
     });
   } catch (e) {
-    return { success: false, message: "Could not change username" };
+    return { success: false, message: "Username is taken" };
   }
   return { success: true, message: "Username changed" };
 }

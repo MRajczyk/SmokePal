@@ -28,7 +28,7 @@ export async function changeEmail(data: EmailSchemaType) {
       },
     });
   } catch (e) {
-    return { success: false, message: "Could not change email" };
+    return { success: false, message: "Email is taken" };
   }
   return { success: true, message: "Email changed" };
 }

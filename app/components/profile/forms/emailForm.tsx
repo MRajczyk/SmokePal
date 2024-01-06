@@ -24,6 +24,8 @@ const ChangeEmailForm = () => {
   });
 
   const onSubmit = async (data: EmailSchemaType) => {
+    setSuccessMessage("");
+    setErrorMessage("");
     const res = await changeEmail(data);
     if (res.success) {
       await update({ email: data.email });

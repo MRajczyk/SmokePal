@@ -24,7 +24,8 @@ const ChangeUsernameForm = () => {
   });
 
   const onSubmit = async (data: PasswordChangeSchemaType) => {
-    //update password on backend vv placeholder so no errors
+    setErrorMessage("");
+    setSuccessMessage("");
     const res = await changePassword(data);
     if (res.success) {
       setSuccessMessage(res.message);

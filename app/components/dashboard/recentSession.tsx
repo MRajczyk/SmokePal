@@ -140,13 +140,15 @@ const RecentSession = () => {
             <p>Products(s):</p>
             {sessionData?.products &&
               sessionData?.products.map((product) => (
-                <DashboardPill value={product} />
+                <DashboardPill key={product} value={product} />
               ))}
           </span>
           <span className="flex flex-row justify-start items-center w-full gap-2">
             <p>Wood(s)</p>
             {sessionData?.woods &&
-              sessionData?.woods.map((wood) => <DashboardPill value={wood} />)}
+              sessionData?.woods.map((wood) => (
+                <DashboardPill key={wood} value={wood} />
+              ))}
           </span>
           {tempSensor1Readings.length > 0 && (
             <LineChart width={700} height={300} className="mt-6 pr-10">

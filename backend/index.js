@@ -131,6 +131,22 @@ app.get("/", (req, res) => {
   res.send("im not a teapot but im alive");
 });
 
+app.get("/api/status", (req, res) => {
+  if (savingDataFlag) {
+    return res.status(200).send(
+      JSON.stringify({
+        message: "active",
+      })
+    );
+  }
+
+  return res.status(200).send(
+    JSON.stringify({
+      message: "inactive",
+    })
+  );
+});
+
 app.post("/api/start", async (req, res) => {
   const authHeader = req.header("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {

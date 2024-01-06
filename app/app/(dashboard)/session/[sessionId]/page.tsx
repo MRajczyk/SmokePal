@@ -43,6 +43,9 @@ import { Ring } from "react-css-spinners";
 import { updateSmokingSession } from "@/app/actions/updateSmokingSession";
 import { startSmokingSessionAction } from "@/app/actions/startSmokingSessionAction";
 import { stopSmokingSessionAction } from "@/app/actions/stopSmokingSessionAction";
+import { StylesConfig } from "react-select";
+import SessionPill from "@/components/session/sessionPill";
+import { useSession } from "next-auth/react";
 
 //buffer is of type buffer but theres typing error as i cant get data property to be recognized by ts
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,6 +73,8 @@ export default function SessionPage({
 }: {
   params: { sessionId: number };
 }) {
+  const session = useSession();
+  const [liveDataStarted, setLiveDataStarted] = useState<boolean>(false);
   const [fetchingHistoricalData, setFetchingHistoricalData] =
     useState<boolean>(false);
   const [editing, setEditing] = useState<boolean>(false);
@@ -348,6 +353,33 @@ export default function SessionPage({
     }
   }, []);
 
+  useEffect(() => {
+    if (params.sessionId) {
+      getBackendStatus();
+    }
+  }, []);
+
+  function getBackendStatus() {
+    const fetch = createZodFetcher(fetcher);
+    fetch(
+      defaultResponseSchema,
+      process.env.NEXT_PUBLIC_BACKEND_URL + "/api/status",
+      {
+        method: "GET",
+      }
+    )
+      .then((res) => {
+        if (res.message === "active") {
+          setLiveDataStarted(true);
+        } else {
+          setLiveDataStarted(false);
+        }
+      })
+      .catch((err) => {
+        setLiveDataStarted(false);
+      });
+  }
+
   async function startSmokingSession() {
     startSmokingSessionAction(params.sessionId);
   }
@@ -358,6 +390,9 @@ export default function SessionPage({
     isSuccess: isSuccessStart,
   } = useMutation({
     mutationFn: startSmokingSession,
+    onSuccess: (msg) => {
+      setLiveDataStarted(true);
+    },
     onError: (error) => {
       if (error instanceof Error) {
         alert(error);
@@ -381,6 +416,9 @@ export default function SessionPage({
     isSuccess: isSuccessStop,
   } = useMutation({
     mutationFn: stopSmokingSession,
+    onSuccess: (msg) => {
+      setLiveDataStarted(false);
+    },
     onError: (error) => {
       if (error instanceof Error) {
         alert(error);
@@ -491,7 +529,7 @@ export default function SessionPage({
 
     if (sessionData?.woods) {
       const selectedWoods: SelectOptionsSchemaType[] = [];
-      sessionData.products.forEach((wood) => {
+      sessionData.woods.forEach((wood) => {
         selectedWoods.push(createOption(wood));
       });
       setValue("woods", selectedWoods);
@@ -509,6 +547,50 @@ export default function SessionPage({
 
   function handleReject() {}
 
+  const colourStyles: StylesConfig = {
+    control: (styles) => ({
+      ...styles,
+      backgroundColor: "#1E2122",
+      borderWidth: 0,
+      minHeight: 90,
+      color: "#6C6B6A",
+      boxShadow: "none",
+      borderRadius: 20,
+    }),
+    option: (styles, { isFocused, isSelected }) => ({
+      ...styles,
+      color: "#F4EDE6",
+      backgroundColor: isFocused
+        ? "#6C6B6A"
+        : isSelected
+        ? "#6C6B6A"
+        : "#1E2122",
+    }),
+    input: (styles) => ({ ...styles, color: "#F4EDE5" }),
+    placeholder: (styles) => ({ ...styles, textAlign: "start" }),
+    singleValue: (styles) => ({ ...styles }),
+    multiValue: (styles) => ({
+      ...styles,
+      height: 40,
+      borderRadius: 20,
+      padding: 8,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "#F4EDE5",
+    }),
+    indicatorSeparator: (styles) => ({ ...styles, backgroundColor: "#6C6B6A" }),
+    menuList: (styles) => ({ ...styles, backgroundColor: "#1E2122" }),
+    multiValueRemove: (styles) => ({
+      ...styles,
+      height: 22,
+      width: 22,
+      borderRadius: 11,
+    }),
+    valueContainer: (styles) => ({ ...styles, padding: 28 }),
+    container: (styles) => ({ ...styles, width: "100%" }),
+  };
+
   return (
     <div className="flex w-full h-full flex-col items-center justify-start">
       {imageModalOpen && (
@@ -525,276 +607,447 @@ export default function SessionPage({
             <Ring color="orange" size={100} />
           </div>
         ) : (
-          <div>
-            {!editing && (
-              <Button
-                variant={"destructive"}
-                className="w-[300px] mt-4"
-                onClick={enableEditingMode}
-              >
-                Edit
-              </Button>
-            )}
-            {editing && (
-              <form
-                key={1}
-                className="flex flex-col gap-1"
-                onSubmit={handleSubmit(debounceUpdateSmokingSession)}
-              >
-                <Button
-                  variant={"default"}
-                  className="w-[300px] mt-4 bg-orange-400"
-                  type="submit"
+          <div className="flex w-full h-full flex-col items-center justify-start">
+            {editing ? (
+              <div className="flex flex-col w-[1400px] justify-center items-center p-8 text-5xl">
+                <form
+                  key={2}
+                  onSubmit={handleSubmit(debounceUpdateSmokingSession)}
+                  className="w-full h-full flex justify-center items-center flex-col"
                 >
-                  Save
-                </Button>
-              </form>
+                  <input
+                    {...register("title")}
+                    placeholder="Title"
+                    className="inline-block h-[90px] p-[28px] rounded-[20px] placeholder:text-[#6C6B6A] bg-[#15191C] text-[#F4EDE5] text-center"
+                  />
+                  <p className="text-red-600 text-2xl">
+                    {errors.title?.message}
+                  </p>
+                </form>
+              </div>
+            ) : (
+              <div className="text-5xl p-8 text-[#F4EDE5] font-semibold">
+                <p>{sessionData?.title}</p>
+              </div>
             )}
-            <p>Session id: {params.sessionId}</p>
-            {sessionData && (
-              <div>
+            <div className="grid grid-cols-2 w-[1400px] gap-4 h-full pb-[50px]">
+              <div className="flex w-full h-full gap-3 bg-[#15191C] items-center flex-col justify-start rounded-3xl col-span-1 p-10">
                 {editing ? (
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-1 w-full">
                     <form
                       key={0}
-                      className="flex flex-col gap-1"
+                      className="flex flex-col gap-3 w-full"
                       onSubmit={handleSubmit(debounceUpdateSmokingSession)}
                     >
-                      <input {...register("title")} placeholder="title" />
-                      <p className="text-red-600">{errors.title?.message}</p>
+                      <div>
+                        <span className="flex flex-row gap-2 justify-start items-center text-[#F4EDE5] mb-3">
+                          <div className="bg-[#D1271C] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
+                          <p className="inline-block">Red sensor</p>
+                        </span>
+                        <input
+                          {...register("tempSensor1Name")}
+                          placeholder="Red sensor name"
+                          className="w-full h-[90px] p-[28px] rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+                        />
+                        <p className="text-red-600">
+                          {errors.tempSensor1Name?.message}
+                        </p>
+                      </div>
 
-                      <Controller
-                        control={control}
-                        name="products"
-                        rules={{ required: true }}
-                        render={({
-                          field: { onChange, onBlur, value, ref },
-                        }) => (
-                          <CreatableSelect
-                            isMulti
-                            placeholder="Select product..."
-                            onChange={onChange} // send value to hook form
-                            onBlur={onBlur} // notify when input is touched/blur
-                            ref={ref}
-                            value={value}
-                            isClearable
-                            isDisabled={isLoadingProducts}
-                            isLoading={isLoadingProducts}
-                            onCreateOption={handleCreateProducts}
-                            options={optionsProducts}
-                          />
-                        )}
-                      />
-                      <p className="text-red-600">{errors.products?.message}</p>
+                      <div>
+                        <span className="flex flex-row gap-2 justify-start items-center text-[#F4EDE5] mb-3">
+                          <div className="bg-[#F4981D] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
+                          <p className="inline-block">Yellow sensor</p>
+                        </span>
+                        <input
+                          {...register("tempSensor2Name")}
+                          placeholder="Yellow sensor name"
+                          className="w-full h-[90px] p-[28px] rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+                        />
+                        <p className="text-red-600">
+                          {errors.tempSensor2Name?.message}
+                        </p>
+                      </div>
 
-                      <Controller
-                        control={control}
-                        name="woods"
-                        rules={{ required: true }}
-                        render={({
-                          field: { onChange, onBlur, value, ref },
-                        }) => (
-                          <CreatableSelect
-                            isMulti
-                            placeholder="Select wood..."
-                            onChange={onChange} // send value to hook form
-                            onBlur={onBlur} // notify when input is touched/blur
-                            ref={ref}
-                            value={value}
-                            isClearable
-                            isDisabled={isLoadingWood}
-                            isLoading={isLoadingWood}
-                            onCreateOption={handleCreateWood}
-                            options={optionsWood}
-                          />
-                        )}
-                      />
-                      <p className="text-red-600">{errors.woods?.message}</p>
-
-                      <textarea
-                        {...register("description")}
-                        placeholder="description"
-                        className="resize-none"
-                      />
-                      <p className="text-red-600">
-                        {errors.description?.message}
-                      </p>
-
-                      <input
-                        {...register("tempSensor1Name")}
-                        placeholder="Red sensor name"
-                      />
-                      <p className="text-red-600">
-                        {errors.tempSensor1Name?.message}
-                      </p>
-
-                      <input
-                        {...register("tempSensor2Name")}
-                        placeholder="Green sensor name"
-                      />
-                      <p className="text-red-600">
-                        {errors.tempSensor2Name?.message}
-                      </p>
-
-                      <input
-                        {...register("tempSensor3Name")}
-                        placeholder="Blue sensor name"
-                      />
-                      <p className="text-red-600">
-                        {errors.tempSensor3Name?.message}
-                      </p>
+                      <div>
+                        <span className="flex flex-row gap-2 justify-start items-center text-[#F4EDE5] mb-3">
+                          <div className="bg-[#211ECC] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
+                          <p className="inline-block">Blue sensor</p>
+                        </span>
+                        <input
+                          {...register("tempSensor3Name")}
+                          placeholder="Blue sensor name"
+                          className="w-full h-[90px] p-[28px] rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+                        />
+                        <p className="text-red-600">
+                          {errors.tempSensor3Name?.message}
+                        </p>
+                      </div>
                     </form>
                   </div>
                 ) : (
-                  <div>
-                    <p>Session title: {sessionData.title}</p>
-                    <p>Session woods: {sessionData.woods.join(", ")}</p>
-                    <p>Session products: {sessionData.products.join(", ")}</p>
-                    <textarea
-                      disabled
-                      value={sessionData.description ?? ""}
-                      className="resize-none"
-                    />
+                  <div className="flex w-full h-full gap-3 items-center flex-col justify-start">
+                    <div className="flex w-full items-center justify-start flex-col gap-2">
+                      <span className="flex flex-row w-full gap-2 justify-start items-start text-[#F4EDE5]">
+                        <div className="bg-[#D1271C] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
+                        <p className="inline-block">
+                          Current temperature:{" "}
+                          <span className="font-semibold">
+                            {
+                              tempSensor1Readings.at(
+                                tempSensor1Readings.length - 1
+                              )?.value
+                            }
+                          </span>{" "}
+                          °C
+                        </p>
+                      </span>
+                      <span className="flex flex-row w-full gap-2 justify-start items-start text-[#F4EDE5]">
+                        <div className="bg-[#F4981D] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
+                        <p className="inline-block">
+                          Current temperature:{" "}
+                          <span className="font-semibold">
+                            {
+                              tempSensor2Readings.at(
+                                tempSensor2Readings.length - 1
+                              )?.value
+                            }
+                          </span>{" "}
+                          °C
+                        </p>
+                      </span>
+                      <span className="flex flex-row w-full gap-2 justify-start items-start text-[#F4EDE5]">
+                        <div className="bg-[#211ECC] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
+                        <p className="inline-block">
+                          Current temperature:{" "}
+                          <span className="font-semibold">
+                            {
+                              tempSensor3Readings.at(
+                                tempSensor3Readings.length - 1
+                              )?.value
+                            }
+                          </span>{" "}
+                          °C
+                        </p>
+                      </span>
+                      <span className="flex flex-row w-full gap-2 justify-start items-start text-[#F4EDE5]">
+                        <div className="bg-[#444545] w-[22px] h-[22px] rounded-[11px] ml-3 inline-block"></div>
+                        <p className="inline-block">
+                          Current humidity:{" "}
+                          <span className="font-semibold">
+                            {
+                              humSensor1Readings.at(
+                                humSensor1Readings.length - 1
+                              )?.value
+                            }{" "}
+                            %
+                          </span>
+                        </p>
+                      </span>
+                    </div>
+                    <LineChart
+                      width={600}
+                      height={300}
+                      className="bg-[#E3DBD1] p-6 pl-0 rounded-[20px]"
+                    >
+                      <Line
+                        name={sessionData?.tempSensor1Name ?? "Temperature 1"}
+                        data={tempSensor1Readings}
+                        type="monotone"
+                        dataKey="value"
+                        stroke="red"
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                      <Line
+                        name={sessionData?.tempSensor2Name ?? "Temperature 2"}
+                        data={tempSensor2Readings}
+                        type="monotone"
+                        dataKey="value"
+                        stroke="#F4981D"
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                      <Line
+                        name={sessionData?.tempSensor3Name ?? "Temperature 3"}
+                        data={tempSensor3Readings}
+                        type="monotone"
+                        dataKey="value"
+                        stroke="blue"
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                      {/* <CartesianGrid stroke="#ccc" /> */}
+                      <XAxis
+                        dataKey={"timestampUnix"}
+                        domain={
+                          tempSensor1Readings && tempSensor1Readings.length > 0
+                            ? [
+                                tempSensor1Readings.at(0)!.timestampUnix,
+                                tempSensor1Readings.at(
+                                  tempSensor1Readings.length - 1
+                                )!.timestampUnix,
+                              ]
+                            : []
+                        }
+                        type="number"
+                        tickFormatter={dateFormatter}
+                        interval="preserveStartEnd"
+                      />
+                      <YAxis />
+                      <Legend />
+                    </LineChart>
+                    <LineChart
+                      width={600}
+                      height={300}
+                      className="bg-[#E3DBD1] p-6 pl-0 rounded-[20px]"
+                    >
+                      <Line
+                        name="Humidity"
+                        data={humSensor1Readings}
+                        type="monotone"
+                        dataKey="value"
+                        stroke="black"
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                      {/* <CartesianGrid stroke="#ccc" /> */}
+                      <XAxis
+                        dataKey={"timestampUnix"}
+                        domain={
+                          humSensor1Readings && humSensor1Readings.length > 0
+                            ? [
+                                humSensor1Readings.at(0)!.timestampUnix,
+                                humSensor1Readings.at(
+                                  humSensor1Readings.length - 1
+                                )!.timestampUnix,
+                              ]
+                            : []
+                        }
+                        type="number"
+                        tickFormatter={dateFormatter}
+                        interval="preserveStartEnd"
+                      />
+                      <YAxis />
+                      <Legend />
+                    </LineChart>
                   </div>
                 )}
-                <p>
-                  Current temp1:{" "}
-                  {
-                    tempSensor1Readings.at(tempSensor1Readings.length - 1)
-                      ?.value
-                  }
-                </p>
-                <p>
-                  Current temp2:{" "}
-                  {
-                    tempSensor2Readings.at(tempSensor2Readings.length - 1)
-                      ?.value
-                  }
-                </p>
-                <p>
-                  Current temp3:{" "}
-                  {
-                    tempSensor3Readings.at(tempSensor3Readings.length - 1)
-                      ?.value
-                  }
-                </p>
-                <p>
-                  Current hum1:{" "}
-                  {humSensor1Readings.at(humSensor1Readings.length - 1)?.value}
-                </p>
               </div>
-            )}
-            {sessionFinished !== undefined && !sessionFinished && (
-              <div>
-                <Button
-                  variant="default"
-                  onClick={() => {
-                    debounceStartSmokingSession();
-                  }}
-                >
-                  Start
-                </Button>
-                <Button
-                  variant="default"
-                  onClick={() => debounceStopSmokingSession()}
-                >
-                  Stop
-                </Button>
+              <div className="flex w-full h-full gap-3 bg-[#15191C] items-center flex-col justify-start rounded-3xl col-span-1 p-10">
+                {editing ? (
+                  <div className="flex flex-col gap-1 w-full">
+                    <form
+                      key={1}
+                      className="flex flex-col gap-1"
+                      onSubmit={handleSubmit(debounceUpdateSmokingSession)}
+                    >
+                      <div className="flex w-full gap-1 items-center flex-col justify-start">
+                        <p className="self-start text-[#F4EDE5] font-semibold">
+                          Products(s):
+                        </p>
+                        <Controller
+                          control={control}
+                          name="products"
+                          rules={{ required: true }}
+                          render={({
+                            field: { onChange, onBlur, value, ref },
+                          }) => (
+                            <CreatableSelect
+                              isMulti
+                              placeholder="Select product..."
+                              onChange={onChange} // send value to hook form
+                              onBlur={onBlur} // notify when input is touched/blur
+                              ref={ref}
+                              value={value}
+                              isClearable
+                              isDisabled={isLoadingProducts}
+                              isLoading={isLoadingProducts}
+                              onCreateOption={handleCreateProducts}
+                              options={optionsProducts}
+                              styles={colourStyles}
+                            />
+                          )}
+                        />
+                        <p className="text-red-600">
+                          {errors.products?.message}
+                        </p>
+                      </div>
+                      <div className="flex w-full gap-1 items-center flex-col justify-start">
+                        <p className="self-start text-[#F4EDE5] font-semibold">
+                          Products(s):
+                        </p>
+                        <Controller
+                          control={control}
+                          name="woods"
+                          rules={{ required: true }}
+                          render={({
+                            field: { onChange, onBlur, value, ref },
+                          }) => (
+                            <CreatableSelect
+                              isMulti
+                              placeholder="Select wood..."
+                              onChange={onChange} // send value to hook form
+                              onBlur={onBlur} // notify when input is touched/blur
+                              ref={ref}
+                              value={value}
+                              isClearable
+                              isDisabled={isLoadingWood}
+                              isLoading={isLoadingWood}
+                              onCreateOption={handleCreateWood}
+                              options={optionsWood}
+                              styles={colourStyles}
+                            />
+                          )}
+                        />
+                        <p className="text-red-600">{errors.woods?.message}</p>
+                      </div>
+                      <div className="flex w-full gap-1 items-center flex-col justify-start">
+                        <p className="self-start text-[#F4EDE5] font-semibold">
+                          Description:
+                        </p>
+                        <textarea
+                          {...register("description")}
+                          placeholder="Description"
+                          className="w-full h-[140px] p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+                        />
+                        <p className="text-red-600">
+                          {errors.description?.message}
+                        </p>
+                      </div>
+
+                      <ImageCarousel
+                        handleAddImage={handleAddImage}
+                        handleImageClick={handleImageClick}
+                        handleRemoveImage={handleRemoveImage}
+                        images={images}
+                        editing={editing}
+                        className="w-full rounded-[20px] bg-transparent text-[#F4EDE5] border-[#1E2122] border-2"
+                      />
+                    </form>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3 justify-start items-center w-full">
+                    {connectionStatus === "Open" ? (
+                      !editing && (
+                        <div className="flex flex-row w-[600px] gap-2 justify-center items-start text-[#F4EDE5]">
+                          {!liveDataStarted && (
+                            <Button
+                              variant="default"
+                              onClick={() => {
+                                debounceStartSmokingSession();
+                              }}
+                              className="w-full h-[100px] p-0 text-2xl rounded-[20px] bg-[#F4EDE5] text-[#15191C]"
+                            >
+                              Start
+                            </Button>
+                          )}
+                          {liveDataStarted && (
+                            <Button
+                              onClick={() => debounceStopSmokingSession()}
+                              variant={"destructive"}
+                              className="w-full h-[100px] p-0 text-2xl rounded-[20px]"
+                            >
+                              Stop
+                            </Button>
+                          )}
+                        </div>
+                      )
+                    ) : (
+                      <div className="flex flex-row h-[100px] justify-center items-center flex-wrap gap-2 w-full p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]">
+                        <p className="self-start text-[#F4EDE5] self-center font-semibold">
+                          Connecting to WebSocket Server...
+                        </p>
+                        <Ring color="white" size={20} />
+                      </div>
+                    )}
+                    <div className="flex w-full h-full gap-3 items-center flex-col justify-start">
+                      <div className="flex w-full gap-1 items-center flex-col justify-start">
+                        <p className="self-start text-[#F4EDE5] font-semibold">
+                          Products(s):
+                        </p>
+                        <div className="flex flex-row flex-wrap gap-2 w-full p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]">
+                          {sessionData?.products &&
+                            sessionData?.products.map((product) => (
+                              <SessionPill key={product} value={product} />
+                            ))}
+                        </div>
+                      </div>
+                      <div className="flex w-full gap-1 items-center flex-col justify-start">
+                        <p className="self-start text-[#F4EDE5] font-semibold">
+                          Woods(s):
+                        </p>
+                        <div className="flex flex-row flex-wrap gap-2 w-full p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]">
+                          {sessionData?.woods &&
+                            sessionData?.woods.map((wood) => (
+                              <SessionPill key={wood} value={wood} />
+                            ))}
+                        </div>
+                      </div>
+                      <div className="flex w-full gap-1 items-center flex-col justify-start">
+                        <p className="self-start text-[#F4EDE5] font-semibold">
+                          Description:
+                        </p>
+                        <textarea
+                          disabled
+                          value={sessionData?.description ?? ""}
+                          className="w-full h-[140px] p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+                        />
+                      </div>
+                      <ImageCarousel
+                        handleAddImage={handleAddImage}
+                        handleRemoveImage={handleRemoveImage}
+                        handleImageClick={handleImageClick}
+                        images={images}
+                        editing={editing}
+                        className="w-full rounded-[20px] bg-transparent text-[#F4EDE5] border-[#1E2122] border-2"
+                      />
+                    </div>
+                  </div>
+                )}
+                <div className="flex flex-row w-full gap-2 justify-start items-start text-[#F4EDE5]">
+                  {fromHistory && fromHistory === "true" && !editing && (
+                    <Button
+                      asChild
+                      variant={"default"}
+                      className="w-full p-0 bg-[#1E2122] text-[#F4EDE5] h-[100px] text-2xl rounded-[20px]"
+                    >
+                      <Link href={"/history"}>Go back to history</Link>
+                    </Button>
+                  )}
+                  {!editing &&
+                    sessionData &&
+                    sessionData.authorId === session.data?.user.id && (
+                      <Button
+                        variant={"destructive"}
+                        className="w-full h-[100px] p-0 text-2xl rounded-[20px]"
+                        onClick={enableEditingMode}
+                      >
+                        Edit
+                      </Button>
+                    )}
+                  {editing && (
+                    <form
+                      key={3}
+                      className="w-full h-[100px]"
+                      onSubmit={handleSubmit(debounceUpdateSmokingSession)}
+                    >
+                      <Button
+                        variant={"default"}
+                        className="w-full h-full text-[#F4EDE5] bg-orange-400 text-2xl rounded-[20px] p-0"
+                        type="submit"
+                      >
+                        Save
+                      </Button>
+                    </form>
+                  )}
+                </div>
               </div>
-            )}
-            <br />
-            <p>The WebSocket is currently {connectionStatus}</p>
-            <p>Humidity readings over time</p>
-            {humSensor1Readings.length > 0 && (
-              <LineChart width={600} height={300}>
-                <Line
-                  name="Humidity"
-                  data={humSensor1Readings}
-                  type="monotone"
-                  dataKey="value"
-                  stroke="black"
-                  strokeWidth={2}
-                  dot={false}
-                />
-                {/* <CartesianGrid stroke="#ccc" /> */}
-                <XAxis
-                  dataKey={"timestampUnix"}
-                  domain={[
-                    humSensor1Readings.at(0)!.timestampUnix,
-                    humSensor1Readings.at(humSensor1Readings.length - 1)!
-                      .timestampUnix,
-                  ]}
-                  type="number"
-                  tickFormatter={dateFormatter}
-                  interval="preserveStartEnd"
-                />
-                <YAxis />
-                <Legend />
-              </LineChart>
-            )}
-            <p>Temperature readings over time</p>
-            {tempSensor1Readings.length > 0 && (
-              <LineChart width={600} height={300}>
-                <Line
-                  name={sessionData?.tempSensor1Name ?? "Temperature 1"}
-                  data={tempSensor1Readings}
-                  type="monotone"
-                  dataKey="value"
-                  stroke="red"
-                  strokeWidth={2}
-                  dot={false}
-                />
-                <Line
-                  name={sessionData?.tempSensor2Name ?? "Temperature 2"}
-                  data={tempSensor2Readings}
-                  type="monotone"
-                  dataKey="value"
-                  stroke="green"
-                  strokeWidth={2}
-                  dot={false}
-                />
-                <Line
-                  name={sessionData?.tempSensor3Name ?? "Temperature 3"}
-                  data={tempSensor3Readings}
-                  type="monotone"
-                  dataKey="value"
-                  stroke="blue"
-                  strokeWidth={2}
-                  dot={false}
-                />
-                {/* <CartesianGrid stroke="#ccc" /> */}
-                <XAxis
-                  dataKey={"timestampUnix"}
-                  domain={[
-                    tempSensor1Readings.at(0)!.timestampUnix,
-                    tempSensor1Readings.at(tempSensor1Readings.length - 1)!
-                      .timestampUnix,
-                  ]}
-                  type="number"
-                  tickFormatter={dateFormatter}
-                  interval="preserveStartEnd"
-                />
-                <YAxis />
-                <Legend />
-              </LineChart>
-            )}
+            </div>
           </div>
         )
       ) : (
         <div>Invalid session id</div>
-      )}
-      <ImageCarousel
-        handleAddImage={handleAddImage}
-        handleRemoveImage={handleRemoveImage}
-        handleImageClick={handleImageClick}
-        images={images}
-        editing={editing}
-        className="mt-4"
-      />
-      {fromHistory && fromHistory === "true" && (
-        <Button asChild variant={"destructive"} className="w-[300px] mt-4">
-          <Link href={"/history"}>Go back to history</Link>
-        </Button>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,9 @@ import Logotype from "@/public/assets/logotype.svg?url";
 import Image from "next/image";
 
 export default function RegisterPage() {
+  const [registerSuccess, setRegisterSuccess] = useState("");
+  const [registerError, setRegisterError] = useState("");
+
   const {
     watch,
     trigger,
@@ -23,11 +26,13 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (data: RegisterSchemaType) => {
+    setRegisterError("");
+    setRegisterSuccess("");
     const res = await registerUser(data);
     if (res.success === true) {
-      alert("Registered successfully!");
+      setRegisterSuccess("Registered successfully!");
     } else {
-      alert("Could not register user");
+      setRegisterError(res.error);
     }
   };
 
@@ -83,6 +88,8 @@ export default function RegisterPage() {
         <Button type="submit" variant="gradient" size="auth">
           Create Account
         </Button>
+        {registerError && <p className="text-red-600">{registerError}</p>}
+        {registerSuccess && <p className="text-green-600">{registerSuccess}</p>}
         <span className="text-[#6C6B6A] mt-4">
           Already a member?
           <Link className="text-[#F4EDE5] ml-2 font-bold" href="/auth/login">

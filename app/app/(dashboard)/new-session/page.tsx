@@ -199,10 +199,9 @@ const NewSessionPage = () => {
       ...styles,
       backgroundColor: "#1E2122",
       borderWidth: 0,
-      height: 90,
+      minHeight: 90,
       color: "#6C6B6A",
       boxShadow: "none",
-      paddingLeft: 38,
     }),
     option: (styles, { isFocused, isSelected }) => ({
       ...styles,
@@ -214,7 +213,7 @@ const NewSessionPage = () => {
         : "#1E2122",
     }),
     input: (styles) => ({ ...styles, color: "#F4EDE5" }),
-    placeholder: (styles) => ({ ...styles }),
+    placeholder: (styles) => ({ ...styles, textAlign: "start" }),
     singleValue: (styles) => ({ ...styles }),
     multiValue: (styles) => ({
       ...styles,
@@ -228,16 +227,22 @@ const NewSessionPage = () => {
     }),
     indicatorSeparator: (styles) => ({ ...styles, backgroundColor: "#6C6B6A" }),
     menuList: (styles) => ({ ...styles, backgroundColor: "#1E2122" }),
-    multiValueRemove: (styles) => ({ ...styles, height: 22 }),
+    multiValueRemove: (styles) => ({
+      ...styles,
+      height: 22,
+      width: 22,
+      borderRadius: 11,
+    }),
+    valueContainer: (styles) => ({ ...styles, padding: 28 }),
   };
 
   return (
-    <div className="flex flex-col w-full h-full items-center justify-center">
-      <div className="text-4xl p-8 text-[#F4EDE5] font-semibold">
+    <div className="flex flex-col w-full h-full items-center justify-start">
+      <div className="text-5xl p-8 text-[#F4EDE5] font-semibold">
         Start new session
       </div>
       <div className="grid grid-cols-2 w-[1400px] gap-4 grid-rows-4 h-full mb-[100px]">
-        <div className="flex row-span-4 bg-[#15191C] col-span-1 flex-col gap-1 justify-start items-center w-full p-[50px] rounded-[20px]">
+        <div className="flex row-span-4 bg-[#15191C] col-span-1 flex-col gap-1 justify-center items-center w-full p-[50px] rounded-[20px]">
           <form
             key={0}
             className="flex flex-col gap-[6px] w-[470px]"
@@ -246,7 +251,7 @@ const NewSessionPage = () => {
             <input
               {...register("title")}
               placeholder="Title"
-              className="w-full h-[90px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+              className="w-full h-[90px] p-[28px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
             />
             <p className="text-red-600">{errors.title?.message}</p>
 
@@ -297,7 +302,7 @@ const NewSessionPage = () => {
             <textarea
               {...register("description")}
               placeholder="Add a description..."
-              className="w-full h-[140px] p-[38px] resize-none rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+              className="w-full h-[140px] p-[28px] resize-none rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
             />
             <p className="text-red-600">{errors.description?.message}</p>
           </form>
@@ -309,7 +314,7 @@ const NewSessionPage = () => {
             className="w-[470px] rounded-[9px] bg-transparent text-[#F4EDE5] border-[#1E2122] border-2"
           />
         </div>
-        <div className="flex bg-[#15191C] col-span-1 row-span-3 flex-col gap-1 justify-start items-center w-full p-[50px] rounded-[20px]">
+        <div className="flex bg-[#15191C] col-span-1 row-span-3 flex-col gap-1 justify-center items-center w-full p-[50px] rounded-[20px]">
           <form
             key={1}
             className="flex flex-col gap-3"
@@ -323,13 +328,11 @@ const NewSessionPage = () => {
               <input
                 {...register("tempSensor1Name")}
                 placeholder="Red sensor name"
-                className="w-[470px] h-[90px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+                className="w-[470px] h-[90px] p-[28px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
               />
-              {errors.tempSensor1Name && (
-                <p className="text-red-600 mt-1">
-                  {errors.tempSensor1Name?.message}
-                </p>
-              )}
+              <p className="text-red-600 mt-1">
+                {errors.tempSensor1Name?.message}
+              </p>
             </div>
 
             <div>
@@ -340,7 +343,7 @@ const NewSessionPage = () => {
               <input
                 {...register("tempSensor2Name")}
                 placeholder="Yellow sensor name"
-                className="w-[470px] h-[90px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+                className="w-[470px] h-[90px] p-[28px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
               />
               {errors.tempSensor2Name && (
                 <p className="text-red-600 mt-1">
@@ -357,7 +360,7 @@ const NewSessionPage = () => {
               <input
                 {...register("tempSensor3Name")}
                 placeholder="Blue sensor name"
-                className="w-[470px] h-[90px] p-[38px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
+                className="w-[470px] h-[90px] p-[28px] rounded-[9px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]"
               />
               {errors.tempSensor3Name && (
                 <p className="text-red-600 mt-1">
@@ -367,13 +370,15 @@ const NewSessionPage = () => {
             </div>
           </form>
         </div>
-        <Button
-          variant={"gradient"}
-          type="submit"
-          className="col-span-1 row-span-1 w-full h-full text-4xl font-semibold rounded-[20px]"
-        >
-          Start new session!
-        </Button>
+        <form key={2} onSubmit={handleSubmit(handleFormSubmit)}>
+          <Button
+            variant={"gradient"}
+            type="submit"
+            className="col-span-1 row-span-1 w-full h-full text-4xl font-semibold rounded-[20px]"
+          >
+            Start new session!
+          </Button>
+        </form>
       </div>
     </div>
   );

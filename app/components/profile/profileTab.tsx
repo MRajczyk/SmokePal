@@ -26,7 +26,7 @@ const ProfileTab = ({ title, href }: { title: string; href: string }) => {
       <Link
         href={href}
         className={cn(
-          "flex text-[#F4EDE5] justify-between fill-[#F4EDE5]",
+          "flex justify-between fill-[#F4EDE5]",
           currentSubpath === title.toLowerCase() ? "fill-[#1E2122]" : ""
         )}
       >

@@ -55,7 +55,7 @@ const ImageCarouselItem = ({
           width={20}
           height={20}
           onClick={removeImage}
-          className="absolute top-[-4px] right-[-10px] cursor-pointer"
+          className="absolute top-[-6px] right-[-6px] cursor-pointer"
         />
       )}
     </div>
