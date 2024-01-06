@@ -7,10 +7,10 @@ import historyArrow from "@/public/assets/historyArrow.svg?url";
 
 const HistoryBanner = () => {
   return (
-    <div className="flex w-full h-full items-center justify-center bg-[#15191C] rounded-[20px] p-8">
+    <div className="flex w-full h-full items-center justify-center bg-[#15191C] rounded-[20px]">
       <Button
         asChild
-        className="flex items-center justify-center w-full h-full"
+        className="flex items-center justify-center w-full h-full p-8"
         variant={"ghost"}
       >
         <Link href="/history" className="flex text-[#F4EDE5]">

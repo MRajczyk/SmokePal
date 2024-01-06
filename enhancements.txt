@@ -1,2 +1,2 @@
 start stop aktywne, (jak ws zamkniety to dac info???)
-history barton nie jest caly klikalny
+edit tylko na swoich wyndzeniach
