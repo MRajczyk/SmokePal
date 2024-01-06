@@ -1,0 +1,4 @@
+favicon, 
+alert na rejestracji zmienic na moze texcik, 
+start stop aktywne, (jak ws zamkniety to dac info???)
+history barton nie jest caly klikalny
