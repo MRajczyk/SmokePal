@@ -983,7 +983,7 @@ export default function SessionPage({
                     >
                       <Button
                         variant={"default"}
-                        className="w-full h-full text-[#F4EDE5] bg-orange-400 text-2xl rounded-[20px] mt-4 p-0"
+                        className="w-full h-full text-[#F4EDE5] bg-orange-400 text-2xl rounded-[20px] p-0"
                         type="submit"
                       >
                         Save
