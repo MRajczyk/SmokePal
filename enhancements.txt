@@ -1,2 +1,0 @@
-start stop aktywne, (jak ws zamkniety to dac info???)
-edit tylko na swoich wyndzeniach

@@ -45,6 +45,7 @@ import { startSmokingSessionAction } from "@/app/actions/startSmokingSessionActi
 import { stopSmokingSessionAction } from "@/app/actions/stopSmokingSessionAction";
 import { StylesConfig } from "react-select";
 import SessionPill from "@/components/session/sessionPill";
+import { useSession } from "next-auth/react";
 
 //buffer is of type buffer but theres typing error as i cant get data property to be recognized by ts
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -72,6 +73,8 @@ export default function SessionPage({
 }: {
   params: { sessionId: number };
 }) {
+  const session = useSession();
+  const [liveDataStarted, setLiveDataStarted] = useState<boolean>(false);
   const [fetchingHistoricalData, setFetchingHistoricalData] =
     useState<boolean>(false);
   const [editing, setEditing] = useState<boolean>(false);
@@ -350,6 +353,33 @@ export default function SessionPage({
     }
   }, []);
 
+  useEffect(() => {
+    if (params.sessionId) {
+      getBackendStatus();
+    }
+  }, []);
+
+  function getBackendStatus() {
+    const fetch = createZodFetcher(fetcher);
+    fetch(
+      defaultResponseSchema,
+      process.env.NEXT_PUBLIC_BACKEND_URL + "/api/status",
+      {
+        method: "GET",
+      }
+    )
+      .then((res) => {
+        if (res.message === "active") {
+          setLiveDataStarted(true);
+        } else {
+          setLiveDataStarted(false);
+        }
+      })
+      .catch((err) => {
+        setLiveDataStarted(false);
+      });
+  }
+
   async function startSmokingSession() {
     startSmokingSessionAction(params.sessionId);
   }
@@ -360,6 +390,9 @@ export default function SessionPage({
     isSuccess: isSuccessStart,
   } = useMutation({
     mutationFn: startSmokingSession,
+    onSuccess: (msg) => {
+      setLiveDataStarted(true);
+    },
     onError: (error) => {
       if (error instanceof Error) {
         alert(error);
@@ -383,6 +416,9 @@ export default function SessionPage({
     isSuccess: isSuccessStop,
   } = useMutation({
     mutationFn: stopSmokingSession,
+    onSuccess: (msg) => {
+      setLiveDataStarted(false);
+    },
     onError: (error) => {
       if (error instanceof Error) {
         alert(error);
@@ -802,7 +838,7 @@ export default function SessionPage({
                 {editing ? (
                   <div className="flex flex-col gap-1 w-full">
                     <form
-                      key={2}
+                      key={1}
                       className="flex flex-col gap-1"
                       onSubmit={handleSubmit(debounceUpdateSmokingSession)}
                     >
@@ -892,24 +928,37 @@ export default function SessionPage({
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3 justify-start items-center w-full">
-                    {!editing && (
-                      <div className="flex flex-row w-[600px] gap-2 justify-center items-start text-[#F4EDE5]">
-                        <Button
-                          variant="default"
-                          onClick={() => {
-                            debounceStartSmokingSession();
-                          }}
-                          className="w-full h-[100px] p-0 text-2xl rounded-[20px] bg-[#F4EDE5] text-[#15191C]"
-                        >
-                          Start
-                        </Button>
-                        <Button
-                          onClick={() => debounceStopSmokingSession()}
-                          variant={"destructive"}
-                          className="w-full h-[100px] p-0 text-2xl rounded-[20px]"
-                        >
-                          Stop
-                        </Button>
+                    {connectionStatus === "Open" ? (
+                      !editing && (
+                        <div className="flex flex-row w-[600px] gap-2 justify-center items-start text-[#F4EDE5]">
+                          {!liveDataStarted && (
+                            <Button
+                              variant="default"
+                              onClick={() => {
+                                debounceStartSmokingSession();
+                              }}
+                              className="w-full h-[100px] p-0 text-2xl rounded-[20px] bg-[#F4EDE5] text-[#15191C]"
+                            >
+                              Start
+                            </Button>
+                          )}
+                          {liveDataStarted && (
+                            <Button
+                              onClick={() => debounceStopSmokingSession()}
+                              variant={"destructive"}
+                              className="w-full h-[100px] p-0 text-2xl rounded-[20px]"
+                            >
+                              Stop
+                            </Button>
+                          )}
+                        </div>
+                      )
+                    ) : (
+                      <div className="flex flex-row h-[100px] justify-center items-center flex-wrap gap-2 w-full p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]">
+                        <p className="self-start text-[#F4EDE5] self-center font-semibold">
+                          Connecting to WebSocket Server...
+                        </p>
+                        <Ring color="white" size={20} />
                       </div>
                     )}
                     <div className="flex w-full h-full gap-3 items-center flex-col justify-start">
@@ -920,7 +969,7 @@ export default function SessionPage({
                         <div className="flex flex-row flex-wrap gap-2 w-full p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]">
                           {sessionData?.products &&
                             sessionData?.products.map((product) => (
-                              <SessionPill value={product} />
+                              <SessionPill key={product} value={product} />
                             ))}
                         </div>
                       </div>
@@ -931,7 +980,7 @@ export default function SessionPage({
                         <div className="flex flex-row flex-wrap gap-2 w-full p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]">
                           {sessionData?.woods &&
                             sessionData?.woods.map((wood) => (
-                              <SessionPill value={wood} />
+                              <SessionPill key={wood} value={wood} />
                             ))}
                         </div>
                       </div>
@@ -966,15 +1015,17 @@ export default function SessionPage({
                       <Link href={"/history"}>Go back to history</Link>
                     </Button>
                   )}
-                  {!editing && (
-                    <Button
-                      variant={"destructive"}
-                      className="w-full h-[100px] p-0 text-2xl rounded-[20px]"
-                      onClick={enableEditingMode}
-                    >
-                      Edit
-                    </Button>
-                  )}
+                  {!editing &&
+                    sessionData &&
+                    sessionData.authorId === session.data?.user.id && (
+                      <Button
+                        variant={"destructive"}
+                        className="w-full h-[100px] p-0 text-2xl rounded-[20px]"
+                        onClick={enableEditingMode}
+                      >
+                        Edit
+                      </Button>
+                    )}
                   {editing && (
                     <form
                       key={3}
