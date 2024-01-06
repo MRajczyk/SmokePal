@@ -22,6 +22,7 @@ export async function updateSmokingSession(
   if (!parseResult.success) {
     return { success: false, message: "Invalid new session data" };
   }
+  const userFromSession = session.user;
 
   try {
     //first end all possible not-finished sessions
@@ -33,6 +34,10 @@ export async function updateSmokingSession(
 
     if (!sessionInstance) {
       return { success: false, message: "Invalid session Id" };
+    }
+
+    if (sessionInstance.authorId !== userFromSession.id) {
+      return { success: false, message: "Unauthorized" };
     }
 
     //TODO: in the future handle all of these in a single transaction maybe
