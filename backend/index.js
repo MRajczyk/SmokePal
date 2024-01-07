@@ -10,7 +10,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5000",
+    origin: ["http://localhost:5000", process.env.LOCAL_IP + ":5000"],
   })
 );
 const appPort = 3000;
@@ -44,6 +44,9 @@ mqttClient.on("connect", () => {
 
 mqttClient.on("message", async (topic, message) => {
   //TODO: decide whether that name fits and if it should be left that this flag controls not only saving to DB but also sending live data through WS
+  // I think I have to check how to avoid resend of last buffered input on client connection - what even causes it?
+  // OK - i know it has to do with subscribing on getting start msg - I should reconsider how it all works
+  // idea 1 - subscribe on startup, not on START endpoind call... idk why it's even done like that currently but whatever
   if (savingDataFlag) {
     const timestamp = moment().utc().format();
     const parsedMessage = JSON.parse(message);

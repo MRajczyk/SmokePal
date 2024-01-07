@@ -79,7 +79,7 @@ export default function SessionPage({
     useState<boolean>(false);
   const [editing, setEditing] = useState<boolean>(false);
 
-  const socketUrl = "ws://localhost:7071";
+  const socketUrl = "ws://" + process.env.NEXT_PUBLIC_HOST_IP + ":7071";
   const [sessionFinished, setSessionFinished] = useState(undefined);
   const [sessionData, setSessionData] = useState<SmokingSession | undefined>(
     undefined
