@@ -7,7 +7,6 @@ import debounce from "just-debounce-it";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SUBMIT_DEBOUNCE_MS } from "@/lib/utils";
-import { useMutation } from "react-query";
 import { createZodFetcher } from "zod-fetch";
 import { fetcher } from "@/lib/utils";
 import defaultResponseSchema from "@/schemas/defaultResponseSchema";
@@ -381,53 +380,31 @@ export default function SessionPage({
   }
 
   async function startSmokingSession() {
-    startSmokingSessionAction(params.sessionId);
+    const res = await startSmokingSessionAction(params.sessionId.toString());
+    if (res.success) {
+      setLiveDataStarted(true);
+    } else {
+      console.log(res.message);
+    }
   }
 
-  const {
-    mutate: mutateStart,
-    isLoading: isLoadingStart,
-    isSuccess: isSuccessStart,
-  } = useMutation({
-    mutationFn: startSmokingSession,
-    onSuccess: (msg) => {
-      setLiveDataStarted(true);
-    },
-    onError: (error) => {
-      if (error instanceof Error) {
-        alert(error);
-      }
-    },
-  });
-
   const debounceStartSmokingSession = debounce(
-    () => mutateStart(),
+    () => startSmokingSession(),
     SUBMIT_DEBOUNCE_MS,
     true
   );
 
   async function stopSmokingSession() {
-    stopSmokingSessionAction();
+    const res = await stopSmokingSessionAction(params.sessionId.toString());
+    if (res.success) {
+      setLiveDataStarted(false);
+    } else {
+      console.log(res.message);
+    }
   }
 
-  const {
-    mutate: mutateStop,
-    isLoading: isLoadingStop,
-    isSuccess: isSuccessStop,
-  } = useMutation({
-    mutationFn: stopSmokingSession,
-    onSuccess: (msg) => {
-      setLiveDataStarted(false);
-    },
-    onError: (error) => {
-      if (error instanceof Error) {
-        alert(error);
-      }
-    },
-  });
-
   const debounceStopSmokingSession = debounce(
-    () => mutateStop(),
+    () => stopSmokingSession(),
     SUBMIT_DEBOUNCE_MS,
     true
   );
@@ -928,39 +905,40 @@ export default function SessionPage({
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3 justify-start items-center w-full">
-                    {connectionStatus === "Open" ? (
-                      !editing && (
-                        <div className="flex flex-row w-[600px] gap-2 justify-center items-start text-[#F4EDE5]">
-                          {!liveDataStarted && (
-                            <Button
-                              variant="default"
-                              onClick={() => {
-                                debounceStartSmokingSession();
-                              }}
-                              className="w-full h-[100px] p-0 text-2xl rounded-[20px] bg-[#F4EDE5] text-[#15191C]"
-                            >
-                              Start
-                            </Button>
-                          )}
-                          {liveDataStarted && (
-                            <Button
-                              onClick={() => debounceStopSmokingSession()}
-                              variant={"destructive"}
-                              className="w-full h-[100px] p-0 text-2xl rounded-[20px]"
-                            >
-                              Stop
-                            </Button>
-                          )}
+                    {sessionData?.authorId === session.data?.user.id &&
+                      (connectionStatus === "Open" ? (
+                        !editing && (
+                          <div className="flex flex-row w-[600px] gap-2 justify-center items-start text-[#F4EDE5]">
+                            {!liveDataStarted && (
+                              <Button
+                                variant="default"
+                                onClick={() => {
+                                  debounceStartSmokingSession();
+                                }}
+                                className="w-full h-[100px] p-0 text-2xl rounded-[20px] bg-[#F4EDE5] text-[#15191C]"
+                              >
+                                Start
+                              </Button>
+                            )}
+                            {liveDataStarted && (
+                              <Button
+                                onClick={() => debounceStopSmokingSession()}
+                                variant={"destructive"}
+                                className="w-full h-[100px] p-0 text-2xl rounded-[20px]"
+                              >
+                                Stop
+                              </Button>
+                            )}
+                          </div>
+                        )
+                      ) : (
+                        <div className="flex flex-row h-[100px] justify-center items-center flex-wrap gap-2 w-full p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]">
+                          <p className="text-[#F4EDE5] self-center font-semibold">
+                            Connecting to WebSocket Server...
+                          </p>
+                          <Ring color="white" size={20} />
                         </div>
-                      )
-                    ) : (
-                      <div className="flex flex-row h-[100px] justify-center items-center flex-wrap gap-2 w-full p-[28px] resize-none rounded-[20px] placeholder:text-[#6C6B6A] bg-[#1E2122] text-[#F4EDE5]">
-                        <p className="self-start text-[#F4EDE5] self-center font-semibold">
-                          Connecting to WebSocket Server...
-                        </p>
-                        <Ring color="white" size={20} />
-                      </div>
-                    )}
+                      ))}
                     <div className="flex w-full h-full gap-3 items-center flex-col justify-start">
                       <div className="flex w-full gap-1 items-center flex-col justify-start">
                         <p className="self-start text-[#F4EDE5] font-semibold">

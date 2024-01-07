@@ -10,7 +10,10 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5000", process.env.LOCAL_IP + ":5000"],
+    origin: [
+      "http://localhost:5000",
+      "http://" + process.env.LOCAL_IP + ":5000",
+    ],
   })
 );
 const appPort = 3000;
@@ -155,6 +158,7 @@ app.post("/api/start", async (req, res) => {
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(404).send(
       JSON.stringify({
+        success: false,
         message: "Forbidden",
       })
     );
@@ -171,6 +175,7 @@ app.post("/api/start", async (req, res) => {
   } catch (e) {
     return res.status(404).send(
       JSON.stringify({
+        success: false,
         message: "Forbidden",
       })
     );
@@ -182,6 +187,7 @@ app.post("/api/start", async (req, res) => {
   ) {
     return res.status(404).send(
       JSON.stringify({
+        success: false,
         message: "Forbidden",
       })
     );
@@ -190,7 +196,12 @@ app.post("/api/start", async (req, res) => {
   console.log("starting to pass all incoming data through websockets");
   mqttClient.subscribe("esp8266_data", (err) => {
     if (err) {
-      return res.status(500);
+      return res.status(500).send(
+        JSON.stringify({
+          success: false,
+          message: "MQTT internal error",
+        })
+      );
     }
   });
 
@@ -200,6 +211,7 @@ app.post("/api/start", async (req, res) => {
 
   return res.status(200).send(
     JSON.stringify({
+      success: true,
       message: "Successfully subscribed to topic esp8266_data",
     })
   );
@@ -210,6 +222,7 @@ app.post("/api/stop", async (req, res) => {
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(404).send(
       JSON.stringify({
+        success: false,
         message: "Forbidden",
       })
     );
@@ -226,6 +239,7 @@ app.post("/api/stop", async (req, res) => {
   } catch (e) {
     return res.status(404).send(
       JSON.stringify({
+        success: false,
         message: "Forbidden",
       })
     );
@@ -241,6 +255,7 @@ app.post("/api/stop", async (req, res) => {
   mqttClient.unsubscribe("esp8266_data");
   return res.status(200).send(
     JSON.stringify({
+      success: true,
       message: "Unsubscribed to topic esp8266_data",
     })
   );

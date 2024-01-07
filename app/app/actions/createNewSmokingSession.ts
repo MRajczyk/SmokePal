@@ -24,6 +24,21 @@ export async function createNewSmokingSession(
   const userFromSession = session.user;
 
   try {
+    // const eventualActiveSession = await prisma.smokingSession.findFirst({
+    //   where: {
+    //     finished: false,
+    //   },
+    // });
+    // if (
+    //   eventualActiveSession &&
+    //   eventualActiveSession.authorId !== userFromSession.id
+    // ) {
+    //   return {
+    //     success: false,
+    //     message: "Another user's session is in progress",
+    //   };
+    // }
+
     //first end all possible not-finished sessions
     await prisma.smokingSession.updateMany({
       where: {

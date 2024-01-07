@@ -1,17 +1,35 @@
 "use server";
+import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/server/auth";
-import { createZodFetcher } from "zod-fetch";
-import defaultResponseSchema from "@/schemas/defaultResponseSchema";
-import { fetcher } from "@/lib/utils";
 import { getToken } from "next-auth/jwt";
 import { headers, cookies } from "next/headers";
 
-export async function startSmokingSessionAction(sessionId: number) {
+export async function startSmokingSessionAction(sessionId: string) {
   const session = await getServerSession(authOptions);
   if (!session) {
     // TODO: maybe redirect to login page?
-    return { success: false, message: "Unauthorized" };
+    return { success: false, data: "Unauthorized" };
+  }
+
+  try {
+    const sessionInstance = await prisma.smokingSession.findFirst({
+      where: {
+        id: Number.parseInt(sessionId),
+      },
+    });
+
+    if (!sessionInstance) {
+      return { success: false, data: "Invalid session Id" };
+    }
+
+    const userFromSession = session.user;
+    if (sessionInstance.authorId !== userFromSession.id) {
+      return { success: false, data: "Unauthorized" };
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    return { success: false, data: e.message };
   }
 
   const token = await getToken({
@@ -28,9 +46,7 @@ export async function startSmokingSessionAction(sessionId: number) {
   });
 
   try {
-    const fetch = createZodFetcher(fetcher);
-    return fetch(
-      defaultResponseSchema,
+    const res = await fetch(
       process.env.NEXT_PUBLIC_BACKEND_URL + "/api/start",
       {
         method: "POST",
@@ -44,7 +60,8 @@ export async function startSmokingSessionAction(sessionId: number) {
         },
       }
     );
+    return await res.json();
   } catch (e) {
-    return { success: false, message: "Could not fetch the data" };
+    return { success: false, data: "Could not start live monitoring" };
   }
 }

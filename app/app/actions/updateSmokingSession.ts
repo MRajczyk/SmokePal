@@ -25,7 +25,6 @@ export async function updateSmokingSession(
   const userFromSession = session.user;
 
   try {
-    //first end all possible not-finished sessions
     const sessionInstance = await prisma.smokingSession.findFirst({
       where: {
         id: parseResult.data.id,
