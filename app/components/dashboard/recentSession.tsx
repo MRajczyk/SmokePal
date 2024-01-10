@@ -166,7 +166,7 @@ const RecentSession = () => {
                 data={tempSensor2Readings}
                 type="monotone"
                 dataKey="value"
-                stroke="green"
+                stroke="#F4981D"
                 strokeWidth={2}
                 dot={false}
               />
