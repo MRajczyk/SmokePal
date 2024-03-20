@@ -46,5 +46,5 @@ Prod build:
   npm run build
   npm run start
 Dev mode:
-  npm run build
+  npm run dev
 ```
