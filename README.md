@@ -5,7 +5,7 @@ browse already finished ones.
 
 ## Usage
 To get the fullest of the app you will need to either port source code for your setup or utilize my source and microcontrollers schematics <br>
-Both are available at this [link](https://github.com/MRajczyk/arduino-tests)
+Both are available at this [link](https://github.com/MRajczyk/SmokePalMicrocontrollers)
 
 ## Overview
 This repo holds a fullstack Next.js app, a separate Express backend and also a docker compose file for Postgres DB configuration. <br>
