@@ -8,7 +8,7 @@ To get the fullest of the app you will need to either port source code for your 
 Both are available at this [link](https://github.com/MRajczyk/SmokePalMicrocontrollers)
 
 ## Overview
-This repo holds a fullstack Next.js app, a separate Express backend and also a docker compose file for Postgres DB configuration. <br>
+This repo contains a fullstack Next.js app, a separate Express backend and also a docker compose file for Postgres DB configuration. <br>
 Both subprojects have their own dependencies and have to be run separately explicitly, as I still did not include them in my compose file.
 
 ![image](https://github.com/MRajczyk/SmokePal/assets/103463343/6732ad61-f85d-4fbd-a4ce-0769148fc4a4)
